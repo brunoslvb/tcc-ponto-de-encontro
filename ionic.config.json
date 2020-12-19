@@ -1,0 +1,7 @@
+{
+  "name": "Ponto de Encontro",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
