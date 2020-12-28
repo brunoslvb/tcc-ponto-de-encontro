@@ -1,0 +1,26 @@
+ion-header {
+
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: 150px;
+  }
+}
+
+ion-content {
+  padding: 10px;
+  
+  img {
+    width: 100%;
+    align-items: flex-end;
+  }
+}
+
+ion-button {
+  overflow: hidden;
+  margin: 16px;
+  --background: #0D476B;
+  --border-radius: 10px;
+}
+
