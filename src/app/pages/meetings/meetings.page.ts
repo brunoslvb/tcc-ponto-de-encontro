@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 
 @Component({
   selector: 'app-meetings',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MeetingsPage implements OnInit {
 
-  constructor() { }
+  constructor(private modalController: ModalController) { }
 
   ngOnInit() {
+  }
+
+  async showModalMap(){
+    const modal = await this.modalController.create({
+      component: ModalMapComponent
+    });
+
+    await modal.present();
   }
 
 }

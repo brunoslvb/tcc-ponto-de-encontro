@@ -13,3 +13,62 @@ ion-icon {
   color: #ff5252;
 }
 
+ion-card {
+  border-radius: 15px;
+  --background: #FFF;
+
+  margin: 20px;
+
+  .card-container {
+
+    margin: 10px 20px;
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .title {
+        text-transform: uppercase;
+        color: #0d476b;
+      }
+    }
+
+    .body {
+
+      color: #000;
+
+      .title {
+        font-weight: 500;
+      }
+
+      .subtitle {
+        margin: 0px;
+        padding: 0px; 
+        font-weight: 200;
+      }
+
+      .flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+    }
+
+    hr {
+      height: 1px;
+      margin-top: 20px;
+      background-color: #dadada;
+    }
+
+    .footer{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ff6b6b;
+    }
+
+  }
+}
+
