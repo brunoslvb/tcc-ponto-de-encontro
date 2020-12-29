@@ -26,8 +26,30 @@
 @import "~@ionic/angular/css/flex-utils.css";
 
 * {
-  --ion-background-color: #d3d6e7; 
+  --ion-background-color: #d3d6e7;
+  font-family: Roboto;
 }
 
 /* Font ROBOTO */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+form {
+
+  ion-item, ion-button {
+    margin: 10px 20px 10px 20px;
+    --background: #FCFCFC;
+    --border-radius: 20px;
+
+    --highlight-height: 0px;
+
+    ion-input {
+      --border-radius: 0px 20px 20px 0px;
+    }
+  }
+
+  h3 {
+    text-align: center;
+    padding: 10px;
+    color: #0d476b;
+  }
+}

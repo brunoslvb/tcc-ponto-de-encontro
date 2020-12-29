@@ -1,0 +1,40 @@
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button [routerLink]="['/meetings']"><ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form [formGroup]="registerForm" (submit)="createMeeting()">
+
+    <h3>Encontro</h3>
+
+    <ion-item>
+      <ion-icon color="" name="chatbubbles-outline" slot="start"></ion-icon>
+      <ion-input type="text" placeholder="Nome do grupo" autofocus="true"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon color="" name="location-outline" slot="start"></ion-icon>
+      <ion-input type="text" formControlName="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon color="" name="calendar-outline" slot="start"></ion-icon>
+      <ion-input type="date" placeholder="Data do Encontro"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon color="" name="time-outline" slot="start"></ion-icon>
+      <ion-input type="time" placeholder="Horário do Encontro"></ion-input>
+    </ion-item>
+
+    <ion-button type="submit" expand="block" fill="solid" size="default">Criar Encontro</ion-button>
+    <!-- <ion-button type="submit" expand="block" color="black" fill="">Criar Encontro</ion-button> -->
+        
+  </form>
+
+</ion-content>

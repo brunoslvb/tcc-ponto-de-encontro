@@ -15,6 +15,10 @@ const routes: Routes = [
     path: 'meetings',
     loadChildren: () => import('./pages/meetings/meetings.module').then( m => m.MeetingsPageModule)
   },
+  {
+    path: 'meetings/create',
+    loadChildren: () => import('./pages/create-meeting/create-meeting.module').then( m => m.CreateMeetingPageModule)
+  },
 ];
 
 @NgModule({
