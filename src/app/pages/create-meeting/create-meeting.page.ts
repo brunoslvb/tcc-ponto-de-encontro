@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavController } from '@ionic/angular';
+import { MeetingsService } from 'src/app/services/meetings/meetings.service';
 
 @Component({
   selector: 'app-create-meeting',
@@ -14,11 +15,15 @@ export class CreateMeetingPage implements OnInit {
   constructor(
     private builder: FormBuilder,
     private nav: NavController,
+    private service: MeetingsService
   ) { }
 
   ngOnInit() {
     this.registerForm = this.builder.group({
-      address: ['']
+      name: ['', Validators.required],
+      address: ['', Validators.required],
+      date: ['', Validators.required],
+      time: ['', Validators.required],
     });
   }
 
@@ -26,8 +31,17 @@ export class CreateMeetingPage implements OnInit {
     console.log(this.registerForm.value.address);
   }
 
-  createMeeting(){
-    console.log("Create Meeting");
+  async createMeeting(){
+    console.log("Create Meeting: ", this.registerForm.value);
+
+    try {
+      await this.service.createMeeting("teste", this.registerForm.value);
+      console.info("Meeting created");
+    } catch (error) {
+      console.error(error);
+    }
+  
+  
   }
 
 }
