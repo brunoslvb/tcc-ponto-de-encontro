@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { IMeeting } from 'src/app/interfaces/meeting';
 
 @Component({
   selector: 'app-modal-map',
@@ -8,7 +9,12 @@ import { ModalController } from '@ionic/angular';
 })
 export class ModalMapComponent implements OnInit {
 
-  constructor(private modalController: ModalController) { }
+  // @Input() meeting: IMeeting;
+  @Input() name: string;
+
+  constructor(
+    private modalController: ModalController
+  ) { }
 
   ngOnInit() {}
 
