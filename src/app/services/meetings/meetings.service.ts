@@ -14,6 +14,10 @@ export class MeetingsService {
     return this.firestore.collection('groups').snapshotChanges();
   }
 
+  async getById(id: string){
+    return this.firestore.collection('groups').doc(id).get();
+  }
+
   async createMeeting(id, data){
     await this.firestore.collection('groups').doc().set(data);
   }
