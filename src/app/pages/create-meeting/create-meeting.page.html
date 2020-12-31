@@ -1,7 +1,9 @@
 <ion-header class="ion-no-border" mode="md">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button [routerLink]="['/meetings']"><ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon></ion-button>
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

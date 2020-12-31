@@ -40,8 +40,10 @@ export class CreateMeetingPage implements OnInit {
     } catch (error) {
       console.error(error);
     }
-  
-  
+  }
+
+  async back(){
+    await this.nav.back();
   }
 
 }

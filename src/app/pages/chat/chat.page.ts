@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { NavController } from '@ionic/angular';
 import { MeetingsService } from 'src/app/services/meetings/meetings.service';
 
 @Component({
@@ -13,6 +14,7 @@ export class ChatPage implements OnInit {
   name: string;
 
   constructor(
+    private nav: NavController,
     private route: ActivatedRoute,
     private service: MeetingsService,
   ) { }
@@ -35,9 +37,11 @@ export class ChatPage implements OnInit {
 
     } catch(error) {
       console.error(error);
-    }
+    } 
+  }
 
-    
+  async back(){
+    await this.nav.back();
   }
 
 }
