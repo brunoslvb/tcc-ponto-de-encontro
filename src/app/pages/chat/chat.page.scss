@@ -1,0 +1,77 @@
+form {
+
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  bottom: 0;
+
+  .items {
+    display: grid;
+    grid-template-columns: 95fr 5fr;
+    align-items: center;
+  }
+
+  ion-item {
+    margin: 10px;
+    width: 100%;
+    padding: 0px;
+  }
+
+  ion-icon {
+    color: #0d476b;
+    // color: #FFF;
+  }
+
+  ion-button {
+    // --background: transparent;
+    --border-radius: 40px;
+    margin-right: 10px;
+    height: 50px;
+  }
+}
+
+.message {
+  background: #FCFCFC;
+  margin: 10px;
+  padding: 10px;
+  white-space: pre-wrap;
+
+  span {
+    float: right;
+  }
+}
+
+.my-message {
+
+  border-radius: 20px 20px 0px 20px;
+
+  color:#FCFCFC;
+  background:#0d476b;
+
+  p, span {
+    color:#FCFCFC;
+  }
+
+}
+
+.other-message {
+  border-radius: 20px 20px 20px 0px;
+
+  p, span {
+    color: #535353;
+  }
+}
+
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+span {
+  font-size: 8pt;
+}
