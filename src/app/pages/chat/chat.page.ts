@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { MeetingsService } from 'src/app/services/meetings/meetings.service';
+import { MeetingService } from 'src/app/services/meeting/meeting.service';
 
 @Component({
   selector: 'app-chat',
@@ -16,7 +16,7 @@ export class ChatPage implements OnInit {
   constructor(
     private nav: NavController,
     private route: ActivatedRoute,
-    private service: MeetingsService,
+    private service: MeetingService,
   ) { }
 
   ngOnInit() {
@@ -27,13 +27,14 @@ export class ChatPage implements OnInit {
     const id = this.route.snapshot.paramMap.get("id");
 
     try{
-      const response = await this.service.getById(id);
+      this.service.getById(id).subscribe(async response => {
 
-      await response.forEach(doc => {
-        this.meeting = doc.data(); 
+        this.meeting = response.payload.data(); 
+  
+        this.name = this.meeting.name;
+
       });
 
-      this.name = this.meeting.name;
 
     } catch(error) {
       console.error(error);
