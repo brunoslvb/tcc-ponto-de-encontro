@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 import { IMeeting } from 'src/app/interfaces/meeting';
-import { MeetingsService } from 'src/app/services/meetings/meetings.service';
+import { MeetingService } from 'src/app/services/meeting/meeting.service';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-meetings',
@@ -15,11 +16,12 @@ export class MeetingsPage implements OnInit {
 
   constructor(
     private modalController: ModalController,
-    private service: MeetingsService
+    private meetingService: MeetingService,
+    private userService: UserService,
   ) { }
 
   ngOnInit() {
-    this.getAllMeetings();
+    this.getMeetingsOfUser();
   }
 
   async showModalMap(meeting: IMeeting){
@@ -31,24 +33,23 @@ export class MeetingsPage implements OnInit {
     await modal.present();
   }
 
-  async getAllMeetings(){
-
-    (await this.service.getAllMeetings()).subscribe(data => {
-      
-      this.meetings = data.map(e => {
-      
-        return {
-          id: e.payload.doc.id,
-          name: e.payload.doc.data()['name'],
-          address: e.payload.doc.data()['address'],
-          date: e.payload.doc.data()['date'],
-          time: e.payload.doc.data()['time'],
-        };
-      
-      });
-      
-      console.log(this.meetings);
+  async getMeetingsOfUser(){
     
+    this.userService.getById(sessionStorage.getItem('user')).subscribe((user: any) => {
+
+      let meetingsAux = [];
+
+      user.payload.data().groups.forEach(group => {
+        this.meetingService.getById(group).subscribe(doc => {
+          let data: any = doc.payload.data();
+
+          data.id = doc.payload.id;
+
+          meetingsAux.push(data);
+        });
+      });
+
+      this.meetings = meetingsAux;
     });
   }
 
