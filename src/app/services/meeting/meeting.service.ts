@@ -4,21 +4,21 @@ import { AngularFirestore } from '@angular/fire/firestore';
 @Injectable({
   providedIn: 'root'
 })
-export class MeetingsService {
+export class MeetingService {
 
   constructor(
     private firestore: AngularFirestore
   ) { }
 
-  async getAllMeetings(){
+  getAllMeetings(){
     return this.firestore.collection('groups').snapshotChanges();
   }
 
-  async getById(id: string){
-    return this.firestore.collection('groups').doc(id).get();
+  getById(id: string){
+    return this.firestore.collection('groups').doc(id).snapshotChanges();
   }
 
-  async createMeeting(id, data){
-    await this.firestore.collection('groups').doc().set(data);
+  createMeeting(data){
+    return this.firestore.collection('groups').add(data);
   }
 }
