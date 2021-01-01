@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavController } from '@ionic/angular';
-import { MeetingsService } from 'src/app/services/meetings/meetings.service';
+import { MeetingService } from 'src/app/services/meeting/meeting.service';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-create-meeting',
@@ -15,7 +16,8 @@ export class CreateMeetingPage implements OnInit {
   constructor(
     private builder: FormBuilder,
     private nav: NavController,
-    private service: MeetingsService
+    private meetingService: MeetingService,
+    private userService: UserService
   ) { }
 
   ngOnInit() {
@@ -32,11 +34,33 @@ export class CreateMeetingPage implements OnInit {
   }
 
   async createMeeting(){
-    console.log("Create Meeting: ", this.registerForm.value);
+
+    const data = {
+      owner: sessionStorage.getItem('user'),
+      name: this.registerForm.value.name,
+      date: this.registerForm.value.date,
+      time: this.registerForm.value.time,
+      location: {
+        address: this.registerForm.value.address,
+        latitude: -9991021300,
+        longitude: -1123439974
+      },
+      members: [
+        sessionStorage.getItem('user'),
+        sessionStorage.getItem('userAux'),
+      ],
+      numberOfmembers: 2
+    }
 
     try {
-      await this.service.createMeeting("teste", this.registerForm.value);
-      console.info("Meeting created");
+      const { id } = await this.meetingService.createMeeting(data);
+
+      console.info("Meeting created:", id);
+
+      await data.members.forEach(async member => {
+        await this.userService.addGroupToUser(member, id);
+      });
+
     } catch (error) {
       console.error(error);
     }
