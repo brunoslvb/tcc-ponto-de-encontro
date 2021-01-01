@@ -5,7 +5,7 @@
     </ion-title>
     <ion-buttons slot="end">
       <ion-button [routerLink]="['/meetings/create']">
-        <ion-icon slot="icon-only" size="large" name="add-circle"></ion-icon>
+        <ion-icon slot="icon-only" size="large" name="add-circle-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -26,7 +26,7 @@
         <div class="body">
     
           <h3 class="title">Ponto Final</h3>
-          <h4 class="subtitle">{{meeting.address}}</h4>
+          <h4 class="subtitle">{{meeting.location.address}}</h4>
     
           <div class="flex">
             <div>
