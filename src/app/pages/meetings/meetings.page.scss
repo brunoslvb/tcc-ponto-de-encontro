@@ -6,6 +6,7 @@
 
 ion-title {
   color: #0d476b;
+  font-size: 12pt;
   font-weight: 500;
 }
 
@@ -29,20 +30,27 @@ ion-card {
       justify-content: space-between;
 
       .title {
+        font-size: 12pt;
         text-transform: uppercase;
         color: #0d476b;
+        margin: 0;
       }
     }
 
     .body {
 
+      outline: 0;
       color: #000;
+      margin-top: -5px;
 
       .title {
         font-weight: 500;
+        font-size: 10pt;
+        text-transform: uppercase;
       }
 
       .subtitle {
+        font-size: 10pt;
         margin: 0px;
         padding: 0px; 
         font-weight: 200;
