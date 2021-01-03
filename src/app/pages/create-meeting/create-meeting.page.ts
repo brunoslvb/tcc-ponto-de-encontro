@@ -4,6 +4,8 @@ import { NavController } from '@ionic/angular';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
 
+declare var google;
+
 @Component({
   selector: 'app-create-meeting',
   templateUrl: './create-meeting.page.html',
@@ -12,6 +14,11 @@ import { UserService } from 'src/app/services/user/user.service';
 export class CreateMeetingPage implements OnInit {
 
   registerForm: FormGroup;
+  addresses: Array<Object> = [];
+  coords: Array<Number>;
+
+  private googleMapsPlaces = new google.maps.places.AutocompleteService();
+  private googleMapsGeocoder = new google.maps.Geocoder();
 
   constructor(
     private builder: FormBuilder,
@@ -29,8 +36,28 @@ export class CreateMeetingPage implements OnInit {
     });
   }
 
-  searchAddress(){
-    console.log(this.registerForm.value.address);
+  async searchAddress(){
+    if(!this.registerForm.value.address.trim().length) return; 
+
+    this.googleMapsPlaces.getPlacePredictions({ input: this.registerForm.value.address }, predictions => {
+      this.addresses = [];
+      this.addresses = predictions;
+    });
+  }
+
+  async searchSelected(address: string) {
+    
+    (<HTMLInputElement>document.getElementById('address')).value = address;
+
+    this.registerForm.value.address = address;
+
+    this.addresses = [];
+
+    await this.googleMapsGeocoder.geocode({
+      address
+    }, (data) => {
+      this.coords = [data[0].geometry.location.lat(), data[0].geometry.location.lng()];
+    });
   }
 
   async createMeeting(){
@@ -42,8 +69,8 @@ export class CreateMeetingPage implements OnInit {
       time: this.registerForm.value.time,
       location: {
         address: this.registerForm.value.address,
-        latitude: -9991021300,
-        longitude: -1123439974
+        latitude: this.coords[0],
+        longitude: this.coords[1]
       },
       members: [
         sessionStorage.getItem('user'),
