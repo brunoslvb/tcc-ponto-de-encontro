@@ -4,3 +4,32 @@ ion-button {
   --background: #0D476B;
   --border-radius: 10px;
 }
+
+form {
+  .list {
+    position: absolute;
+    font-weight: 200;
+    z-index: 100;
+    width: 80%;
+    margin: -10px 20px 0px 20px;
+    border-radius: 20px 20px 5px 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #FCFCFC;
+    color: #000;
+  
+    .item {
+      font-size: 10pt;
+      font-weight: 400;
+      margin: 0px;
+      cursor: pointer;
+      
+      span {
+        display: block;
+        color: #535353;
+        // float: right;
+      }
+    }
+
+  }
+}

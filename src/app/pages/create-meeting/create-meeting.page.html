@@ -21,8 +21,14 @@
 
     <ion-item>
       <ion-icon color="" name="location-outline" slot="start"></ion-icon>
-      <ion-input type="text" formControlName="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
+      <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
     </ion-item>
+
+    <div class="list">
+      <ion-item button class="item" *ngFor="let address of addresses" (click)="searchSelected(address.description)">
+        {{address.description}}
+      </ion-item>
+    </div>
 
     <ion-item>
       <ion-icon color="" name="calendar-outline" slot="start"></ion-icon>
