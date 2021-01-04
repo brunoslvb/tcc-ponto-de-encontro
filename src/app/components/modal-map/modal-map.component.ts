@@ -1,21 +1,34 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, Platform } from '@ionic/angular';
-import { IMeeting } from 'src/app/interfaces/meeting';
-import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, CameraPosition, MarkerOptions, Marker, Environment } from '@ionic-native/google-maps';
+import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, Marker, Environment, GoogleMapsAnimation, ILatLng } from '@ionic-native/google-maps';
+
+declare var google;
 
 @Component({
   selector: 'app-modal-map',
   templateUrl: './modal-map.component.html',
   styleUrls: ['./modal-map.component.scss'],
 })
+
 export class ModalMapComponent implements OnInit {
 
-  @ViewChild('map') mapElement: any; 
+  @ViewChild("map") mapElement: any;
 
+  @Input() id: string;
   @Input() name: string;
+  @Input() address: string;
+  @Input() date: string;
+  @Input() time: string;
+  @Input() latitude: number;
+  @Input() longitude: number;
+  @Input() members: Array<string>;
+  @Input() numberOfMembers: number;
+
+  private colorMarker: string = "#0d476b";
 
   private loading: any;
   private map: GoogleMap;
+  private googleMapsDirections = new google.maps.DirectionsService()
 
   constructor(
     private modalController: ModalController,
@@ -24,11 +37,14 @@ export class ModalMapComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
-    this.mapElement.style.width = `${this.platform.width}px`;
-    this.mapElement.style.height = `${this.platform.height}px`;
-
     this.loadMap();
+  }
+
+  ngAfterViewInit() {
+    this.mapElement = this.mapElement.nativeElement;
+
+    this.mapElement.style.width = `${this.platform.width()}px`;
+    this.mapElement.style.height = `${this.platform.height()}px`;
   }
 
   async closeModalMap(){
@@ -37,7 +53,9 @@ export class ModalMapComponent implements OnInit {
 
   async loadMap() {
 
-    this.loading = await this.loadingController.create({ message: "Aguarde..." });
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
     await this.loading.present();
 
     // This code is necessary for browser
@@ -46,31 +64,69 @@ export class ModalMapComponent implements OnInit {
       'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ'
     });
 
-    // let mapOptions: GoogleMapOptions = {
-    //   camera: {
-    //      target: {
-    //        lat: 43.0741904,
-    //        lng: -89.3809802
-    //      },
-    //      zoom: 18,
-    //      tilt: 30
-    //    }
-    // };
+    let mapOptions: GoogleMapOptions = {
+      controls: {
+        zoom: false
+      }
+    };
 
-    this.map = GoogleMaps.create(this.mapElement);
+    this.map = GoogleMaps.create(this.mapElement, mapOptions);
 
-    // let marker: Marker = this.map.addMarkerSync({
-    //   title: 'Ionic',
-    //   icon: 'blue',
-    //   animation: 'DROP',
-    //   position: {
-    //     lat: 43.0741904,
-    //     lng: -89.3809802
-    //   }
-    // });
-    // marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
-    //   alert('clicked');
-    // });
+    try{
+      await this.map.one(GoogleMapsEvent.MAP_READY);
+
+      const origin: Marker = this.map.addMarkerSync({
+        title: "Teste",
+        icon: this.colorMarker,
+        animation: GoogleMapsAnimation.BOUNCE,
+        position: {
+          lat: -23.4630129,
+          lng: -46.5326677,
+        }
+      });
+
+      const destination: Marker = this.map.addMarkerSync({
+        title: this.address,
+        icon: this.colorMarker,
+        animation: GoogleMapsAnimation.BOUNCE,
+        position: {
+          lat: this.latitude,
+          lng: this.longitude,
+        }
+      });
+
+      const points = new Array<ILatLng>();
+
+      await this.googleMapsDirections.route({
+        origin: origin.getPosition(),
+        destination: destination.getPosition(),
+        travelMode: 'DRIVING'
+      }, async response => {
+        
+        response.routes[0].overview_path.forEach(path => {
+          points.push({
+            lat: path.lat(),
+            lng: path.lng()
+          });
+        });
+
+        await this.map.addPolyline({
+          points: points,
+          color: this.colorMarker,
+          width: 3
+        });
+  
+        this.map.moveCamera({
+          target: points
+        });
+      });
+
+      
+    } catch(error) {
+      console.log(error);
+    } finally {
+      this.loading.dismiss();
+    }
   }
 
 }

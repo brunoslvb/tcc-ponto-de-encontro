@@ -28,7 +28,17 @@ export class MeetingsPage implements OnInit {
   async showModalMap(meeting: IMeeting){
     const modal = await this.modalController.create({
       component: ModalMapComponent,
-      componentProps: { name: meeting.name }
+      componentProps: { 
+        id: meeting.id,
+        name: meeting.name,
+        date: meeting.date,
+        time: meeting.time,
+        address: meeting.location.address,
+        latitude: meeting.location.latitude,
+        longitude: meeting.location.longitude,
+        members: meeting.members,
+        numberOfMembers: meeting.numberOfMembers
+      }
     });
 
     await modal.present();
