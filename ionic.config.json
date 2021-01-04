@@ -1,7 +1,10 @@
 {
   "name": "Ponto de Encontro",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {
+      "enabled": false
+    },
+    "cordova": {}
   },
   "type": "angular"
 }
