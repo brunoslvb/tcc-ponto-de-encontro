@@ -9,5 +9,5 @@ export interface IMeeting {
   date: string;
   time: string;
   members: Array<string>;
-  numberOfmembers: number;
+  numberOfMembers: number;
 }
