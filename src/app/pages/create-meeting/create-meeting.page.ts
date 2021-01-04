@@ -14,7 +14,9 @@ declare var google;
 export class CreateMeetingPage implements OnInit {
 
   registerForm: FormGroup;
-  addresses: Array<Object> = [];
+  addresses: Array<{
+    description: string;
+  }> = [];
   coords: Array<Number>;
 
   private googleMapsPlaces = new google.maps.places.AutocompleteService();
@@ -62,6 +64,11 @@ export class CreateMeetingPage implements OnInit {
 
   async createMeeting(){
 
+    const members: Array<string> = [
+      sessionStorage.getItem('user'),
+      sessionStorage.getItem('userAux'),
+    ]
+
     const data = {
       owner: sessionStorage.getItem('user'),
       name: this.registerForm.value.name,
@@ -72,11 +79,8 @@ export class CreateMeetingPage implements OnInit {
         latitude: this.coords[0],
         longitude: this.coords[1]
       },
-      members: [
-        sessionStorage.getItem('user'),
-        sessionStorage.getItem('userAux'),
-      ],
-      numberOfmembers: 2
+      members,
+      numberOfMembers: members.length
     }
 
     try {
