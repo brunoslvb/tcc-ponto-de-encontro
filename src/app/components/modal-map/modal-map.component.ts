@@ -28,7 +28,10 @@ export class ModalMapComponent implements OnInit {
 
   private loading: any;
   private map: GoogleMap;
-  private googleMapsDirections = new google.maps.DirectionsService()
+  private googleMapsDirections = new google.maps.DirectionsService();
+  private origin: Marker;
+  private destination: Marker;
+  private travelMode: string = "DRIVING";
 
   constructor(
     private modalController: ModalController,
@@ -44,7 +47,7 @@ export class ModalMapComponent implements OnInit {
     this.mapElement = this.mapElement.nativeElement;
 
     this.mapElement.style.width = `${this.platform.width()}px`;
-    this.mapElement.style.height = `${this.platform.height()}px`;
+    this.mapElement.style.height = `${this.platform.height() - 200}px`;
   }
 
   async closeModalMap(){
@@ -75,7 +78,7 @@ export class ModalMapComponent implements OnInit {
     try{
       await this.map.one(GoogleMapsEvent.MAP_READY);
 
-      const origin: Marker = this.map.addMarkerSync({
+      this.origin = this.map.addMarkerSync({
         title: "Teste",
         icon: this.colorMarker,
         animation: GoogleMapsAnimation.BOUNCE,
@@ -85,7 +88,7 @@ export class ModalMapComponent implements OnInit {
         }
       });
 
-      const destination: Marker = this.map.addMarkerSync({
+      this.destination = this.map.addMarkerSync({
         title: this.address,
         icon: this.colorMarker,
         animation: GoogleMapsAnimation.BOUNCE,
@@ -95,38 +98,45 @@ export class ModalMapComponent implements OnInit {
         }
       });
 
-      const points = new Array<ILatLng>();
-
-      await this.googleMapsDirections.route({
-        origin: origin.getPosition(),
-        destination: destination.getPosition(),
-        travelMode: 'DRIVING'
-      }, async response => {
-        
-        response.routes[0].overview_path.forEach(path => {
-          points.push({
-            lat: path.lat(),
-            lng: path.lng()
-          });
-        });
-
-        await this.map.addPolyline({
-          points: points,
-          color: this.colorMarker,
-          width: 3
-        });
-  
-        this.map.moveCamera({
-          target: points
-        });
-      });
-
+      await this.calcRoute();
       
     } catch(error) {
       console.log(error);
     } finally {
       this.loading.dismiss();
     }
+  }
+
+  // async segmentChanged(event: any) {
+  //   this.travelMode = event.detail.value;
+  // }
+
+  async calcRoute() {
+    const points = new Array<ILatLng>();
+
+    await this.googleMapsDirections.route({
+      origin: this.origin.getPosition(),
+      destination: this.destination.getPosition(),
+      travelMode: this.travelMode
+    }, async response => {
+      
+      response.routes[0].overview_path.forEach(path => {
+        points.push({
+          lat: path.lat(),
+          lng: path.lng()
+        });
+      });
+
+      await this.map.addPolyline({
+        points: points,
+        color: this.colorMarker,
+        width: 3
+      });
+
+      this.map.moveCamera({
+        target: points
+      });
+    });
   }
 
 }
