@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 
 @Component({
@@ -10,8 +11,19 @@ import { MeetingService } from 'src/app/services/meeting/meeting.service';
 })
 export class ChatPage implements OnInit {
 
-  meeting: any;
-  name: string;
+  meeting: IMeeting = {
+    id: "",
+    name: "",
+    location: {
+      address: "",
+      latitude: 0,
+      longitude: 0,
+    },
+    date: "",
+    time: "",
+    members: [],
+    numberOfMembers: 0,
+  };
 
   constructor(
     private nav: NavController,
@@ -27,11 +39,24 @@ export class ChatPage implements OnInit {
     const id = this.route.snapshot.paramMap.get("id");
 
     try{
-      this.service.getById(id).subscribe(async response => {
+      
+      await this.service.getById(id).subscribe(async response => {
 
-        this.meeting = response.payload.data(); 
+        const data: any = response.payload.data(); 
   
-        this.name = this.meeting.name;
+        this.meeting = {
+          id: response.payload.id,
+          name: data.name,
+          location: {
+            address: data.location.address,
+            latitude: data.location.latitude,
+            longitude: data.location.longitude,
+          },
+          date: data.date,
+          time: data.time,
+          members: data.members,
+          numberOfMembers: data.numberOfMembers,
+        }        
 
       });
 

@@ -1,7 +1,7 @@
 <ion-header class="" mode="md">
   <ion-toolbar>
-    <h6 class="">{{name}}</h6>
-    <span>5 participantes</span>
+    <h6 class="">{{meeting.name}}</h6>
+    <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers != 1 ? "participantes" : "participante" }}</span>
     <ion-buttons slot="start">
       <ion-button (click)="back()">
         <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
