@@ -1,10 +1,17 @@
 <ion-header class="" mode="md">
   <ion-toolbar>
-    <h6 class="">{{meeting.name}}</h6>
-    <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers != 1 ? "participantes" : "participante" }}</span>
+    <div class="header-text" routerLink="/">
+      <h6 class="">{{meeting.name}}</h6>
+      <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers != 1 ? "participantes" : "participante" }}</span>
+    </div>
     <ion-buttons slot="start">
       <ion-button (click)="back()">
         <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="showPopover($event)">
+        <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
