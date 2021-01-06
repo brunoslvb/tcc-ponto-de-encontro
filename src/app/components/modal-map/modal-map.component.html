@@ -1,18 +1,43 @@
-<ion-header class="" mode="md">
+<div #map class="text-black"></div>
+
+<ion-fab class="back" vertical="top" horizontal="start" slot="fixed">
+  <ion-fab-button (click)="closeModalMap()">
+    <ion-icon name="arrow-back"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-segment mode="ios" scrollable value="DRIVING">
+  <ion-segment-button value="DRIVING">
+    <ion-icon name="car-sharp"></ion-icon>
+  </ion-segment-button>
+  <ion-segment-button value="WALKING">
+    <ion-icon name="walk-sharp"></ion-icon>
+  </ion-segment-button>
+</ion-segment>
+
+<ion-footer>
   <ion-toolbar>
-    <ion-title class="ion-text-center">
-      {{name}}
-    </ion-title>
-    <ion-buttons slot="start">
-      <ion-button (click)="closeModalMap()">
-        <ion-icon slot="icon-only" size="large" name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <div class="list">
+      <ion-item button class="item">
+        <p>Bruno <span>está a 8 minutos de distância</span></p>
+      </ion-item>
+      <ion-item button class="item">
+        <p>Bárbara <span>está a 9 minutos de distância</span></p>
+      </ion-item>
+      <ion-item button class="item">
+        <p>Lucas <span>está a 11 minutos de distância</span></p>
+      </ion-item>
+      <ion-item button class="item">
+        <p>Guilherme <span>está a 15 minutos de distância</span></p>
+      </ion-item>
+      <ion-item button class="item">
+        <p>João <span>está a 19 minutos de distância</span></p>
+      </ion-item>
+      <ion-item button class="item">
+        <p>Romildo <span>está a 23 minutos de distância</span></p>
+      </ion-item>
+    </div>
   </ion-toolbar>
-</ion-header>
+</ion-footer>
 
-<ion-content>
-  <div #map>
 
-  </div>
-</ion-content>
