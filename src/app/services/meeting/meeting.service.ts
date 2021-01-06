@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +21,13 @@ export class MeetingService {
 
   createMeeting(data){
     return this.firestore.collection('groups').add(data);
+  }
+
+  removeUserFromMeeting(meetingId, userId){
+    return this.firestore.collection('groups').doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayRemove(userId) });
+  }
+
+  decrementNumberofMembersFromMeeting(meetingId) {
+    return this.firestore.collection('groups').doc(meetingId).update({ numberOfMembers: firebase.firestore.FieldValue.increment(-1) })
   }
 }

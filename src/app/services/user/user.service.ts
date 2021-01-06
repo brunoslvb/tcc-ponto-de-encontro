@@ -18,4 +18,8 @@ export class UserService {
   getById(user){
     return this.firestore.collection('users').doc(user).snapshotChanges();
   }
+
+  removeMeetingFromUser(userId, meetingId){
+    return this.firestore.collection('users').doc(userId).update({ groups: firebase.firestore.FieldValue.arrayRemove(meetingId) });
+  }
 }
