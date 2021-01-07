@@ -1,5 +1,7 @@
-ion-list *{
+ion-list { 
+  padding: 0;
 
-  --background: #FFF;
-
+  *{
+    --background: #FFF;
+  }
 }

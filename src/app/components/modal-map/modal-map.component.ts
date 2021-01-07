@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, Platform } from '@ionic/angular';
 import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, Marker, Environment, GoogleMapsAnimation, ILatLng } from '@ionic-native/google-maps';
+import { IMeeting } from 'src/app/interfaces/meeting';
 
 declare var google;
 
@@ -14,15 +15,7 @@ export class ModalMapComponent implements OnInit {
 
   @ViewChild("map") mapElement: any;
 
-  @Input() id: string;
-  @Input() name: string;
-  @Input() address: string;
-  @Input() date: string;
-  @Input() time: string;
-  @Input() latitude: number;
-  @Input() longitude: number;
-  @Input() members: Array<string>;
-  @Input() numberOfMembers: number;
+  meeting: IMeeting;
 
   private colorMarker: string = "#0d476b";
 
@@ -89,12 +82,12 @@ export class ModalMapComponent implements OnInit {
       });
 
       this.destination = this.map.addMarkerSync({
-        title: this.address,
+        title: this.meeting.location.address,
         icon: this.colorMarker,
         animation: GoogleMapsAnimation.BOUNCE,
         position: {
-          lat: this.latitude,
-          lng: this.longitude,
+          lat: this.meeting.location.latitude,
+          lng: this.meeting.location.longitude,
         }
       });
 
@@ -106,10 +99,6 @@ export class ModalMapComponent implements OnInit {
       this.loading.dismiss();
     }
   }
-
-  // async segmentChanged(event: any) {
-  //   this.travelMode = event.detail.value;
-  // }
 
   async calcRoute() {
     const points = new Array<ILatLng>();
