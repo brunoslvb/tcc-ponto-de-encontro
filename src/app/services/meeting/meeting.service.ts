@@ -27,7 +27,13 @@ export class MeetingService {
     return this.firestore.collection('groups').doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayRemove(userId) });
   }
 
-  decrementNumberofMembersFromMeeting(meetingId) {
+  recalcNumberOfMembersFromMeeting(meetingId) {
+
+    /**
+     * FIXME: É necessário recuperar as informações do encontro (grupo) e 
+     * contar quantos membros estão cadastrados no grupo
+     */
+
     return this.firestore.collection('groups').doc(meetingId).update({ numberOfMembers: firebase.firestore.FieldValue.increment(-1) })
   }
 }

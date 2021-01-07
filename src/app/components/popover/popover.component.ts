@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { LoadingController, NavController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
@@ -12,29 +12,39 @@ import { UserService } from 'src/app/services/user/user.service';
 export class PopoverComponent implements OnInit {
 
   meeting: IMeeting;
+  private loading: any;
 
   constructor(
     private meetingService: MeetingService,
     private userService: UserService,
-    private nav: NavController
+    private nav: NavController,
+    private loadingController: LoadingController
   ) { }
 
   ngOnInit() {}
 
   async leaveMeeting(){
 
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+    await this.loading.present();
+
     try{
       await this.meetingService.removeUserFromMeeting(this.meeting.id, sessionStorage.getItem('user'));
 
-      await this.meetingService.decrementNumberofMembersFromMeeting(this.meeting.id);
+      await this.meetingService.recalcNumberOfMembersFromMeeting(this.meeting.id);
 
       await this.userService.removeMeetingFromUser(sessionStorage.getItem('user'), this.meeting.id);
 
       await this.nav.navigateForward('/meetings', {
         replaceUrl: true
       });
+
     } catch(err) {
       console.error(err);
+    } finally {
+      await this.loading.dismiss();
     }
 
   }

@@ -4,6 +4,7 @@ import { NavController, PopoverController } from '@ionic/angular';
 import { PopoverComponent } from 'src/app/components/popover/popover.component';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-chat',
@@ -31,7 +32,8 @@ export class ChatPage implements OnInit {
   constructor(
     private nav: NavController,
     private route: ActivatedRoute,
-    private service: MeetingService,
+    private meetingService: MeetingService,
+    private userService: UserService,
     private popoverController: PopoverController
   ) { }
 
@@ -39,31 +41,24 @@ export class ChatPage implements OnInit {
     this.loadDataFromMeeting();
   }
 
+  ionViewWillLeave(){
+    this.dismissPopover();
+  }
+
   async loadDataFromMeeting(){
     const id = this.route.snapshot.paramMap.get("id");
 
     try{
       
-      await this.service.getById(id).subscribe(async response => {
+      await this.meetingService.getById(id).subscribe(async response => {
 
         const data: any = response.payload.data(); 
-  
-        this.meeting = {
-          id: response.payload.id,
-          name: data.name,
-          location: {
-            address: data.location.address,
-            latitude: data.location.latitude,
-            longitude: data.location.longitude,
-          },
-          date: data.date,
-          time: data.time,
-          members: data.members,
-          numberOfMembers: data.numberOfMembers,
-        }        
+        
+        this.meeting = data;
+        
+        this.meeting.id = response.payload.id;
 
       });
-
 
     } catch(error) {
       console.error(error);
