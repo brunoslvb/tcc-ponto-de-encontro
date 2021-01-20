@@ -1,9 +1,6 @@
 {
-  "name": "Ponto de Encontro",
+  "name": "ShareYourRole",
   "integrations": {
-    "capacitor": {
-      "enabled": false
-    },
     "cordova": {}
   },
   "type": "angular"

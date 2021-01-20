@@ -26,7 +26,7 @@ export class CreateMeetingPage implements OnInit {
     private builder: FormBuilder,
     private nav: NavController,
     private meetingService: MeetingService,
-    private userService: UserService
+    private userService: UserService,
   ) { }
 
   ngOnInit() {
@@ -39,10 +39,12 @@ export class CreateMeetingPage implements OnInit {
   }
 
   async searchAddress(){
+
     if(!this.registerForm.value.address.trim().length) return; 
 
+    console.log("Função searchAddress()");
+
     this.googleMapsPlaces.getPlacePredictions({ input: this.registerForm.value.address }, predictions => {
-      this.addresses = [];
       this.addresses = predictions;
     });
   }
@@ -55,10 +57,16 @@ export class CreateMeetingPage implements OnInit {
 
     this.addresses = [];
 
+    console.log("Fora");
+
     await this.googleMapsGeocoder.geocode({
       address
     }, (data) => {
+
+      console.log("Dentro");
+      
       this.coords = [data[0].geometry.location.lat(), data[0].geometry.location.lng()];
+    
     });
   }
 

@@ -1,11 +1,16 @@
-<ion-header class="ion-no-border ion-padding">
-  <img src="../../assets/logo.png" alt="">
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>  
+    <img src="../../assets/logo.png" alt="">
+  </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
 
   <ion-button expand="block" fill="solid" size="default" [routerLink]="['/meetings']">Login</ion-button>
-  <ion-button expand="block" fill="solid" size="default">Cadastrar</ion-button>
+  <ion-button expand="block" fill="solid" size="default" [routerLink]="['/map']">Cadastrar</ion-button>
 
-  <img src="../../assets/splash.png" alt="">
 </ion-content>
+
+<ion-footer class="ion-no-border" mode="md">
+  <img src="../../assets/splash.png" alt="" />
+</ion-footer>

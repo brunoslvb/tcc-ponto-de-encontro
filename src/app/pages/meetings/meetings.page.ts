@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LocalNotifications } from '@capacitor/core';
 import { ModalController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 import { IMeeting } from 'src/app/interfaces/meeting';

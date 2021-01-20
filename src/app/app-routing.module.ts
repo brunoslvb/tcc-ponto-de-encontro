@@ -23,6 +23,10 @@ const routes: Routes = [
     path: 'meetings/:id/chat',
     loadChildren: () => import('./pages/chat/chat.module').then( m => m.ChatPageModule)
   },
+  {
+    path: 'map',
+    loadChildren: () => import('./pages/map/map.module').then( m => m.MapPageModule)
+  },
 ];
 
 @NgModule({
