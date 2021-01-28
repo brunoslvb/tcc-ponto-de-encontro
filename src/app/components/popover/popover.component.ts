@@ -33,7 +33,7 @@ export class PopoverComponent implements OnInit {
     try{
       await this.meetingService.removeUserFromMeeting(this.meeting.id, sessionStorage.getItem('user'));
 
-      await this.meetingService.recalcNumberOfMembersFromMeeting(this.meeting.id);
+      await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
 
       await this.userService.removeMeetingFromUser(sessionStorage.getItem('user'), this.meeting.id);
 
