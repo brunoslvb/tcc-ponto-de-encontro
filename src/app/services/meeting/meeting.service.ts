@@ -7,33 +7,39 @@ import firebase from 'firebase/app';
 })
 export class MeetingService {
 
+  private collection: string = 'meetings';
+
   constructor(
     private firestore: AngularFirestore
   ) { }
 
   getAllMeetings(){
-    return this.firestore.collection('groups').snapshotChanges();
+    return this.firestore.collection(this.collection).snapshotChanges();
   }
 
-  getById(id: string){
-    return this.firestore.collection('groups').doc(id).snapshotChanges();
+  getById(meetingId: string){
+    return this.firestore.collection(this.collection).doc(meetingId).snapshotChanges();
   }
 
-  createMeeting(data){
-    return this.firestore.collection('groups').add(data);
+  createMeeting(meeting: Object){
+    return this.firestore.collection(this.collection).add(meeting);
   }
 
-  removeUserFromMeeting(meetingId, userId){
-    return this.firestore.collection('groups').doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayRemove(userId) });
+  removeUserFromMeeting(meetingId: string, userId: string){
+    return this.firestore.collection(this.collection).doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayRemove(userId) });
   }
 
-  recalcNumberOfMembersFromMeeting(meetingId) {
+  async countNumberOfMembersFromMeeting(meetingId: string) {
 
-    /**
-     * FIXME: É necessário recuperar as informações do encontro (grupo) e 
-     * contar quantos membros estão cadastrados no grupo
-     */
+    let doc: any;
 
-    return this.firestore.collection('groups').doc(meetingId).update({ numberOfMembers: firebase.firestore.FieldValue.increment(-1) })
+    await this.firestore.collection(this.collection).doc(meetingId).get().toPromise().then(response => {
+
+      doc = response.data();
+      
+    });
+    
+    return this.firestore.collection(this.collection).doc(meetingId).update({ numberOfMembers: doc.members.length });
+
   }
 }
