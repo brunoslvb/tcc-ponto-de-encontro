@@ -1,8 +1,10 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { LoadingController, ModalController, Platform } from '@ionic/angular';
+import { LoadingController, ModalController, NavController, NavParams, Platform } from '@ionic/angular';
 import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, Marker, Environment, GoogleMapsAnimation, ILatLng } from '@ionic-native/google-maps';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { ActivatedRoute } from '@angular/router';
+import { MeetingService } from 'src/app/services/meeting/meeting.service';
 
 declare var google;
 
@@ -27,14 +29,17 @@ export class MapPage implements OnInit {
   private travelMode: string = "DRIVING";
 
   constructor(
-    private modalController: ModalController,
+    private nav: NavController,
     private loadingController: LoadingController,
     private platform: Platform,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    private meetingService: MeetingService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
     this.statusBar.overlaysWebView(true);
+    this.loadDataFromMeeting();
     this.loadMap();
   }
 
@@ -51,8 +56,28 @@ export class MapPage implements OnInit {
     this.mapElement.style.height = `${this.platform.height() - 200}px`;
   }
 
-  async closeModalMap(){
-    await this.modalController.dismiss();
+  async back(){
+    await this.nav.back();
+  }
+
+  async loadDataFromMeeting(){
+    const id = this.route.snapshot.paramMap.get("id");
+
+    try{
+      
+      await this.meetingService.getById(id).subscribe(async response => {
+
+        const data: any = response.payload.data(); 
+        
+        this.meeting = data;
+        
+        this.meeting.id = response.payload.id;
+
+      });
+
+    } catch(error) {
+      console.error(error);
+    } 
   }
 
   async loadMap() {

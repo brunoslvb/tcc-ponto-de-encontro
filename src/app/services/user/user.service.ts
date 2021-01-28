@@ -1,25 +1,28 @@
 import { Injectable } from '@angular/core';
 import firebase from 'firebase/app';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
+  private collection: string = 'users';
+
   constructor(
     private firestore: AngularFirestore
   ) { }
 
-  addGroupToUser(id, groupId){
-    return this.firestore.collection('users').doc(id).update({ groups: firebase.firestore.FieldValue.arrayUnion(groupId) });
+  addMeetingToUser(userId: string, meetingId: string){
+    return this.firestore.collection(this.collection).doc(userId).update({ groups: firebase.firestore.FieldValue.arrayUnion(meetingId) });
   }
 
-  getById(user){
-    return this.firestore.collection('users').doc(user).snapshotChanges();
+  getById(userId: string){
+    return this.firestore.collection(this.collection).doc(userId).snapshotChanges();
   }
 
-  removeMeetingFromUser(userId, meetingId){
-    return this.firestore.collection('users').doc(userId).update({ groups: firebase.firestore.FieldValue.arrayRemove(meetingId) });
+  removeMeetingFromUser(userId: string, meetingId: string){
+    return this.firestore.collection(this.collection).doc(userId).update({ groups: firebase.firestore.FieldValue.arrayRemove(meetingId) });
   }
+
 }

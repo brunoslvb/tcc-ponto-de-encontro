@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { LoadingController, ModalController, NavController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
@@ -14,10 +14,14 @@ export class MeetingsPage implements OnInit {
 
   meetings: Array<IMeeting>;
 
+  loading: any;
+
   constructor(
-    private modalController: ModalController,
     private meetingService: MeetingService,
     private userService: UserService,
+    private loadingController: LoadingController,
+    private modalController: ModalController,
+    private nav: NavController
   ) { }
 
   ngOnInit() {
@@ -36,14 +40,22 @@ export class MeetingsPage implements OnInit {
   }
 
   async getMeetingsOfUser(){
-    
+
+    console.log(sessionStorage.getItem('user'));
+
     this.userService.getById(sessionStorage.getItem('user')).subscribe((user: any) => {      
+
+      console.log(user);
 
       let meetingsAux = [];
       
       user.payload.data().groups.forEach(group => {
 
+        console.log(group);
+
         this.meetingService.getById(group).subscribe(doc => {
+
+          console.log(doc.payload.data());
 
           let data: any = doc.payload.data();
 
@@ -64,6 +76,7 @@ export class MeetingsPage implements OnInit {
       this.meetings = meetingsAux;
 
     });
+
   }
 
 }

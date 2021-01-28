@@ -20,7 +20,7 @@
     
         <div class="header">  
           <h2 class="title">{{meeting.name}}</h2>
-          <ion-icon button name="location-sharp" size="large" (click)="showModalMap(meeting)"></ion-icon>
+          <ion-icon button name="location-sharp" size="large" routerLink="{{meeting.id}}/map"></ion-icon>
         </div>
     
         <div button routerLink="{{meeting.id}}/chat" class="body">
@@ -41,23 +41,9 @@
     
         </div>
     
-        <!-- <hr/>
-    
-        <div class="footer" button routerLink="{{meeting.id}}/chat">
-    
-          <h4>Ver mais detalhes</h4>
-    
-          <ion-icon size="large" name="arrow-forward-sharp"></ion-icon>
-    
-        </div> -->
-    
       </div>
     
     </ion-card>
   </div>
-
-  <!-- <app-card href="/home" title="Atividades Físicas" address="Parque Bosque Maia" time="18:00" date="27/12/2020"></app-card>
-  <app-card href="/teste" title="Reencontro turma 2015" address="Centro de Convenções Rotary" time="20:00" date="30/12/2020"></app-card>
-  <app-card href="/lala" title="Cinema em familia" address="Parque Shopping Maia" time="20:00" date="27/12/2020"></app-card> -->
 
 </ion-content>
