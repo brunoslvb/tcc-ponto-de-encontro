@@ -19,35 +19,59 @@
 
 <ion-content>
 
-  <ion-grid>
-    <ion-row>
-      <ion-col size="9" class="message other-message">
-        <h6>Bárbara</h6>
-        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has</p>
-        <span>25/04/2020 15:22</span>
-      </ion-col>
-      <ion-col size="9" offset="3" class="message my-message">
-        <p>askjsybfsjifsanfi diusahbiuabf uai dfjfs dfjfsaalkff fdiofds sdis sios ospjs fpoujsabsabdvisad</p>
-        <span>25/04/2020 15:23</span>
-      </ion-col>
-      <ion-col size="9" class="message other-message">
-        <h6>Lucas</h6>
-        <p>Ok</p>
-        <span>25/04/2020 15:24</span>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div *ngIf="meeting.members.length > 1">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="9" class="message other-message">
+          <h6>Bárbara</h6>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has</p>
+          <span>25/04/2020 15:22</span>
+        </ion-col>
+        <ion-col size="9" offset="3" class="message my-message">
+          <p>askjsybfsjifsanfi diusahbiuabf uai dfjfs dfjfsaalkff fdiofds sdis sios ospjs fpoujsabsabdvisad</p>
+          <span>25/04/2020 15:23</span>
+        </ion-col>
+        <ion-col size="9" class="message other-message">
+          <h6>Lucas</h6>
+          <p>Ok</p>
+          <span>25/04/2020 15:24</span>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
 
-  <form action="">
-    <div class="items">
-      <ion-item>
-        <ion-input type="text" placeholder="Digite uma mensagem"></ion-input>
-      </ion-item>
-      <ion-button type="submit" fill="clear">
-        <ion-icon slot="icon-only" size="small" name="send-sharp"></ion-icon>
-      </ion-button>
-    </div>
-  </form>
+    <form action="">
+      <div class="items">
+        <ion-item>
+          <ion-input type="text" placeholder="Digite uma mensagem"></ion-input>
+        </ion-item>
+        <ion-button type="submit" fill="clear">
+          <ion-icon slot="icon-only" size="small" name="send-sharp"></ion-icon>
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="meeting.members.length < 2" class="alone">
+
+    <h4>Um sonho sonhado sozinho é um sonho. Um sonho sonhado junto é realidade!</h4>
+
+    <ion-fab-button (click)="showModalContacts()">
+      <ion-icon name="person-add"></ion-icon>
+    </ion-fab-button>
+  
+    <form action="">
+      <div class="items">
+        <ion-item>
+          <ion-input type="text" placeholder="Digite uma mensagem"></ion-input>
+        </ion-item>
+        <ion-button type="submit" fill="clear">
+          <ion-icon slot="icon-only" size="small" name="send-sharp"></ion-icon>
+        </ion-button>
+      </div>
+    </form>
+  
+  </div>
+  
 
 </ion-content>

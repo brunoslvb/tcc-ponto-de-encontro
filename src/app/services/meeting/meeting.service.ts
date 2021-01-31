@@ -25,6 +25,10 @@ export class MeetingService {
     return this.firestore.collection(this.collection).add(meeting);
   }
 
+  addUserToMeeting(meetingId: string, userId: string){
+    return this.firestore.collection(this.collection).doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayUnion(userId) });
+  }
+
   removeUserFromMeeting(meetingId: string, userId: string){
     return this.firestore.collection(this.collection).doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayRemove(userId) });
   }

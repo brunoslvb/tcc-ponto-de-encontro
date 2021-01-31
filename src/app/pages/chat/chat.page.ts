@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, PopoverController } from '@ionic/angular';
+import { LoadingController, ModalController, NavController, PopoverController, ToastController } from '@ionic/angular';
+import { ModalContactsComponent } from 'src/app/components/modal-contacts/modal-contacts.component';
 import { PopoverComponent } from 'src/app/components/popover/popover.component';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
@@ -28,13 +29,17 @@ export class ChatPage implements OnInit {
   };
 
   popover: any = null;
+  loading: any;
 
   constructor(
     private nav: NavController,
     private route: ActivatedRoute,
     private meetingService: MeetingService,
     private userService: UserService,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+    private modalController: ModalController
   ) { }
 
   ngOnInit() {
@@ -43,6 +48,31 @@ export class ChatPage implements OnInit {
 
   ionViewWillLeave(){
     this.dismissPopover();
+  }
+
+  async addContactsToMeeting(contacts: Array<string>){
+    this.dismissPopover();
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+
+    await this.loading.present();
+
+    await contacts.forEach(async contact => {
+
+      await this.meetingService.addUserToMeeting(this.meeting.id, contact);
+
+      await this.userService.addMeetingToUser(contact, this.meeting.id);
+
+    });
+
+    await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
+
+    await this.loading.dismiss();
+
+    await this.presentToast('Usuários adicionados com sucesso');
+
   }
 
   async loadDataFromMeeting(){
@@ -70,13 +100,29 @@ export class ChatPage implements OnInit {
     this.popover = await this.popoverController.create({
       component: PopoverComponent,
       componentProps: {
-        meeting: this.meeting
+        meeting: this.meeting,
+        popover: this.popover
       },
       event: ev,
       translucent: true
     });
 
-    return await this.popover.present();
+    await this.popover.present();
+
+    this.popover.onDidDismiss().then(async response => {
+      
+      console.log(response);
+
+      if (!response.data || !response.data.length){
+        console.log('Nenhum contato a ser adicionado')
+        return;
+      }
+
+      console.log(response.data);
+
+      await this.addContactsToMeeting(response.data);
+
+    });
 
   }
 
@@ -88,6 +134,36 @@ export class ChatPage implements OnInit {
 
   async back(){
     await this.nav.back();
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000
+    });
+    toast.present();
+  }
+
+  async showModalContacts() {
+    const modal = await this.modalController.create({
+      component: ModalContactsComponent,
+      componentProps: {
+        meeting: this.meeting
+      }
+    });
+    await modal.present();
+
+    modal.onWillDismiss().then(async response => {
+
+      if (!response.data || !response.data.length){
+        console.log('Nenhum contato a ser adicionado')
+        return;
+      }
+
+      await this.addContactsToMeeting(response.data);
+
+    });
+
   }
 
 }

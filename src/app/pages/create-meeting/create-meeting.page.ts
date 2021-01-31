@@ -87,9 +87,8 @@ export class CreateMeetingPage implements OnInit {
     await this.loading.present();
     
     const members: Array<string> = [
-      sessionStorage.getItem('user'),
-      sessionStorage.getItem('userAux'),
-    ]
+      sessionStorage.getItem('user')
+    ];
 
     const data = {
       owner: sessionStorage.getItem('user'),
@@ -107,8 +106,6 @@ export class CreateMeetingPage implements OnInit {
 
     try {
       const { id } = await this.meetingService.createMeeting(data);
-
-      console.info("Meeting created:", id);
 
       await data.members.forEach(async member => {
         await this.userService.addMeetingToUser(member, id);

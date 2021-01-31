@@ -5,14 +5,15 @@
 export const environment = {
   production: false,
   firebaseConfig: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: "",
-    measurementId: "",
-  }
+    apiKey: "AIzaSyB9I-DhvMIkbMWAFmUR8-OU0V-5RAcDP9k",
+    authDomain: "ponto-de-encontro-dev.firebaseapp.com",
+    projectId: "ponto-de-encontro-dev",
+    storageBucket: "ponto-de-encontro-dev.appspot.com",
+    messagingSenderId: "685923780055",
+    appId: "1:685923780055:web:af5051ffad09bb4b07f792",
+    measurementId: "G-X160CVGKM7"
+  },
+  googleApiKey: "AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ"
 };
 
 /*

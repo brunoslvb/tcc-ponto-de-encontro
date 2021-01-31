@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, NavController } from '@ionic/angular';
+import { LoadingController, ModalController, NavController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/meeting';
+import { ChatPage } from 'src/app/pages/chat/chat.page';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
+import { ModalContactsComponent } from '../modal-contacts/modal-contacts.component';
 
 @Component({
   selector: 'app-popover',
@@ -12,16 +14,36 @@ import { UserService } from 'src/app/services/user/user.service';
 export class PopoverComponent implements OnInit {
 
   meeting: IMeeting;
-  private loading: any;
+  popover: any;
+  loading: any;
 
   constructor(
     private meetingService: MeetingService,
     private userService: UserService,
     private nav: NavController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private modalController: ModalController
   ) { }
 
   ngOnInit() {}
+
+
+  async showModalContacts() {
+    const modal = await this.modalController.create({
+      component: ModalContactsComponent,
+      componentProps: {
+        meeting: this.meeting
+      }
+    });
+    await modal.present();
+
+    modal.onWillDismiss().then(async response => {
+
+      await this.popover.dismiss(response.data);
+
+    });
+
+  }
 
   async leaveMeeting(){
 

@@ -83,3 +83,20 @@ span {
   transition: 0.5s;
   color: #0d476b;
 }
+
+.alone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-flow: column;
+  height: 100%;
+  color: #0d476b;
+  padding: 20px;
+
+  ion-fab-button, ion-icon {
+    color: #0d476b;
+    --background: #FFF;
+  }
+  
+}

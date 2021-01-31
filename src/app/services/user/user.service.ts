@@ -25,4 +25,8 @@ export class UserService {
     return this.firestore.collection(this.collection).doc(userId).update({ groups: firebase.firestore.FieldValue.arrayRemove(meetingId) });
   }
 
+  getContactsFromUser(userId: string) {
+    return this.firestore.collection(this.collection).doc(userId).collection('contacts').get().toPromise();
+  }
+
 }

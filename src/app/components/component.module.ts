@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { CardComponent } from './card/card.component';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
+import { ModalContactsComponent } from './modal-contacts/modal-contacts.component';
 
 @NgModule({
   declarations: [
-    CardComponent
+    CardComponent,
+    ModalContactsComponent
   ],
   imports: [
     CommonModule,
@@ -14,7 +16,8 @@ import { RouterModule } from '@angular/router';
     RouterModule
   ],
   exports: [
-    CardComponent
+    CardComponent,
+    ModalContactsComponent
   ]
 })
 export class ComponentModule { }
