@@ -100,8 +100,7 @@ export class ChatPage implements OnInit {
     this.popover = await this.popoverController.create({
       component: PopoverComponent,
       componentProps: {
-        meeting: this.meeting,
-        popover: this.popover
+        meeting: this.meeting
       },
       event: ev,
       translucent: true
@@ -133,7 +132,7 @@ export class ChatPage implements OnInit {
   }
 
   async back(){
-    await this.nav.back();
+    await this.nav.navigateForward('/meetings');
   }
 
   async presentToast(message: string) {

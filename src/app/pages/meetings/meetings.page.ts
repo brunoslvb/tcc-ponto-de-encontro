@@ -41,21 +41,13 @@ export class MeetingsPage implements OnInit {
 
   async getMeetingsOfUser(){
 
-    console.log(sessionStorage.getItem('user'));
-
     this.userService.getById(sessionStorage.getItem('user')).subscribe((user: any) => {      
-
-      console.log(user);
 
       let meetingsAux = [];
       
       user.payload.data().groups.forEach(group => {
 
-        console.log(group);
-
         this.meetingService.getById(group).subscribe(doc => {
-
-          console.log(doc.payload.data());
 
           let data: any = doc.payload.data();
 

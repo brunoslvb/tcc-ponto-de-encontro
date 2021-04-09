@@ -9,7 +9,6 @@ export class HomePage {
 
   constructor() {
     sessionStorage.setItem("user", "brunosilva2365@gmail.com");
-    sessionStorage.setItem("userAux", "barbara@gmail.com");
   }
 
 }

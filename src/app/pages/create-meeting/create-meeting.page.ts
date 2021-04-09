@@ -113,7 +113,7 @@ export class CreateMeetingPage implements OnInit {
 
       await this.loading.dismiss();
       await this.presentToast(`Encontro ${data.name} criado com sucesso.`);
-      await this.nav.back();
+      await this.nav.navigateForward(`/meetings/${id}/chat`);
       
     } catch (error) {
       console.error(error);

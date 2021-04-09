@@ -14,7 +14,6 @@ import { ModalContactsComponent } from '../modal-contacts/modal-contacts.compone
 export class PopoverComponent implements OnInit {
 
   meeting: IMeeting;
-  popover: any;
   loading: any;
 
   constructor(
@@ -26,24 +25,6 @@ export class PopoverComponent implements OnInit {
   ) { }
 
   ngOnInit() {}
-
-
-  async showModalContacts() {
-    const modal = await this.modalController.create({
-      component: ModalContactsComponent,
-      componentProps: {
-        meeting: this.meeting
-      }
-    });
-    await modal.present();
-
-    modal.onWillDismiss().then(async response => {
-
-      await this.popover.dismiss(response.data);
-
-    });
-
-  }
 
   async leaveMeeting(){
 
