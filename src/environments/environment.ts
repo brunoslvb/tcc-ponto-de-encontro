@@ -13,7 +13,7 @@ export const environment = {
     appId: "1:685923780055:web:af5051ffad09bb4b07f792",
     measurementId: "G-X160CVGKM7"
   },
-  googleApiKey: "AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ"
+  googleApiKey: "AIzaSyDXJAnGKojc37PwDC3nZvoxqv8SpSeqaQs"
 };
 
 /*

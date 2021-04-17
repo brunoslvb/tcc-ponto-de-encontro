@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, ModalController, NavController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/meeting';
-import { ChatPage } from 'src/app/pages/chat/chat.page';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
 import { ModalContactsComponent } from '../modal-contacts/modal-contacts.component';

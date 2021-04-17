@@ -4,18 +4,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { CreateMeetingPageRoutingModule } from './create-meeting-routing.module';
+import { CreatePageRoutingModule } from './create-routing.module';
 
-import { CreateMeetingPage } from './create-meeting.page';
+import { CreatePage } from './create.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     IonicModule,
-    CreateMeetingPageRoutingModule,
-    ReactiveFormsModule
+    CreatePageRoutingModule
   ],
-  declarations: [CreateMeetingPage]
+  declarations: [CreatePage]
 })
-export class CreateMeetingPageModule {}
+export class CreatePageModule {}

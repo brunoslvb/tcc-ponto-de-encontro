@@ -6,11 +6,11 @@ import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
-  selector: 'app-meetings',
-  templateUrl: './meetings.page.html',
-  styleUrls: ['./meetings.page.scss'],
+  selector: 'app-list',
+  templateUrl: './list.page.html',
+  styleUrls: ['./list.page.scss'],
 })
-export class MeetingsPage implements OnInit {
+export class ListPage implements OnInit {
 
   meetings: Array<IMeeting>;
 
@@ -22,7 +22,7 @@ export class MeetingsPage implements OnInit {
     private loadingController: LoadingController,
     private modalController: ModalController,
     private nav: NavController
-  ) { }
+  ) { sessionStorage.setItem("user", "brunosilva2365@gmail.com"); }
 
   ngOnInit() {
     this.getMeetingsOfUser();

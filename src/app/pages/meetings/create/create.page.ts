@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LoadingController, NavController, ToastController } from '@ionic/angular';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { NavController, LoadingController, ToastController } from '@ionic/angular';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
 
 declare var google;
 
 @Component({
-  selector: 'app-create-meeting',
-  templateUrl: './create-meeting.page.html',
-  styleUrls: ['./create-meeting.page.scss'],
+  selector: 'app-create',
+  templateUrl: './create.page.html',
+  styleUrls: ['./create.page.scss'],
 })
-export class CreateMeetingPage implements OnInit {
+export class CreatePage implements OnInit {
 
   registerForm: FormGroup;
   addresses: Array<{
