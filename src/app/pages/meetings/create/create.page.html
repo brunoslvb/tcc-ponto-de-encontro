@@ -21,7 +21,7 @@
 
     <ion-item>
       <ion-icon color="" name="location-outline" slot="start"></ion-icon>
-      <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
+      <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionInput)="searchAddress()" (ionChange)="clearInput()"></ion-input>
     </ion-item>
 
     <div class="list">

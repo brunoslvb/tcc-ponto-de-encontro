@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController, PopoverController, LoadingController, ToastController, ModalController } from '@ionic/angular';
-import { ModalContactsComponent } from 'src/app/components/modal-contacts/modal-contacts.component';
+import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
 import { PopoverComponent } from 'src/app/components/popover/popover.component';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';

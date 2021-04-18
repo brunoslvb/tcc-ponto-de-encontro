@@ -42,15 +42,22 @@ export class CreatePage implements OnInit {
     });
   }
 
-  async searchAddress(){
-
-    if(!this.registerForm.value.address.trim().length) return; 
-
-    console.log("Função searchAddress()");
+  async searchAddress(){    
+    if(!this.registerForm.value.address.trim().length) {      
+      this.addresses = [];
+      return;
+    }; 
 
     this.googleMapsPlaces.getPlacePredictions({ input: this.registerForm.value.address }, predictions => {
       this.addresses = predictions;
     });
+  }
+
+  clearInput() {
+    if(!this.registerForm.value.address.trim().length) {
+      this.addresses = [];
+      return;
+    }; 
   }
 
   async searchSelected(address: string) {
