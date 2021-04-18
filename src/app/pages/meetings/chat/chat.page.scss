@@ -1,3 +1,8 @@
+ion-header ion-toolbar {
+  --background: #4ECDC4;
+  color: #FFF;
+}
+
 form {
 
   position: absolute;
@@ -12,21 +17,23 @@ form {
   }
 
   ion-item {
+    --background: #EFF4F6;
     margin: 10px;
     width: 100%;
     padding: 0px;
   }
 
   ion-icon {
-    color: #0d476b;
+    color: #385A64;
     // color: #FFF;
   }
 
   ion-button {
-    // --background: transparent;
+    --background: #EFF4F6;;
     --border-radius: 40px;
     margin-right: 10px;
     height: 50px;
+    margin-top: 20px;
   }
 }
 
@@ -45,17 +52,19 @@ form {
 
   border-radius: 20px 20px 0px 20px;
 
-  color:#FCFCFC;
-  background:#0d476b;
+  color:#4E4B66;
+  background:#FFF;
 
   p, span {
-    color:#FCFCFC;
+    color:#4E4B66;
   }
 
 }
 
 .other-message {
   border-radius: 20px 20px 20px 0px;
+
+  background: #EFF4F6;
 
   p, span {
     color: #535353;
@@ -81,7 +90,7 @@ span {
   border: none;
   outline: none;
   transition: 0.5s;
-  color: #0d476b;
+  color: #385A64;
 }
 
 .alone {
@@ -91,11 +100,11 @@ span {
   text-align: center;
   flex-flow: column;
   height: 100%;
-  color: #0d476b;
+  color: #385A64;
   padding: 20px;
 
   ion-fab-button, ion-icon {
-    color: #0d476b;
+    color: #385A64;
     --background: #FFF;
   }
   

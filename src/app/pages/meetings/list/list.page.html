@@ -1,49 +1,66 @@
-<ion-header class="">
-  <ion-toolbar>
-    <ion-title>
-      ENCONTROS
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button [routerLink]="['/meetings/create']">
-        <ion-icon slot="icon-only" name="add-circle-sharp"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
-
-  <div *ngFor="let meeting of meetings">
-    <ion-card>
-
-      <div class="card-container">
+<ion-app>
+  <ion-menu side="start" menuId="main-menu" content-id="main">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Start Menu</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item>Menu Item</ion-item>
+        <ion-item>Menu Item</ion-item>
+        <ion-item>Menu Item</ion-item>
+        <ion-item>Menu Item</ion-item>
+        <ion-item>Menu Item</ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+  <ion-router-outlet id="main"></ion-router-outlet>
+  
+  <ion-header class="ion-no-border">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button menu="main-menu"></ion-menu-button>
+      </ion-buttons>
+      <ion-title></ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  
+  <ion-content>
     
-        <div class="header">  
-          <h2 class="title">{{meeting.name}}</h2>
-          <ion-icon button name="location-sharp" size="large" routerLink="{{meeting.id}}/map"></ion-icon>
-        </div>
-    
-        <div button routerLink="{{meeting.id}}/chat" class="body">
-    
-          <h3 class="title">Ponto Final</h3>
-          <h4 class="subtitle">{{meeting.location.address}}</h4>
-    
-          <div class="flex">
-            <div>
-              <h3 class="title">Horário</h3>
-              <h4 class="subtitle">{{meeting.time}}</h4>
-            </div>
-            <div>
-              <h3 class="title">Data</h3>
-              <h4 class="subtitle">{{meeting.date}}</h4>
-            </div>
+    <div *ngFor="let meeting of meetings">
+      <ion-card>
+        
+        <div class="card-container">
+          
+          <div class="header">
+            <h2 class="title">{{meeting.name}}</h2>
+            <ion-icon button name="location-sharp" size="large" routerLink="{{meeting.id}}/map"></ion-icon>
           </div>
-    
+          
+          <div button routerLink="{{meeting.id}}/chat" class="body">
+            
+            <h3 class="title">Ponto Final</h3>
+            <h4 class="subtitle">{{meeting.location.address}}</h4>
+            
+            <div class="flex">
+              <div>
+                <h3 class="title">Horário</h3>
+                <h4 class="subtitle">{{meeting.time}}</h4>
+              </div>
+              <div>
+                <h3 class="title">Data</h3>
+                <h4 class="subtitle">{{meeting.date}}</h4>
+              </div>
+            </div>
+            
+          </div>
+          
         </div>
+        
+      </ion-card>
+    </div>
     
-      </div>
-    
-    </ion-card>
-  </div>
-
-</ion-content>
+  </ion-content>
+</ion-app>

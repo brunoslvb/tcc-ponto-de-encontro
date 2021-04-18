@@ -1,29 +1,37 @@
 ion-header ion-toolbar {
-  --background: #d3d6e7;
+  // --background: #F8F8F8;
 
   text-align: center;
 
   img {
-    width: 200px;
+    padding-top: 20px;
+    width: auto;
   }
 }
 
-ion-content {
+.container {
+
+  display: block;
+  align-content: center;
 
   ion-button {
     overflow: hidden;
-    margin: 16px;
-    --background: #0D476B;
-    --border-radius: 10px;
+    margin: 30px;
+    --background: #385A64;
+    --border-radius: 20px;
+    --background-activated: #4a7683;
+
+    span {
+      font-size: 10pt;
+    }
+
   }
 }
 
-
 ion-footer {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
+  margin: 10px auto;
+  text-align: center;
+  color: #9E9E9E;
 }
 
 

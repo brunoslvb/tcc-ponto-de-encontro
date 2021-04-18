@@ -3,7 +3,6 @@ import { LoadingController, ModalController, NavController } from '@ionic/angula
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
 import { UserService } from 'src/app/services/user/user.service';
-import { ModalContactsComponent } from '../modal-contacts/modal-contacts.component';
 
 @Component({
   selector: 'app-popover',

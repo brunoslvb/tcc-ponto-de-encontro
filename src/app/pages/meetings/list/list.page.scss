@@ -1,9 +1,18 @@
-* {
-  --background: #d3d6e7;
-  font-family: Roboto;
-  outline: none;
-}
+ion-header {
 
+  ion-toolbar {
+  
+    margin-bottom: 20px;
+
+    --background: #4ECDC4;
+
+    ion-menu-button {
+      color: #FFF;
+    }
+
+  }
+
+}
 
 ion-title {
   color: #0d476b;
@@ -33,7 +42,7 @@ ion-card {
       .title {
         font-size: 12pt;
         text-transform: uppercase;
-        color: #0d476b;
+        color: #385A64;
         margin: 0;
       }
     }
@@ -76,7 +85,7 @@ ion-card {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: #ff6b6b;
+      color: #4ECDC4;
     }
 
   }

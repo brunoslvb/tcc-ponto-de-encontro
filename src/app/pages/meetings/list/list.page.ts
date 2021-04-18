@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, ModalController, NavController } from '@ionic/angular';
+import { LoadingController, MenuController, ModalController, NavController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 import { IMeeting } from 'src/app/interfaces/meeting';
 import { MeetingService } from 'src/app/services/meeting/meeting.service';
@@ -21,7 +21,8 @@ export class ListPage implements OnInit {
     private userService: UserService,
     private loadingController: LoadingController,
     private modalController: ModalController,
-    private nav: NavController
+    private nav: NavController,
+    private menu: MenuController
   ) { sessionStorage.setItem("user", "brunosilva2365@gmail.com"); }
 
   ngOnInit() {
@@ -69,6 +70,11 @@ export class ListPage implements OnInit {
 
     });
 
+  }
+
+  lala() {
+    this.menu.enable(true, 'main-menu');
+    this.menu.open('main-menu');
   }
 
 }

@@ -1,11 +1,30 @@
+ion-header ion-toolbar {
+
+  --background: #4ECDC4;
+  color: #FFF;
+  margin-bottom: 20px;
+
+  ion-buttons {
+    display: flex;
+    align-self: flex-start;
+  }
+
+  ion-title {
+    margin-top: 100px;
+    padding: 10px;
+    font-weight: normal;
+  }
+}
+
 ion-button {
   overflow: hidden;
   margin: 16px;
-  --background: #0D476B;
+  --background: #385A64;
   --border-radius: 10px;
 }
 
 form {
+  
   .list {
     position: absolute;
     font-weight: 200;
@@ -26,7 +45,7 @@ form {
       
       span {
         display: block;
-        color: #535353;
+        color: #385A64;
         // float: right;
       }
     }
