@@ -75,8 +75,12 @@ form {
 
     --highlight-height: 0px;
 
-    ion-input, ion-select {
+    ion-input {
       margin: 5px;
+    }
+
+    ion-select {
+      margin: 3px;
     }
   }
 
