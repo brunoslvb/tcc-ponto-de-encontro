@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, NavController, NavParams, Platform } from '@ionic/angular';
 import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, Marker, Environment, GoogleMapsAnimation, ILatLng } from '@ionic-native/google-maps';
-import { IMeeting } from 'src/app/interfaces/meeting';
+import { IMeeting } from 'src/app/interfaces/Meeting';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { ActivatedRoute } from '@angular/router';
-import { MeetingService } from 'src/app/services/meeting/meeting.service';
+import { MeetingService } from 'src/app/services/meeting.service';
 
 declare var google;
 

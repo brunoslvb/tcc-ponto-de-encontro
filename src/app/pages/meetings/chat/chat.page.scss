@@ -5,15 +5,18 @@ ion-header ion-toolbar {
 
 form {
 
-  position: absolute;
+  position: fixed;
   margin: 0;
   padding: 0;
   bottom: 0;
+
+  background-color: #F8F8F8;
 
   .items {
     display: grid;
     grid-template-columns: 95fr 5fr;
     align-items: center;
+    justify-content: center;
   }
 
   ion-item {
@@ -25,12 +28,12 @@ form {
 
   ion-icon {
     color: #385A64;
-    // color: #FFF;
+    font-size: 24px;
   }
 
   ion-button {
-    --background: #EFF4F6;;
-    --border-radius: 40px;
+    --background: transparent;
+    --border-radius: 40px 40px 40px 40px;
     margin-right: 10px;
     height: 50px;
     margin-top: 20px;
@@ -108,4 +111,9 @@ span {
     --background: #FFF;
   }
   
+}
+
+#messages {
+  margin-bottom: 100px;
+  overflow-y: auto;
 }

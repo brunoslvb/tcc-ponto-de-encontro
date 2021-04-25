@@ -37,7 +37,6 @@
     <div class="input">
       <ion-label position="stacked">Data do encontro</ion-label>
       <ion-item>
-        <ion-icon color="" name="calendar-outline" slot="end"></ion-icon>
         <ion-input type="date" formControlName="date" placeholder="Data do Encontro"></ion-input>
       </ion-item>
     </div>
@@ -45,12 +44,11 @@
     <div class="input">
       <ion-label position="stacked">Horário do encontro</ion-label>
       <ion-item>
-        <ion-icon color="" name="time-outline" slot="end"></ion-icon>
         <ion-input type="time" formControlName="time" placeholder="Horário do Encontro"></ion-input>
       </ion-item>
     </div>
 
-    <ion-button [disabled]="registerForm.invalid" type="submit" expand="block" fill="solid" size="default">Criar Encontro</ion-button>
+    <ion-button [disabled]="registerForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default">Criar Encontro</ion-button>
         
   </form>
 

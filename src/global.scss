@@ -25,10 +25,30 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+.ion-color-turquoise {
+  --ion-color-base: var(--ion-color-turquoise);
+  --ion-color-base-rgb: var(--ion-color-turquoise-rgb);
+  --ion-color-contrast: var(--ion-color-turquoise-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-turquoise-contrast-rgb);
+  --ion-color-shade: var(--ion-color-turquoise-shade);
+  --ion-color-tint: var(--ion-color-turquoise-tint);
+}
+
+.ion-color-turquoise-dark {
+  --ion-color-base: var(--ion-color-turquoise-dark);
+  --ion-color-base-rgb: var(--ion-color-turquoise-dark-rgb);
+  --ion-color-contrast: var(--ion-color-turquoise-dark-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-turquoise-dark-contrast-rgb);
+  --ion-color-shade: var(--ion-color-turquoise-dark-shade);
+  --ion-color-tint: var(--ion-color-turquoise-dark-tint);
+}
+
+
 * {
   --ion-background-color: #F8F8F8;
   font-family: 'Poppins', Roboto;
 }
+
 
 /* Font Poppins*/
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
@@ -49,21 +69,20 @@ form {
   }
 
   ion-item, ion-button {
-    margin: 0px 20px 20px 20px;
-    --background: #FCFCFC;
+    margin: 0px 10px 20px 10px;
+    --background: #EFF4F6;
     --border-radius: 20px;
 
-    --highlight-height: none;
+    --highlight-height: 0px;
 
-    ion-input {
-      --border-radius: 0px 20px 20px 0px;
-      // margin: 10px;
+    ion-input, ion-select {
+      margin: 5px;
     }
   }
 
   h3 {
     text-align: center;
     padding: 10px;
-    color: #0d476b;
+    color: #385A64;
   }
 }

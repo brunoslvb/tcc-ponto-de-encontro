@@ -18,10 +18,6 @@ const routes: Routes = [
       { path: ':id/map', component: MapPage },
     ]
   },
-  {
-    path: 'map',
-    loadChildren: () => import('./map/map.module').then( m => m.MapPageModule)
-  },
 ];
 
 @NgModule({

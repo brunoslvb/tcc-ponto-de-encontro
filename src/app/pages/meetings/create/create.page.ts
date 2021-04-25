@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NavController, LoadingController, ToastController } from '@ionic/angular';
-import { MeetingService } from 'src/app/services/meeting/meeting.service';
-import { UserService } from 'src/app/services/user/user.service';
+import { MeetingService } from 'src/app/services/meeting.service';
+import { UserService } from 'src/app/services/user.service';
 
 declare var google;
 

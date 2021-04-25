@@ -29,6 +29,16 @@
   
   <ion-content>
     
+    <div *ngIf="meetings.length === 0" class="alone">
+
+      <h3>Poxa, parece que você não tem nenhum encontro. Que tal criar um?</h3>
+  
+      <ion-fab-button routerLink="/meetings/create">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+  
+    </div>
+
     <div *ngFor="let meeting of meetings">
       <ion-card>
         

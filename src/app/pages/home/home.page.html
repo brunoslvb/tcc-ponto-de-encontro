@@ -1,16 +1,15 @@
 <ion-header class="ion-no-border" mode="md">
-  <ion-toolbar>  
-    <img src="../../assets/header.png" alt="">
+  <ion-toolbar>
+    <ion-buttons slot="start"></ion-buttons>
   </ion-toolbar>
+  <img src="../../assets/header.png" alt="">
 </ion-header>
 
 <div class="container">
 
-  <ion-button expand="block" fill="solid" size="large" [routerLink]="['/meetings']"><span>Login</span></ion-button>
-  <ion-button expand="block" fill="solid" size="large" [routerLink]="['/map']"><span>Cadastrar</span></ion-button>
+  <ion-button expand="block" fill="solid" size="large" [routerLink]="['/auth/login']"><span>Login</span></ion-button>
+  <ion-button expand="block" fill="solid" size="large" [routerLink]="['/auth/register']"><span>Cadastrar</span></ion-button>
 
 </div>
 
-<ion-footer class="ion-no-border" mode="md">
-  <span>SLVXERY</span>
-</ion-footer>
+<app-footer></app-footer>

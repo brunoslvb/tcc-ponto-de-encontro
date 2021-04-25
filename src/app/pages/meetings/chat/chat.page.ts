@@ -3,9 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { NavController, PopoverController, LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
 import { PopoverComponent } from 'src/app/components/popover/popover.component';
-import { IMeeting } from 'src/app/interfaces/meeting';
-import { MeetingService } from 'src/app/services/meeting/meeting.service';
-import { UserService } from 'src/app/services/user/user.service';
+import { IMeeting } from 'src/app/interfaces/Meeting';
+import { MeetingService } from 'src/app/services/meeting.service';
+import { UserService } from 'src/app/services/user.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChatService } from 'src/app/services/chat.service';
+import { IMessage } from 'src/app/interfaces/Message';
+import firebase from 'firebase/app';
 
 @Component({
   selector: 'app-chat',
@@ -13,6 +17,12 @@ import { UserService } from 'src/app/services/user/user.service';
   styleUrls: ['./chat.page.scss'],
 })
 export class ChatPage implements OnInit {
+
+  username: string = sessionStorage.getItem("user");
+
+  chatForm: FormGroup;
+
+  messages: Array<IMessage> = [];
 
   meeting: IMeeting = {
     id: "",
@@ -35,14 +45,23 @@ export class ChatPage implements OnInit {
     private nav: NavController,
     private route: ActivatedRoute,
     private meetingService: MeetingService,
+    private chatService: ChatService,
     private userService: UserService,
     private popoverController: PopoverController,
     private loadingController: LoadingController,
     private toastController: ToastController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private builder: FormBuilder
   ) { }
 
   ngOnInit() {
+
+    this.chatForm = this.builder.group({
+      message: ['', Validators.required],
+    });
+
+    this.getMessages();
+
     this.loadDataFromMeeting();
   }
 
@@ -162,6 +181,44 @@ export class ChatPage implements OnInit {
       await this.addContactsToMeeting(response.data);
 
     });
+
+  }
+
+  async getMessages(){
+
+    let messages: Array<IMessage> = [];
+
+    await this.chatService.getMessages(this.route.snapshot.paramMap.get("id")).subscribe(async (response: any) => {  
+      
+      messages = [];
+
+      response.forEach((item: any) => {
+
+        const data: IMessage = item.payload.doc.data();
+        
+        data.myMessage = data.from === this.username;
+
+        messages.push(data);
+      });
+
+      this.messages = messages;
+
+    });
+
+  }
+
+  async sendMessage(){
+    
+    const data = {
+      from: this.username,
+      fromName: sessionStorage.getItem("name"),
+      message: this.chatForm.value.message,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }
+
+    this.chatForm.reset();
+    
+    await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), data);
 
   }
 

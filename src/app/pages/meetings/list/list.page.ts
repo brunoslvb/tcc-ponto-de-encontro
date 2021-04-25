@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, MenuController, ModalController, NavController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
-import { IMeeting } from 'src/app/interfaces/meeting';
-import { MeetingService } from 'src/app/services/meeting/meeting.service';
-import { UserService } from 'src/app/services/user/user.service';
+import { IMeeting } from 'src/app/interfaces/Meeting';
+import { MeetingService } from 'src/app/services/meeting.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-list',
@@ -12,7 +12,7 @@ import { UserService } from 'src/app/services/user/user.service';
 })
 export class ListPage implements OnInit {
 
-  meetings: Array<IMeeting>;
+  meetings: Array<IMeeting> = [];
 
   loading: any;
 
@@ -23,7 +23,9 @@ export class ListPage implements OnInit {
     private modalController: ModalController,
     private nav: NavController,
     private menu: MenuController
-  ) { sessionStorage.setItem("user", "brunosilva2365@gmail.com"); }
+  ) { 
+    // sessionStorage.setItem("user", "brunosilva2365@gmail.com"); 
+  }
 
   ngOnInit() {
     this.getMeetingsOfUser();

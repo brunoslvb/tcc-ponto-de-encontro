@@ -2,7 +2,7 @@
   <ion-toolbar>
     <div class="header-text" routerLink="/">
       <h6 class="">{{meeting.name}}</h6>
-      <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers != 1 ? "participantes" : "participante" }}</span>
+      <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers > 1 ? "participantes" : "participante" }}</span>
     </div>
     <ion-buttons slot="start">
       <ion-button (click)="back()">
@@ -23,33 +23,26 @@
 <ion-content>
 
   <div *ngIf="meeting.members.length > 1">
-    <ion-grid>
-      <ion-row>
-        <ion-col size="9" class="message other-message">
-          <h6>Bárbara</h6>
-          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has</p>
-          <span>25/04/2020 15:22</span>
-        </ion-col>
-        <ion-col size="9" offset="3" class="message my-message">
-          <p>askjsybfsjifsanfi diusahbiuabf uai dfjfs dfjfsaalkff fdiofds sdis sios ospjs fpoujsabsabdvisad</p>
-          <span>25/04/2020 15:23</span>
-        </ion-col>
-        <ion-col size="9" class="message other-message">
-          <h6>Lucas</h6>
-          <p>Ok</p>
-          <span>25/04/2020 15:24</span>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <div id="messages">
+      <ion-grid *ngFor="let message of messages">
+        <ion-row>
+          <ion-col size="9" [offset]="message.myMessage ? 3 : 0" [ngClass]="{ 'message': true, 'my-message': message.myMessage, 'other-message': !message.myMessage }">
+            <h6>{{message.myMessage ? "" : message.fromName}}</h6>
+            <p>{{message.message}}</p>
+            <span>{{ message.createdAt?.toMillis() | date: 'short' }}</span>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
 
 
-    <form action="">
+    <form [formGroup]="chatForm" (submit)="sendMessage()">
       <div class="items">
         <ion-item>
-          <ion-input type="text" placeholder="Digite uma mensagem"></ion-input>
+          <ion-input formControlName="message" type="text" placeholder="Digite uma mensagem"></ion-input>
         </ion-item>
-        <ion-button type="submit" fill="clear">
-          <ion-icon slot="icon-only" size="small" name="send-sharp"></ion-icon>
+        <ion-button [disabled]="chatForm.invalid" type="submit" fill="clear">
+          <ion-icon slot="icon-only" name="send-sharp"></ion-icon>
         </ion-button>
       </div>
     </form>
@@ -62,18 +55,7 @@
     <ion-fab-button (click)="showModalContacts()">
       <ion-icon name="person-add"></ion-icon>
     </ion-fab-button>
-  
-    <form action="">
-      <div class="items">
-        <ion-item>
-          <ion-input type="text" placeholder="Digite uma mensagem"></ion-input>
-        </ion-item>
-        <ion-button type="submit" fill="clear">
-          <ion-icon slot="icon-only" size="small" name="send-sharp"></ion-icon>
-        </ion-button>
-      </div>
-    </form>
-  
+
   </div>
 
 </ion-content>

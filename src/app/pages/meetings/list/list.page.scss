@@ -91,3 +91,24 @@ ion-card {
   }
 }
 
+.alone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-flow: column;
+  height: 100%;
+  color: #9E9E9E;
+  padding: 20px;
+
+  h3 {
+    line-height: 30px;
+    font-weight: 200;
+  }
+
+  ion-fab-button, ion-icon {
+    color: #FFF;
+    --background: #4ECDC4;
+  }
+  
+}

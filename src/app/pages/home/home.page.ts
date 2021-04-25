@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 export class HomePage {
 
   constructor() {
-    sessionStorage.setItem("user", "brunosilva2365@gmail.com");
+    // sessionStorage.setItem("user", "brunosilva2365@gmail.com");
   }
 
 }

@@ -1,0 +1,30 @@
+ion-header ion-toolbar {
+  // --background: #F8F8F8;
+
+  text-align: center;
+
+  img {
+    padding-top: 20px;
+    width: auto;
+  }
+}
+
+ion-icon {
+  color: #385A64;
+  // color: #FFF;
+}
+
+ion-content {
+  --padding-top: 50px;
+}
+
+span {
+  font-size: 10pt;
+}
+
+.items {
+  display: grid;
+  grid-template-columns: 5fr 95fr;
+  align-items: center;
+  margin: 0;
+}

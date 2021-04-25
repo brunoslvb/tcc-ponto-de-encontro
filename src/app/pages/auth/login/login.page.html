@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/auth">
+        <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <img src="../../assets/header.png" alt="">
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div id="recaptcha-container"></div>
+
+  <form [formGroup]="loginForm" (submit)="signin()">
+
+    <h3>Login</h3>
+
+    <div class="items">
+      <div class="input">
+        <ion-list>
+          <ion-item>
+            <ion-select formControlName="ddd" placeholder="DDD">
+              <ion-select-option *ngFor="let ddd of ddd" [value]="ddd.ddd">{{ddd.ddd}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </div>
+      <div class="input">
+        <ion-item>
+          <ion-icon name="call-outline" slot="end"></ion-icon>
+          <ion-input type="text" id="phone" formControlName="phone" placeholder="Celular"></ion-input>
+        </ion-item>
+      </div>
+    </div>
+
+    <ion-button [disabled]="loginForm.invalid" id="signin" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default"><span>Login</span></ion-button>
+    <ion-button routerLink="/auth/register" color="turquoise-dark" expand="block" fill="clear" size="default"><span>Cadastre-se</span></ion-button>
+  </form>
+
+</ion-content>
+
+<app-footer></app-footer>

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { LoadingController, ModalController, Platform } from '@ionic/angular';
 import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, Marker, Environment, GoogleMapsAnimation, ILatLng } from '@ionic-native/google-maps';
-import { IMeeting } from 'src/app/interfaces/meeting';
+import { IMeeting } from 'src/app/interfaces/Meeting';
 
 declare var google;
 

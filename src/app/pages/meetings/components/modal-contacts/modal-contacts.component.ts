@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, ModalController } from '@ionic/angular';
-import { IMeeting } from 'src/app/interfaces/meeting';
-import { MeetingService } from 'src/app/services/meeting/meeting.service';
-import { UserService } from 'src/app/services/user/user.service';
+import { IMeeting } from 'src/app/interfaces/Meeting';
+import { MeetingService } from 'src/app/services/meeting.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-modal-contacts',

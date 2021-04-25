@@ -1,6 +1,6 @@
 ion-header ion-toolbar {
 
-  --background: #4ECDC4;
+  --background: var(--ion-color-turquoise);
   color: #FFF;
   margin-bottom: 20px;
 
@@ -18,9 +18,9 @@ ion-header ion-toolbar {
 
 ion-button {
   overflow: hidden;
-  margin: 16px;
-  --background: #385A64;
-  --border-radius: 10px;
+  margin: auto;
+  width: 300px;
+  --border-radius: 20px;
 }
 
 form {
