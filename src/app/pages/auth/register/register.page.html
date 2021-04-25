@@ -11,7 +11,9 @@
 
 <ion-content class="ion-padding">
 
-  <form [formGroup]="registerForm" (submit)="register()">
+  <div id="recaptcha-container"></div>
+
+  <form [formGroup]="registerForm" (submit)="signup()">
 
     <h3>Cadastre-se</h3>
 

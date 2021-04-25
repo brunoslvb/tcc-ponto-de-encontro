@@ -21,7 +21,12 @@ export class AuthService {
   }
 
   saveUserInFirestore(user: IUser){
-    return this.firestore.collection(this.collection).doc(user.uuid).set(user);
+
+    const id = user.uid;
+
+    delete user.uid;
+
+    return this.firestore.collection(this.collection).doc(id).set(user);
   }
 
 }

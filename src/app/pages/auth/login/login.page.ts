@@ -6,6 +6,7 @@ import DDD from '../../../config/DDD.js';
 import firebase from 'firebase/app';
 
 import { AlertController, ToastController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service.js';
 
 const window = {
   recaptchaVerifier: undefined
@@ -27,7 +28,8 @@ export class LoginPage implements OnInit {
   constructor(
     private builder: FormBuilder,
     private alertController: AlertController,
-    private toast: ToastController
+    private toastController: ToastController,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -52,14 +54,25 @@ export class LoginPage implements OnInit {
     const phoneNumber = `${this.areaCode}${this.loginForm.value.ddd}${this.loginForm.value.phone}`;
     const appVerifier = window.recaptchaVerifier;
 
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier).then(confirmationResult => {
-            
-      this.confirmCode(confirmationResult);
+    try {
+      const confirmationResult = await this.authService.signInWithPhoneNumber(phoneNumber, appVerifier)
     
-    }).catch(err => {
+      const confirmationCode = await this.presentAlertPrompt();
+    
+      if(confirmationCode === null) return;
+
+      confirmationResult.confirm(confirmationCode).then(result => {
+
+        console.log(result);
+
+      }).catch(async err => {
+        await this.presentToast('Código de verificação inválido');
+      });
+    
+    } catch (err) {
       console.error(err);
       this.recaptchaVerifier();
-    });
+    }
 
   }
 
@@ -74,7 +87,7 @@ export class LoginPage implements OnInit {
       console.log(result);
 
     }).catch(async err => {
-      await this.presentToastWithOptions();
+      await this.presentToast('Código de verificação inválido');
     });
 
   }
@@ -84,7 +97,6 @@ export class LoginPage implements OnInit {
     let response = null;
 
     const alert = await this.alertController.create({
-      cssClass: 'my-custom-class',
       header: 'Código de confirmação',
       backdropDismiss: false,
       inputs: [
@@ -136,32 +148,13 @@ export class LoginPage implements OnInit {
   }
 
   
-  async presentToastWithOptions() {
-    const toast = await this.toast.create({
-      header: 'Código incorreto',
-      message: 'Click to Close',
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
       position: 'bottom',
-      buttons: [
-        {
-          side: 'start',
-          icon: 'star',
-          text: 'Favorite',
-          handler: () => {
-            console.log('Favorite clicked');
-          }
-        }, {
-          text: 'Done',
-          role: 'cancel',
-          handler: () => {
-            console.log('Cancel clicked');
-          }
-        }
-      ]
+      message: message,
+      duration: 3000
     });
-    await toast.present();
-
-    const { role } = await toast.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
+    toast.present();
   }
 
 }
