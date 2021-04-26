@@ -43,6 +43,11 @@ export class RegisterPage implements OnInit {
     });
 
     this.recaptchaVerifier();
+
+  }
+  
+  ionViewWillEnter(){
+    this.authService.isUserLoggedIn();
   }
 
   register(){
@@ -68,10 +73,17 @@ export class RegisterPage implements OnInit {
     const phoneNumber = `${this.areaCode}${this.registerForm.value.ddd}${this.registerForm.value.phone}`;
     const appVerifier = window.recaptchaVerifier;
 
+    if((await this.authService.findUserById(phoneNumber)).exists) {
+      await this.presentToast("Já existe uma conta com este número");
+      await this.loading.dismiss();
+      return;
+    }
+
     const user: IUser = {
       name: this.registerForm.value.name,
       email: this.registerForm.value.email,
-      phone: phoneNumber
+      phone: phoneNumber,
+      groups: []
     }
 
     try {
@@ -91,8 +103,6 @@ export class RegisterPage implements OnInit {
 
       confirmationResult.confirm(confirmationCode).then(async result => {
 
-        user.uid = result.user.uid;
-
         await this.authService.saveUserInFirestore(user);
 
         await this.loading.dismiss();
@@ -102,9 +112,11 @@ export class RegisterPage implements OnInit {
       });
     
     } catch (err) {
+      
       console.error(err);
       await this.presentToast("Ocorreu um erro no envio do SMS de validação, por favor tente novamente mais tarde")
       this.recaptchaVerifier();
+
     } finally {
       await this.loading.dismiss();
     }

@@ -5,7 +5,7 @@ import DDD from '../../../config/DDD.js';
 
 import firebase from 'firebase/app';
 
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service.js';
 
 const window = {
@@ -20,6 +20,8 @@ const window = {
 
 export class LoginPage implements OnInit {
 
+  loading: any;
+
   loginForm: FormGroup;
   ddd: IDDD[] = DDD;
 
@@ -29,7 +31,8 @@ export class LoginPage implements OnInit {
     private builder: FormBuilder,
     private alertController: AlertController,
     private toastController: ToastController,
-    private authService: AuthService
+    private authService: AuthService,
+    private loadingController: LoadingController
   ) { }
 
   ngOnInit() {
@@ -41,6 +44,10 @@ export class LoginPage implements OnInit {
     this.recaptchaVerifier();
   }
   
+  ionViewWillEnter(){
+    this.authService.isUserLoggedIn();
+  }
+
   recaptchaVerifier(){
     
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
@@ -51,19 +58,39 @@ export class LoginPage implements OnInit {
   
   async signin(){
     
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+
+    await this.loading.present();
+
     const phoneNumber = `${this.areaCode}${this.loginForm.value.ddd}${this.loginForm.value.phone}`;
     const appVerifier = window.recaptchaVerifier;
+
+    if(!(await this.authService.findUserById(phoneNumber)).exists) {
+      await this.presentToast("Conta não encontrada");
+      await this.loading.dismiss();
+      return;
+    }
 
     try {
       const confirmationResult = await this.authService.signInWithPhoneNumber(phoneNumber, appVerifier)
     
+      await this.loading.dismiss();
+
       const confirmationCode = await this.presentAlertPrompt();
     
+      this.loading = await this.loadingController.create({
+        spinner: 'crescent'
+      });
+  
+      await this.loading.present();
+
       if(confirmationCode === null) return;
 
-      confirmationResult.confirm(confirmationCode).then(result => {
+      confirmationResult.confirm(confirmationCode).then(async result => {
 
-        console.log(result);
+        await this.presentToast('Login realizado com sucesso');
 
       }).catch(async err => {
         await this.presentToast('Código de verificação inválido');
@@ -72,6 +99,8 @@ export class LoginPage implements OnInit {
     } catch (err) {
       console.error(err);
       this.recaptchaVerifier();
+    } finally {
+      await this.loading.dismiss();
     }
 
   }

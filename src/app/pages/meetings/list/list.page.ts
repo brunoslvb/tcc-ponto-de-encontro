@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LoadingController, MenuController, ModalController, NavController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 import { IMeeting } from 'src/app/interfaces/Meeting';
+import { IUser } from 'src/app/interfaces/User';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -16,18 +17,18 @@ export class ListPage implements OnInit {
 
   loading: any;
 
+  user: IUser = JSON.parse(sessionStorage.getItem('user'));
+
   constructor(
     private meetingService: MeetingService,
     private userService: UserService,
     private loadingController: LoadingController,
     private modalController: ModalController,
     private nav: NavController,
-    private menu: MenuController
-  ) { 
-    // sessionStorage.setItem("user", "brunosilva2365@gmail.com"); 
-  }
+    private menu: MenuController,
+  ) { }
 
-  ngOnInit() {
+  ngOnInit() {    
     this.getMeetingsOfUser();
   }
 
@@ -43,8 +44,8 @@ export class ListPage implements OnInit {
   }
 
   async getMeetingsOfUser(){
-
-    this.userService.getById(sessionStorage.getItem('user')).subscribe((user: any) => {      
+    
+    this.userService.getById(this.user.phone).subscribe((user: any) => {      
 
       let meetingsAux = [];
       

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NavController, LoadingController, ToastController } from '@ionic/angular';
+import { IUser } from 'src/app/interfaces/User';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -12,6 +13,8 @@ declare var google;
   styleUrls: ['./create.page.scss'],
 })
 export class CreatePage implements OnInit {
+  
+  loading: any;
 
   registerForm: FormGroup;
   addresses: Array<{
@@ -19,7 +22,7 @@ export class CreatePage implements OnInit {
   }> = [];
   coords: Array<Number>;
 
-  loading: any;
+  user: IUser = JSON.parse(sessionStorage.getItem('user'));
 
   private googleMapsPlaces = new google.maps.places.AutocompleteService();
   private googleMapsGeocoder = new google.maps.Geocoder();
@@ -94,11 +97,11 @@ export class CreatePage implements OnInit {
     await this.loading.present();
     
     const members: Array<string> = [
-      sessionStorage.getItem('user')
+      this.user.phone
     ];
 
     const data = {
-      owner: sessionStorage.getItem('user'),
+      owner: this.user.phone,
       name: this.registerForm.value.name,
       date: this.registerForm.value.date,
       time: this.registerForm.value.time,

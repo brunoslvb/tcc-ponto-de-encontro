@@ -7,5 +7,6 @@ export interface IUser {
       address?: string;
       latitude?: number;
       longitude?: number;
-    }
+    };
+    groups?: Array<string>;
 }

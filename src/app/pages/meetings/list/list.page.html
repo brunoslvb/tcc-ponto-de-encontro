@@ -2,15 +2,11 @@
   <ion-menu side="start" menuId="main-menu" content-id="main">
     <ion-header>
       <ion-toolbar>
-        <ion-title>Start Menu</ion-title>
+        <ion-title>Opções</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item>Menu Item</ion-item>
-        <ion-item>Menu Item</ion-item>
-        <ion-item>Menu Item</ion-item>
-        <ion-item>Menu Item</ion-item>
         <ion-item>Menu Item</ion-item>
       </ion-list>
     </ion-content>
@@ -26,14 +22,13 @@
     </ion-toolbar>
   </ion-header>
   
-  
   <ion-content>
     
     <div *ngIf="meetings.length === 0" class="alone">
 
       <h3>Poxa, parece que você não tem nenhum encontro. Que tal criar um?</h3>
   
-      <ion-fab-button routerLink="/meetings/create">
+      <ion-fab-button vertical="center" horizontal="center" slot="fixed" routerLink="/meetings/create">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
   
@@ -70,6 +65,17 @@
         </div>
         
       </ion-card>
+
+    </div>
+
+    <div *ngIf="meetings.length > 0">
+  
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button class="create-button" color="turquoise" routerLink="/meetings/create">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+  
     </div>
     
   </ion-content>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -7,8 +8,12 @@ import { Component } from '@angular/core';
 })
 export class HomePage {
 
-  constructor() {
-    // sessionStorage.setItem("user", "brunosilva2365@gmail.com");
+  constructor(
+    private authService: AuthService
+  ) { }
+
+  ionViewWillEnter(){
+    this.authService.isUserLoggedIn();
   }
 
 }
