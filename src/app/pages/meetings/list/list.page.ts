@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, MenuController, ModalController, NavController } from '@ionic/angular';
+import { AlertController, LoadingController, MenuController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
@@ -26,6 +26,8 @@ export class ListPage implements OnInit {
     private modalController: ModalController,
     private nav: NavController,
     private menu: MenuController,
+    private alertController: AlertController,
+    private toastController: ToastController
   ) { }
 
   ngOnInit() {    
@@ -75,9 +77,102 @@ export class ListPage implements OnInit {
 
   }
 
-  lala() {
-    this.menu.enable(true, 'main-menu');
-    this.menu.open('main-menu');
+  async addContact(){
+    const phone = await this.presentAlertPrompt();
+
+    if(phone === null || phone === "") return;
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+
+    await this.loading.present();
+
+    const contact: any = await this.userService.getContactById(phone);
+
+    console.log(contact);
+    
+
+    if(!contact.exists) {
+      await this.loading.dismiss();
+      return await this.presentToast("Número de telefone não encontrado");
+    }
+
+    if((await this.userService.getContactByIdInUser(phone)).exists) {
+      await this.loading.dismiss();
+      return await this.presentToast("Contato já está adicionado");
+    }
+
+    const data: IUser = {
+      name: contact.data().name,
+      phone: contact.data().phone,
+    }
+
+    await this.userService.addContact(data);
+
+    await this.loading.dismiss();
+
+    await this.presentToast("Contato adicionado com sucesso");
+
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      position: 'bottom',
+      message: message,
+      duration: 3000
+    });
+    toast.present();
+  }
+
+  async presentAlertPrompt() {
+
+    let response = null;
+
+    const alert = await this.alertController.create({
+      header: 'Adicione um amigo',
+      backdropDismiss: false,
+      inputs: [
+        {
+          name: 'phone',
+          type: 'text',          
+          placeholder: 'Ex.: +5511912345678'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {            
+            alert.dismiss();
+          }
+        }, {
+          text: 'Confirmar',
+          role: "ok",
+          handler: ({phone}) => {
+            alert.dismiss(phone);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
+    await alert.onDidDismiss().then((res) => {
+
+      if(res.role === "cancel") {
+        return;
+      }
+      
+      console.log(res);
+
+      response = res.data.values.phone;
+
+    });
+
+    return response;
+
   }
 
 }

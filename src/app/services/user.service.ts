@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { IUser } from '../interfaces/User';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 export class UserService {
 
   private collection: string = 'users';
+  private currentUser: IUser = JSON.parse(sessionStorage.getItem('user'));
 
   constructor(
     private firestore: AngularFirestore
@@ -25,8 +27,20 @@ export class UserService {
     return this.firestore.collection(this.collection).doc(userId).update({ groups: firebase.firestore.FieldValue.arrayRemove(meetingId) });
   }
 
-  getContactsFromUser(userId: string) {
-    return this.firestore.collection(this.collection).doc(userId).collection('contacts').get().toPromise();
+  getContacts() {
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection('contacts').get().toPromise();
+  }
+
+  getContactById(userId: string) {
+    return this.firestore.collection(this.collection).doc(userId).get().toPromise();
+  }
+
+  getContactByIdInUser(userId: string) {
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection('contacts').doc(userId).get().toPromise();
+  }
+
+  addContact(user: IUser) {
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection("contacts").doc(user.phone).set(user);
   }
 
 }

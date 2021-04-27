@@ -22,10 +22,10 @@
       <ion-item>
         <ion-label>
           <h2>{{contact.name}}</h2>
-          <h3>{{contact.email}}</h3>
+          <h3>{{contact.phone}}</h3>
         </ion-label>
         <div *ngIf="!contact.isInTheMeeting">
-          <ion-checkbox color="dark" value={{contact.email}} (ionChange)="getSelectedContacts($event)"></ion-checkbox>
+          <ion-checkbox color="dark" value={{contact.phone}} (ionChange)="getSelectedContacts($event)"></ion-checkbox>
         </div>
       </ion-item>
     </div>

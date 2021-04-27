@@ -9,16 +9,41 @@ ion-header {
     ion-menu-button {
       color: #FFF;
     }
+  
+  }
+  
+}
+
+ion-menu {
+  
+  color: #9E9E9E;
+
+  ion-toolbar {
+    --background: #F8F8F8;
+  }
+  
+  ion-item {
+
+    transition: 0.5s;
 
   }
 
+  ion-item:active {
+    opacity: 0.4;       
+  }
+  
+
+  ion-icon {
+    color: #385A64;
+  }
+  
+  ion-footer {
+    margin: 10px auto;
+    text-align: center;
+    color: #9E9E9E;
+  }
 }
 
-ion-title {
-  color: #0d476b;
-  font-size: 12pt;
-  font-weight: 500;
-}
 
 ion-icon {
   color: #ff5252;

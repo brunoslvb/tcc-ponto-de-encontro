@@ -46,7 +46,7 @@ export class ModalContactsComponent implements OnInit {
 
     await this.loading.present();
 
-    await this.userService.getContactsFromUser(sessionStorage.getItem('user')).then(response => {
+    await this.userService.getContacts().then(response => {
 
       let contact: any;
 
@@ -55,7 +55,7 @@ export class ModalContactsComponent implements OnInit {
         contact = doc.data();
 
         for (let i = 0; i < this.meeting.members.length; i++) {
-          if(contact.email === this.meeting.members[i]) {
+          if(contact.phone === this.meeting.members[i]) {
             contact.isInTheMeeting = true;
             break;
           }
