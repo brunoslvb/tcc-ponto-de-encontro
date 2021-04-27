@@ -13,11 +13,11 @@ export class ChatService {
   ) { }
 
   getMessages(chatId: string){
-    return this.firestore.collection(`meetings/${chatId}/chat`, ref => ref.orderBy('createdAt')).snapshotChanges();
+    return this.firestore.collection(`${this.collection}/${chatId}/chat`, ref => ref.orderBy('createdAt')).snapshotChanges();
   }
 
   saveMessage(chatId: string, data){
-    return this.firestore.collection(`meetings/${chatId}/chat`).add(data);
+    return this.firestore.collection(`${this.collection}/${chatId}/chat`).add(data);
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController, PopoverController, LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
@@ -10,6 +10,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatService } from 'src/app/services/chat.service';
 import { IMessage } from 'src/app/interfaces/Message';
 import firebase from 'firebase/app';
+import { IUser } from 'src/app/interfaces/User';
 
 @Component({
   selector: 'app-chat',
@@ -18,7 +19,7 @@ import firebase from 'firebase/app';
 })
 export class ChatPage implements OnInit {
 
-  username: string = sessionStorage.getItem("user");
+  user: IUser = JSON.parse(sessionStorage.getItem("user"));
 
   chatForm: FormGroup;
 
@@ -196,7 +197,7 @@ export class ChatPage implements OnInit {
 
         const data: IMessage = item.payload.doc.data();
         
-        data.myMessage = data.from === this.username;
+        data.myMessage = data.from === this.user.phone;
 
         messages.push(data);
       });
@@ -210,8 +211,8 @@ export class ChatPage implements OnInit {
   async sendMessage(){
     
     const data = {
-      from: this.username,
-      fromName: sessionStorage.getItem("name"),
+      from: this.user.phone,
+      fromName: this.user.name,
       message: this.chatForm.value.message,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }
