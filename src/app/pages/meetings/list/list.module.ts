@@ -17,6 +17,6 @@ import { ComponentModule } from 'src/app/components/component.module';
     ComponentModule,
     ListPageRoutingModule
   ],
-  declarations: [ListPage]
+  declarations: []
 })
 export class ListPageModule {}

@@ -1,0 +1,28 @@
+<ion-header class="ion-no-border" mode="">
+  <ion-toolbar>
+    <ion-title>Amigos</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" size="large" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list>
+    <div *ngFor="let contact of contacts">
+      <ion-item>
+        <ion-avatar slot="start">
+          <img src="../../../../../assets/bruno.jpg">
+        </ion-avatar>
+        <ion-label>
+          <h2>{{contact.name}}</h2>
+          <h3>{{contact.phone}}</h3>
+        </ion-label>
+        <ion-icon slot="end" name="trash-outline"></ion-icon>
+      </ion-item>
+    </div>
+  </ion-list>
+</ion-content>

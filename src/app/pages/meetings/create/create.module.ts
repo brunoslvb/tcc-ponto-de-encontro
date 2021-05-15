@@ -16,6 +16,6 @@ import { CreatePage } from './create.page';
     IonicModule,
     CreatePageRoutingModule
   ],
-  declarations: [CreatePage]
+  declarations: []
 })
 export class CreatePageModule {}

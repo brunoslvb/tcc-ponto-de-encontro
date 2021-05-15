@@ -5,6 +5,8 @@ import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
+import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
+import { ModalListContactsComponent } from '../components/modal-list-contacts/modal-list-contacts.component';
 
 @Component({
   selector: 'app-list',
@@ -30,7 +32,7 @@ export class ListPage implements OnInit {
     private toastController: ToastController
   ) { }
 
-  ngOnInit() {    
+  ngOnInit() {
     this.getMeetingsOfUser();
   }
 
@@ -47,7 +49,9 @@ export class ListPage implements OnInit {
 
   async getMeetingsOfUser(){
     
-    this.userService.getById(this.user.phone).subscribe((user: any) => {      
+    this.userService.getById(this.user.phone).snapshotChanges().subscribe((user: any) => {      
+
+      this.user = user.payload.data();
 
       let meetingsAux = [];
       
@@ -82,7 +86,7 @@ export class ListPage implements OnInit {
   }
 
   async addContact(){
-    const phone = await this.presentAlertPrompt();
+    const phone = await this.presentAlertAddContact();
 
     if(phone === null || phone === "") return;
 
@@ -129,7 +133,7 @@ export class ListPage implements OnInit {
     toast.present();
   }
 
-  async presentAlertPrompt() {
+  async presentAlertAddContact() {        
 
     let response = null;
 
@@ -177,6 +181,73 @@ export class ListPage implements OnInit {
 
     return response;
 
+  }
+
+  async presentAlertNotification(){
+
+    console.log(this.user);
+    
+
+    const alert = await this.alertController.create({
+      header: `${ this.user.receiveNotifications ? "Desativar" : "Ativar"} notificações`,
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {            
+            alert.dismiss();
+          }
+        }, {
+          text: 'Confirmar',
+          role: "ok",
+          handler: () => {
+            this.toggleNotifications();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
+  }
+
+  async toggleNotifications() {
+    const data: IUser = this.user;
+
+    const msg: string = `Notificações ${ this.user.receiveNotifications ? "desativadas" : "ativadas"} com sucesso`;
+
+    data.receiveNotifications = !data.receiveNotifications;
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+
+    await this.loading.present();
+
+    try{
+      
+      await this.userService.editUser(data);
+
+      await this.presentToast(msg);
+
+    } catch(error) {
+      console.error(error);
+      await this.presentToast("Problemas ao atualizar informações. Tente novamente mais tarder");
+    } finally {
+      await this.loading.dismiss();
+    }
+  }
+
+  async showContacts(){
+    const modal = await this.modalController.create({
+      component: ModalListContactsComponent,
+      componentProps: {
+        user: this.user
+      }
+    });
+    await modal.present();
   }
 
 }
