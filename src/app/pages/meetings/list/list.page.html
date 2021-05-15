@@ -7,7 +7,7 @@
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item button><ion-icon slot="start" name="person-outline"></ion-icon>Perfil</ion-item>
+        <ion-item button (click)="profile()"><ion-icon slot="start" name="person-outline"></ion-icon>Perfil</ion-item>
         <ion-item button (click)="addContact()"><ion-icon slot="start" name="people-outline"></ion-icon>Adicionar amigo</ion-item>
         <ion-item button><ion-icon slot="start" name="notifications-outline"></ion-icon>Notificações</ion-item>
         <ion-item button><ion-icon slot="start" name="log-out-outline"></ion-icon>Sair</ion-item>
@@ -19,10 +19,16 @@
   </ion-menu>
   <ion-router-outlet id="main"></ion-router-outlet>
   
-  <ion-header class="ion-no-border">
+  <ion-header class="ion-no-border" mode="md">
+    <div class="logo">
+      <img src="../../assets/logo.png" alt="">
+    </div>
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button menu="main-menu"></ion-menu-button>
+      </ion-buttons>
+      <ion-buttons slot="start">
+        <!-- <ion-menu-button menu="main-menu"></ion-menu-button> -->
       </ion-buttons>
       <ion-title></ion-title>
     </ion-toolbar>
@@ -76,7 +82,7 @@
 
     <div *ngIf="meetings.length > 0">
   
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab class="button-float">
         <ion-fab-button class="create-button" color="turquoise" routerLink="/meetings/create">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>

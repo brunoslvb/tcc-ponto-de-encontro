@@ -77,6 +77,10 @@ export class ListPage implements OnInit {
 
   }
 
+  async profile() {
+    await this.nav.navigateForward(`/user/${btoa(this.user.phone)}`);
+  }
+
   async addContact(){
     const phone = await this.presentAlertPrompt();
 
