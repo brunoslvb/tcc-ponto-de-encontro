@@ -20,7 +20,7 @@ export class UserService {
   }
 
   getById(userId: string){
-    return this.firestore.collection(this.collection).doc(userId).snapshotChanges();
+    return this.firestore.collection(this.collection).doc(userId);
   }
 
   removeMeetingFromUser(userId: string, meetingId: string){
@@ -41,6 +41,10 @@ export class UserService {
 
   addContact(user: IUser) {
     return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection("contacts").doc(user.phone).set(user);
+  }
+
+  editUser(user: IUser){
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).update(user);
   }
 
 }

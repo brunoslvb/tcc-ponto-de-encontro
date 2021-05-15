@@ -1,0 +1,50 @@
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="photo">
+    <div class="iconEdit">
+      <ion-icon button name="camera-outline"></ion-icon>
+    </div>
+    <img src="../../../../assets/bruno.jpg" alt="Ícone usuário">
+  </div>
+
+  <form [formGroup]="editForm" (submit)="update()">
+
+    <div class="input">
+      <ion-item>
+        <ion-icon name="person-outline" slot="end"></ion-icon>
+        <ion-input type="text" id="name" formControlName="name" placeholder="Nome" [value]=(user.name)></ion-input>
+      </ion-item>
+    </div>
+
+    <div class="input">
+      <ion-item>
+        <ion-icon name="mail-outline" slot="end"></ion-icon>
+        <ion-input type="text" id="email" formControlName="email" placeholder="E-mail" [value]=(user.email)></ion-input>
+      </ion-item>
+    </div>
+    
+    <div class="input">
+      <ion-item>
+        <ion-icon name="call-outline" slot="end"></ion-icon>
+        <ion-input type="text" id="phone" formControlName="phone" placeholder="Celular" [value]=(user.phone) disabled></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-button [disabled]="editForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default"><span>Editar</span></ion-button>
+  </form>
+
+</ion-content>
+
+
+<app-footer></app-footer>
