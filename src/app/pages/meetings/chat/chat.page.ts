@@ -70,7 +70,7 @@ export class ChatPage implements OnInit {
     this.dismissPopover();
   }
 
-  async addContactsToMeeting(contacts: Array<string>){
+  async addContactsToMeeting(contacts: IUser[]){
     this.dismissPopover();
 
     this.loading = await this.loadingController.create({
@@ -79,11 +79,17 @@ export class ChatPage implements OnInit {
 
     await this.loading.present();
 
-    await contacts.forEach(async contact => {
+    await contacts.forEach(async (contact: any) => {
 
-      await this.meetingService.addUserToMeeting(this.meeting.id, contact);
+      await this.meetingService.addUserToMeeting(this.meeting.id, contact.phone);
 
-      await this.userService.addMeetingToUser(contact, this.meeting.id);
+      await this.userService.addMeetingToUser(contact.phone, this.meeting.id);
+
+      await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), {
+        message: `${contact.name} foi adicionado ao encontro`,
+        type: "event",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
     });
 
@@ -214,6 +220,7 @@ export class ChatPage implements OnInit {
       from: this.user.phone,
       fromName: this.user.name,
       message: this.chatForm.value.message,
+      type: "message",
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }
 

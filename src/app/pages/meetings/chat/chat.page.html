@@ -25,13 +25,22 @@
   <div *ngIf="meeting.members.length > 1">
     <div id="messages">
       <ion-grid *ngFor="let message of messages">
-        <ion-row>
-          <ion-col size="9" [offset]="message.myMessage ? 3 : 0" [ngClass]="{ 'message': true, 'my-message': message.myMessage, 'other-message': !message.myMessage }">
-            <h6>{{message.myMessage ? "" : message.fromName}}</h6>
-            <p>{{message.message}}</p>
-            <span>{{ message.createdAt?.toMillis() | date: 'short' }}</span>
-          </ion-col>
-        </ion-row>
+        <div *ngIf="message.type === 'message'">
+          <ion-row>
+            <ion-col size="9" [offset]="message.myMessage ? 3 : 0" [ngClass]="{ 'message': true, 'my-message': message.myMessage, 'other-message': !message.myMessage }">
+              <h6>{{message.myMessage ? "" : message.fromName}}</h6>
+              <p>{{message.message}}</p>
+              <span>{{ message.createdAt?.toMillis() | date: 'short' }}</span>
+            </ion-col>
+          </ion-row>
+        </div>
+        <div *ngIf="message.type !== 'message'">
+          <ion-row>
+            <ion-col class="event" size="7">
+              {{message.message}}
+            </ion-col>
+          </ion-row>
+        </div>
       </ion-grid>
     </div>
 

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/Meeting';
+import { IUser } from 'src/app/interfaces/User';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -12,10 +13,10 @@ import { UserService } from 'src/app/services/user.service';
 export class ModalContactsComponent implements OnInit {
 
   meeting: IMeeting;
-  contacts: Array<any> = [];
+  contacts: any = [];
   loading: any;
 
-  selectedContacts: Array<string> = [];
+  selectedContacts: IUser[] = [];
 
   constructor(
     private userService: UserService,
@@ -28,12 +29,12 @@ export class ModalContactsComponent implements OnInit {
     this.loadContactsFromUser();
   }
 
-  getSelectedContacts(ev: any) {
+  getSelectedContacts(ev: any, contact: any) {
 
     if(ev.detail.checked) {
-      this.selectedContacts.push(ev.detail.value);
+      this.selectedContacts.push(contact);
     } else {
-      this.selectedContacts.splice(this.selectedContacts.indexOf(ev.detail.value), 1);
+      this.selectedContacts.splice(this.selectedContacts.indexOf(contact), 1);
     }
 
   }

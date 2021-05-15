@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingController, ModalController, NavController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/Meeting';
+import { IUser } from 'src/app/interfaces/User';
+import { ChatService } from 'src/app/services/chat.service';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
+
+import firebase from 'firebase/app';
 
 @Component({
   selector: 'app-popover',
@@ -11,6 +15,7 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class PopoverComponent implements OnInit {
 
+  user: IUser = JSON.parse(sessionStorage.getItem('user'));
   meeting: IMeeting;
   loading: any;
 
@@ -19,7 +24,8 @@ export class PopoverComponent implements OnInit {
     private userService: UserService,
     private nav: NavController,
     private loadingController: LoadingController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private chatService: ChatService
   ) { }
 
   ngOnInit() {}
@@ -32,11 +38,17 @@ export class PopoverComponent implements OnInit {
     await this.loading.present();
 
     try{
-      await this.meetingService.removeUserFromMeeting(this.meeting.id, sessionStorage.getItem('user'));
+      await this.meetingService.removeUserFromMeeting(this.meeting.id, this.user.phone);
 
       await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
 
-      await this.userService.removeMeetingFromUser(sessionStorage.getItem('user'), this.meeting.id);
+      await this.userService.removeMeetingFromUser(this.user.phone, this.meeting.id);
+
+      await this.chatService.saveMessage(this.meeting.id, {
+        message: `${this.user.name} saiu do encontro`,
+        type: "event",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
       await this.nav.navigateForward('/meetings', {
         replaceUrl: true

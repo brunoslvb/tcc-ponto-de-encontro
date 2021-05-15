@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NavController, LoadingController, ToastController } from '@ionic/angular';
 import { IUser } from 'src/app/interfaces/User';
+import { ChatService } from 'src/app/services/chat.service';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
+
+import firebase from 'firebase/app';
 
 declare var google;
 
@@ -32,6 +35,7 @@ export class CreatePage implements OnInit {
     private nav: NavController,
     private meetingService: MeetingService,
     private userService: UserService,
+    private chatService: ChatService,
     private loadingController: LoadingController,
     public toastController: ToastController
   ) { }
@@ -119,6 +123,12 @@ export class CreatePage implements OnInit {
 
       await data.members.forEach(async member => {
         await this.userService.addMeetingToUser(member, id);
+      });
+
+      await this.chatService.saveMessage(id, {
+        message: `Encontro ${data.name} criado`,
+        type: "event",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
       await this.loading.dismiss();

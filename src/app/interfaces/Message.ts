@@ -6,4 +6,5 @@ export interface IMessage {
   createdAt: firebase.firestore.FieldValue;
   message: string;
   myMessage: boolean;
+  type?: string;
 }
