@@ -16,6 +16,6 @@ import { ChatPage } from './chat.page';
     IonicModule,
     ChatPageRoutingModule
   ],
-  declarations: [ChatPage]
+  declarations: []
 })
 export class ChatPageModule {}

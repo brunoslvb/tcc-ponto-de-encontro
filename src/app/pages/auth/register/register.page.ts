@@ -83,7 +83,8 @@ export class RegisterPage implements OnInit {
       name: this.registerForm.value.name,
       email: this.registerForm.value.email,
       phone: phoneNumber,
-      groups: []
+      groups: [],
+      receiveNotifications: true
     }
 
     try {
