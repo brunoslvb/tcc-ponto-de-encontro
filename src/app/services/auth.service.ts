@@ -35,6 +35,26 @@ export class AuthService {
     return this.firestore.collection(this.collection).doc(id).get().toPromise();
   }
 
+  async getUserLogged() {
+    try {
+      await this.isLoggedIn.subscribe(async user => {
+        
+        if(user){
+
+          console.log(user);
+
+          const data: IUser = (await this.findUserById(user.phoneNumber)).data();
+
+          return data;
+        }
+      });      
+    } catch (err) {
+      console.error(err);
+    }
+
+    return null;
+  }
+
   async isUserLoggedIn(){
 
     this.loading = await this.loadingController.create({ spinner: 'crescent' });
@@ -46,13 +66,15 @@ export class AuthService {
         
         if(user){
 
+          console.log(user);
+
           const data: any = (await this.findUserById(user.phoneNumber)).data();
 
-          sessionStorage.setItem('user', JSON.stringify({
+          sessionStorage.setItem('user', btoa(JSON.stringify({
             name: data.name,
             phone: data.phone,
             email: data.email
-          }));
+          })));
 
           this.nav.navigateForward('meetings');
         }

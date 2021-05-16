@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, ModalController } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { IUser } from 'src/app/interfaces/User';
-import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -12,7 +11,7 @@ import { UserService } from 'src/app/services/user.service';
 export class ModalListContactsComponent implements OnInit {
 
   user: IUser;
-  contacts: any = [];
+  contacts: Array<IUser> = [];
   loading: any;
 
   selectedContacts: IUser[] = [];
@@ -20,7 +19,9 @@ export class ModalListContactsComponent implements OnInit {
   constructor(
     private userService: UserService,
     private loadingController: LoadingController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private toastController: ToastController,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -36,7 +37,7 @@ export class ModalListContactsComponent implements OnInit {
 
     await this.loading.present();
 
-    await this.userService.getContacts().then(response => {
+    await this.userService.getContacts().get().toPromise().then(response => {
 
       let contact: any;
 
@@ -47,13 +48,68 @@ export class ModalListContactsComponent implements OnInit {
         this.contacts.push(contact);
       });
 
-    });
-
-    console.log(this.contacts);
-    
+    });    
 
     await this.loading.dismiss();
 
+  }
+
+  async alertDeleteContact(contact: IUser) {
+    const alert = await this.alertController.create({
+      header: `Deseja remover ${contact.name} ?`,
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {            
+            alert.dismiss();
+          }
+        }, {
+          text: 'Confirmar',
+          role: "ok",
+          handler: () => {
+            this.deleteContact(contact.phone);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async deleteContact(contact: string){
+    
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+
+    await this.loading.present();
+
+    try {
+      await this.userService.deleteContact(contact);
+
+      let aux = this.contacts.findIndex((item: IUser) => item.phone === contact);
+
+      if(aux != -1){
+        this.contacts.splice(aux, 1);
+      }
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await this.loading.dismiss();
+    }
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      position: 'bottom',
+      message: message,
+      duration: 3000
+    });
+    toast.present();
   }
 
   async closeModal(){

@@ -25,7 +25,7 @@ export class CreatePage implements OnInit {
   }> = [];
   coords: Array<Number>;
 
-  user: IUser = JSON.parse(sessionStorage.getItem('user'));
+  user: IUser = JSON.parse(atob(sessionStorage.getItem('user')));
 
   private googleMapsPlaces = new google.maps.places.AutocompleteService();
   private googleMapsGeocoder = new google.maps.Geocoder();

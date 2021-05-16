@@ -16,6 +16,6 @@ import { ComponentModule } from 'src/app/components/component.module';
     IonicModule,
     HomePageRoutingModule
   ],
-  declarations: []
+  declarations: [HomePage]
 })
 export class HomePageModule {}

@@ -46,4 +46,17 @@ export class MeetingService {
     return this.firestore.collection(this.collection).doc(meetingId).update({ numberOfMembers: doc.members.length });
 
   }
+
+  async deleteChat(meetingId) {
+    return this.firestore.collection(this.collection).doc(meetingId).collection('chat').get().toPromise().then(data => {
+      data.docs.forEach(doc => {
+        doc.ref.delete()
+      })
+    })
+  }
+
+  async deleteMeeting(meetingId) {
+    return this.firestore.collection(this.collection).doc(meetingId).delete();
+  }
+
 }

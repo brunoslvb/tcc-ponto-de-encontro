@@ -81,7 +81,7 @@ export class ProfilePage implements OnInit {
 
     try{
       
-      await this.userService.editUser(this.editForm.value);
+      await this.userService.update(this.editForm.value);
 
       await this.presentToast("Informações atualizadas com sucesso");
 

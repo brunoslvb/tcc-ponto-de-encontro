@@ -21,7 +21,7 @@
           <h2>{{contact.name}}</h2>
           <h3>{{contact.phone}}</h3>
         </ion-label>
-        <ion-icon slot="end" name="trash-outline"></ion-icon>
+        <ion-icon slot="end" name="trash-outline" (click)="alertDeleteContact(contact)"></ion-icon>
       </ion-item>
     </div>
   </ion-list>

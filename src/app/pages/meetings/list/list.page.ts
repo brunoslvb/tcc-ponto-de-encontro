@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, LoadingController, MenuController, ModalController, NavController, ToastController } from '@ionic/angular';
-import { ModalMapComponent } from 'src/app/components/modal-map/modal-map.component';
+import { AlertController, LoadingController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
-import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
 import { ModalListContactsComponent } from '../components/modal-list-contacts/modal-list-contacts.component';
 
 @Component({
@@ -15,11 +13,11 @@ import { ModalListContactsComponent } from '../components/modal-list-contacts/mo
 })
 export class ListPage implements OnInit {
 
+  loading: any;
+  
   meetings: Array<IMeeting> = [];
 
-  loading: any;
-
-  user: IUser = JSON.parse(sessionStorage.getItem('user'));
+  user: IUser = JSON.parse(atob(sessionStorage.getItem('user')));
 
   constructor(
     private meetingService: MeetingService,
@@ -27,27 +25,15 @@ export class ListPage implements OnInit {
     private loadingController: LoadingController,
     private modalController: ModalController,
     private nav: NavController,
-    private menu: MenuController,
     private alertController: AlertController,
     private toastController: ToastController
   ) { }
 
   ngOnInit() {
-    this.getMeetingsOfUser();
+    this.getMeetingsFromUser();
   }
 
-  async showModalMap(meeting: IMeeting){
-    const modal = await this.modalController.create({
-      component: ModalMapComponent,
-      componentProps: {
-        meeting
-      }
-    });
-
-    await modal.present();
-  }
-
-  async getMeetingsOfUser(){
+  async getMeetingsFromUser(){
     
     this.userService.getById(this.user.phone).snapshotChanges().subscribe((user: any) => {      
 
@@ -81,12 +67,41 @@ export class ListPage implements OnInit {
 
   }
 
-  async profile() {
-    await this.nav.navigateForward(`/user/${btoa(this.user.phone)}`);
+  async alertAddContact() {        
+
+    const alert = await this.alertController.create({
+      header: 'Adicione um amigo',
+      backdropDismiss: false,
+      inputs: [
+        {
+          name: 'phone',
+          type: 'text',          
+          placeholder: 'Ex.: +5511912345678'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {            
+            alert.dismiss();
+          }
+        }, {
+          text: 'Confirmar',
+          role: "ok",
+          handler: ({phone}) => {
+            this.addContact(phone);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
   }
 
-  async addContact(){
-    const phone = await this.presentAlertAddContact();
+  async addContact(phone: string){
 
     if(phone === null || phone === "") return;
 
@@ -96,10 +111,7 @@ export class ListPage implements OnInit {
 
     await this.loading.present();
 
-    const contact: any = await this.userService.getContactById(phone);
-
-    console.log(contact);
-    
+    const contact: any = await this.userService.getById(phone).get().toPromise();    
 
     if(!contact.exists) {
       await this.loading.dismiss();
@@ -124,69 +136,7 @@ export class ListPage implements OnInit {
 
   }
 
-  async presentToast(message: string) {
-    const toast = await this.toastController.create({
-      position: 'bottom',
-      message: message,
-      duration: 3000
-    });
-    toast.present();
-  }
-
-  async presentAlertAddContact() {        
-
-    let response = null;
-
-    const alert = await this.alertController.create({
-      header: 'Adicione um amigo',
-      backdropDismiss: false,
-      inputs: [
-        {
-          name: 'phone',
-          type: 'text',          
-          placeholder: 'Ex.: +5511912345678'
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {            
-            alert.dismiss();
-          }
-        }, {
-          text: 'Confirmar',
-          role: "ok",
-          handler: ({phone}) => {
-            alert.dismiss(phone);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-
-    await alert.onDidDismiss().then((res) => {
-
-      if(res.role === "cancel") {
-        return;
-      }
-      
-      console.log(res);
-
-      response = res.data.values.phone;
-
-    });
-
-    return response;
-
-  }
-
-  async presentAlertNotification(){
-
-    console.log(this.user);
-    
+  async alertNotification(){
 
     const alert = await this.alertController.create({
       header: `${ this.user.receiveNotifications ? "Desativar" : "Ativar"} notificações`,
@@ -228,7 +178,7 @@ export class ListPage implements OnInit {
 
     try{
       
-      await this.userService.editUser(data);
+      await this.userService.update(data);
 
       await this.presentToast(msg);
 
@@ -248,6 +198,19 @@ export class ListPage implements OnInit {
       }
     });
     await modal.present();
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      position: 'bottom',
+      message: message,
+      duration: 3000
+    });
+    toast.present();
+  }
+
+  async profile() {
+    await this.nav.navigateForward(`/user/${btoa(this.user.phone)}`);
   }
 
 }

@@ -19,7 +19,7 @@ import { IUser } from 'src/app/interfaces/User';
 })
 export class ChatPage implements OnInit {
 
-  user: IUser = JSON.parse(sessionStorage.getItem("user"));
+  user: IUser = JSON.parse(atob(sessionStorage.getItem("user")));
 
   chatForm: FormGroup;
 
@@ -126,7 +126,8 @@ export class ChatPage implements OnInit {
     this.popover = await this.popoverController.create({
       component: PopoverComponent,
       componentProps: {
-        meeting: this.meeting
+        meeting: this.meeting,
+        chatId: this.route.snapshot.paramMap.get("id")
       },
       event: ev,
       translucent: true
@@ -158,7 +159,7 @@ export class ChatPage implements OnInit {
   }
 
   async back(){
-    await this.nav.navigateForward('/meetings');
+    await this.nav.navigateForward('/meetings', { animationDirection: 'back' });
   }
 
   async presentToast(message: string) {

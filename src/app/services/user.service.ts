@@ -9,7 +9,7 @@ import { IUser } from '../interfaces/User';
 export class UserService {
 
   private collection: string = 'users';
-  private currentUser: IUser = JSON.parse(sessionStorage.getItem('user'));
+  private currentUser: IUser = JSON.parse(atob(sessionStorage.getItem('user')));
 
   constructor(
     private firestore: AngularFirestore
@@ -28,11 +28,7 @@ export class UserService {
   }
 
   getContacts() {
-    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection('contacts').get().toPromise();
-  }
-
-  getContactById(userId: string) {
-    return this.firestore.collection(this.collection).doc(userId).get().toPromise();
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection('contacts');
   }
 
   getContactByIdInUser(userId: string) {
@@ -43,8 +39,12 @@ export class UserService {
     return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection("contacts").doc(user.phone).set(user);
   }
 
-  editUser(user: IUser){
+  update(user: IUser){
     return this.firestore.collection(this.collection).doc(this.currentUser.phone).update(user);
+  }
+
+  deleteContact(contactId){
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection('contacts').doc(contactId).delete();
   }
 
 }

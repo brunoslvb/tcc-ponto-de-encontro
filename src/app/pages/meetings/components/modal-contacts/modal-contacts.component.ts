@@ -47,7 +47,7 @@ export class ModalContactsComponent implements OnInit {
 
     await this.loading.present();
 
-    await this.userService.getContacts().then(response => {
+    await this.userService.getContacts().get().toPromise().then(response => {
 
       let contact: any;
 
