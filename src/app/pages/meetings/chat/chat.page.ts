@@ -11,6 +11,7 @@ import { ChatService } from 'src/app/services/chat.service';
 import { IMessage } from 'src/app/interfaces/Message';
 import firebase from 'firebase/app';
 import { IUser } from 'src/app/interfaces/User';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -42,6 +43,9 @@ export class ChatPage implements OnInit {
   popover: any = null;
   loading: any;
 
+  listenerMeeting: Subscription;
+  listenerChat: Subscription;
+
   constructor(
     private nav: NavController,
     private route: ActivatedRoute,
@@ -70,8 +74,53 @@ export class ChatPage implements OnInit {
     this.dismissPopover();
   }
 
+  async leaveMeeting(){
+
+    this.listenerMeeting.unsubscribe();
+    this.listenerChat.unsubscribe();
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+    await this.loading.present();
+
+    try{
+
+      await this.userService.removeMeetingFromUser(this.user.phone, this.meeting.id);
+      
+      if(this.meeting.numberOfMembers > 1){
+        
+        await this.meetingService.removeUserFromMeeting(this.meeting.id, this.user.phone);
+        
+        await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
+
+        await this.chatService.saveMessage(this.meeting.id, {
+          message: `${this.user.name} saiu do encontro`,
+          type: "event",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+      } else {
+        
+        await this.meetingService.deleteChat(this.meeting.id);
+        await this.meetingService.deleteMeeting(this.meeting.id);
+      
+      }
+
+      await this.nav.navigateForward('/meetings', {
+        replaceUrl: true
+      });
+
+    } catch(err) {
+      console.error(err);
+    } finally {
+      await this.loading.dismiss();
+    }
+
+  }
+
   async addContactsToMeeting(contacts: IUser[]){
-    this.dismissPopover();
+    // this.dismissPopover();
 
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -106,7 +155,7 @@ export class ChatPage implements OnInit {
 
     try{
       
-      await this.meetingService.getById(id).subscribe(async response => {
+      this.listenerMeeting = await this.meetingService.getById(id).subscribe(async response => {
 
         const data: any = response.payload.data(); 
         
@@ -124,6 +173,7 @@ export class ChatPage implements OnInit {
   async showPopover(ev: any) {
 
     this.popover = await this.popoverController.create({
+      
       component: PopoverComponent,
       componentProps: {
         meeting: this.meeting,
@@ -137,16 +187,14 @@ export class ChatPage implements OnInit {
 
     this.popover.onDidDismiss().then(async response => {
       
-      console.log(response);
-
-      if (!response.data || !response.data.length){
-        console.log('Nenhum contato a ser adicionado')
-        return;
+      switch (response.role) {
+        case 'leaveMeeting':
+          this.leaveMeeting();
+          break;
+      
+        default:
+          return;
       }
-
-      console.log(response.data);
-
-      await this.addContactsToMeeting(response.data);
 
     });
 
@@ -196,8 +244,8 @@ export class ChatPage implements OnInit {
 
     let messages: Array<IMessage> = [];
 
-    await this.chatService.getMessages(this.route.snapshot.paramMap.get("id")).subscribe(async (response: any) => {  
-      
+    this.listenerChat = await this.chatService.getMessages(this.route.snapshot.paramMap.get("id")).subscribe(async (response: any) => {  
+    
       messages = [];
 
       response.forEach((item: any) => {
@@ -211,6 +259,8 @@ export class ChatPage implements OnInit {
 
       this.messages = messages;
 
+      console.log("Passou aqui");
+      
     });
 
   }

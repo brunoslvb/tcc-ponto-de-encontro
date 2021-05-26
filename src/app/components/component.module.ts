@@ -6,11 +6,14 @@ import { RouterModule } from '@angular/router';
 import { CustomInputComponent } from './custom-input/custom-input.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FooterComponent } from './footer/footer.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { PopoverComponent } from './popover/popover.component';
 
 @NgModule({
   declarations: [
     CardComponent,
     CustomInputComponent,
+    PopoverComponent, 
     FooterComponent
   ],
   imports: [
@@ -22,6 +25,7 @@ import { FooterComponent } from './footer/footer.component';
   exports: [
     CardComponent,
     CustomInputComponent,
+    PopoverComponent,
     FooterComponent
   ]
 })
