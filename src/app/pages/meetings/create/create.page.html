@@ -24,11 +24,11 @@
       <ion-label position="stacked">Endereço</ion-label>
       <ion-item>
         <ion-icon color="" name="location-outline" slot="end"></ion-icon>
-        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionInput)="searchAddress()" (ionChange)="clearInput()"></ion-input>
+        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
       </ion-item>
     </div>
 
-    <div class="list">
+    <div id="addressesList" class="list">
       <ion-item button class="item" *ngFor="let address of addresses" (click)="searchSelected(address.description)">
         {{address.description}}
       </ion-item>

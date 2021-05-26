@@ -60,28 +60,23 @@ export class CreatePage implements OnInit {
     });
   }
 
-  clearInput() {
-    if(!this.registerForm.value.address.trim().length) {
-      this.addresses = [];
-      return;
-    }; 
-  }
-
   async searchSelected(address: string) {
     
     (<HTMLInputElement>document.getElementById('address')).value = address;
-
+    
     this.registerForm.value.address = address;
-
-    this.addresses = [];
-
+    
     await this.googleMapsGeocoder.geocode({
       address
     }, (data) => {
       
       this.coords = [data[0].geometry.location.lat(), data[0].geometry.location.lng()];
-    
+      
     });
+    
+    this.addresses = [];
+    
+    (<HTMLInputElement>document.getElementById('addressesList')).style.display = 'none';
   }
 
   async presentToast(message: string) {
