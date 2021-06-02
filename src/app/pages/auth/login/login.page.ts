@@ -6,7 +6,7 @@ import DDD from '../../../config/DDD.js';
 import firebase from 'firebase/app';
 
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
-import { AuthService } from 'src/app/services/auth.service.js';
+import { AuthService } from 'src/app/services/auth.service';
 
 const window = {
   recaptchaVerifier: undefined

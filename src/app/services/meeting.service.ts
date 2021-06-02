@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
+import { IMeeting } from '../interfaces/Meeting';
+import { IUser } from '../interfaces/User';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +13,8 @@ export class MeetingService {
   private collection: string = 'meetings';
 
   constructor(
-    private firestore: AngularFirestore
+    private firestore: AngularFirestore,
+    private userService: UserService
   ) { }
 
   getAllMeetings(){
@@ -18,7 +22,7 @@ export class MeetingService {
   }
 
   getById(meetingId: string){
-    return this.firestore.collection(this.collection).doc(meetingId).snapshotChanges();
+    return this.firestore.collection(this.collection).doc(meetingId);
   }
 
   createMeeting(meeting: Object){

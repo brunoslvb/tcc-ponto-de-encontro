@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "685923780055",
+    "project_id": "ponto-de-encontro-dev",
+    "storage_bucket": "ponto-de-encontro-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685923780055:android:ddbd27c7ca0249c007f792",
+        "android_client_info": {
+          "package_name": "br.edu.ifsp.shareyourrole"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "685923780055-dlkp9u20v04cjmoiua18fh1mbbcnu1lj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4pMMtDgRXpYToulkCc6Xc9YBNmrFL3V0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "685923780055-dlkp9u20v04cjmoiua18fh1mbbcnu1lj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

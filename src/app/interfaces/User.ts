@@ -11,4 +11,5 @@ export interface IUser {
   groups?: Array<string>;
   photo?: string;
   receiveNotifications?: boolean;
+  tokenNotification?: string;
 }

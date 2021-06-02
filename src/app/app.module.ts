@@ -16,6 +16,9 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { environment } from 'src/environments/environment';
 
 import firebase from 'firebase';
+import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { MessagingService } from './services/messaging.service';
+import { AsyncPipe } from '@angular/common';
 
 firebase.initializeApp(environment.firebaseConfig);
 
@@ -27,6 +30,7 @@ firebase.initializeApp(environment.firebaseConfig);
     IonicModule.forRoot(),
     AppRoutingModule,
     AngularFireAuthModule,
+    AngularFireMessagingModule,
     AngularFireStorageModule,
     AngularFirestoreModule.enablePersistence(),
     AngularFireModule.initializeApp(environment.firebaseConfig)
@@ -34,6 +38,8 @@ firebase.initializeApp(environment.firebaseConfig);
   providers: [
     StatusBar,
     SplashScreen,
+    MessagingService,
+    AsyncPipe,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

@@ -12,6 +12,8 @@ import { IMessage } from 'src/app/interfaces/Message';
 import firebase from 'firebase/app';
 import { IUser } from 'src/app/interfaces/User';
 import { Observable, Subscription } from 'rxjs';
+import { MessagingService } from 'src/app/services/messaging.service';
+import { INotification } from 'src/app/interfaces/Notification';
 
 @Component({
   selector: 'app-chat',
@@ -56,7 +58,8 @@ export class ChatPage implements OnInit {
     private loadingController: LoadingController,
     private toastController: ToastController,
     private modalController: ModalController,
-    private builder: FormBuilder
+    private builder: FormBuilder,
+    private notificationService: MessagingService
   ) { }
 
   ngOnInit() {
@@ -155,7 +158,7 @@ export class ChatPage implements OnInit {
 
     try{
       
-      this.listenerMeeting = await this.meetingService.getById(id).subscribe(async response => {
+      this.listenerMeeting = await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
 
         const data: any = response.payload.data(); 
         
@@ -278,6 +281,26 @@ export class ChatPage implements OnInit {
     this.chatForm.reset();
     
     await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), data);
+
+    const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
+
+    Promise.all(promises).then((response) => {
+      
+      const tokens = response.map((user: any) => {
+        return user.receiveNotifications ? user.tokenNotification : null;
+      });
+      
+      const notification: INotification = {
+        notification: {
+          title: this.meeting.name,
+          body: 'Você possui novas mensagens',
+        },
+        registration_ids: tokens
+      }
+  
+      this.notificationService.sendNotification(notification);
+
+    });    
 
   }
 

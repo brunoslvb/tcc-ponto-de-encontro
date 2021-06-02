@@ -65,7 +65,7 @@ export class MapPage implements OnInit {
 
     try{
       
-      await this.meetingService.getById(id).subscribe(async response => {
+      await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
 
         const data: any = response.payload.data(); 
         

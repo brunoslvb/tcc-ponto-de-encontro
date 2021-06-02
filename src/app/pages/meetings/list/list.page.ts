@@ -3,6 +3,7 @@ import { AlertController, LoadingController, ModalController, NavController, Toa
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
 import { MeetingService } from 'src/app/services/meeting.service';
+import { MessagingService } from 'src/app/services/messaging.service';
 import { UserService } from 'src/app/services/user.service';
 import { ModalListContactsComponent } from '../components/modal-list-contacts/modal-list-contacts.component';
 
@@ -14,6 +15,7 @@ import { ModalListContactsComponent } from '../components/modal-list-contacts/mo
 export class ListPage implements OnInit {
 
   loading: any;
+  message: any;
   
   meetings: Array<IMeeting> = [];
 
@@ -26,10 +28,16 @@ export class ListPage implements OnInit {
     private modalController: ModalController,
     private nav: NavController,
     private alertController: AlertController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private messagingService: MessagingService,
   ) { }
 
   ngOnInit() {
+
+    this.messagingService.requestPermission();
+    this.messagingService.receiveMessage();
+    this.message = this.messagingService.currentMessage;
+
     this.getMeetingsFromUser();
   }
 
@@ -43,7 +51,7 @@ export class ListPage implements OnInit {
       
       user.payload.data().groups.forEach(group => {
 
-        this.meetingService.getById(group).subscribe(doc => {
+        this.meetingService.getById(group).snapshotChanges().subscribe(doc => {
 
           let data: any = doc.payload.data();
 
