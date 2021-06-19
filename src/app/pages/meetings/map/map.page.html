@@ -1,10 +1,20 @@
-<div #map class="text-black"></div>
+
+
+<div #map class="map"></div>
 
 <ion-fab class="back" vertical="top" horizontal="start" slot="fixed">
   <ion-fab-button (click)="back()">
     <ion-icon name="arrow-back"></ion-icon>
   </ion-fab-button>
 </ion-fab>
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button routerLink="">
+    <ion-icon name="people-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+
 
 <!-- 
   <ion-segment mode="ios" scrollable value="DRIVING">
@@ -16,6 +26,15 @@
     </ion-segment-button>
   </ion-segment>
  -->
+
+
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content>
+    </ion-refresher-content>
+  </ion-refresher>
+</ion-content>
 
 <ion-footer>
   <ion-toolbar>
@@ -41,5 +60,4 @@
     </div>
   </ion-toolbar>
 </ion-footer>
-
 

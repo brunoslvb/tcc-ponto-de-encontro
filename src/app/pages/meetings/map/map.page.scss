@@ -1,6 +1,7 @@
 * {
   --background: #FFF;
   --color: #000;
+  outline: 0;
 }
 
 .back {
@@ -14,11 +15,13 @@
   }
 }
 
-ion-footer { 
+
+ion-toolbar { 
   position: fixed;
   margin: 0;
   padding: 0;
   bottom: 0;
+  z-index: 1;
 
   .list {
     font-weight: 200;
@@ -43,7 +46,7 @@ ion-footer {
   }
 }
 
-.text-black {
+.map {
   z-index: 1;
   color: #000;
 }
