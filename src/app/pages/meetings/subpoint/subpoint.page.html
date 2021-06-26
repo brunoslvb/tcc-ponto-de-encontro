@@ -1,0 +1,56 @@
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <div class="title">
+      <ion-title>Sugerir subpoint</ion-title>
+      <ion-icon slot="icon-only" name="information-circle" (click)="subpointInformation()"></ion-icon>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <form [formGroup]="registerForm" (submit)="addSubpoint()">
+    
+    <div class="input">
+      <ion-label position="stacked">Endereço</ion-label>
+      <ion-item>
+        <ion-icon color="" name="location-outline" slot="end"></ion-icon>
+        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
+      </ion-item>
+    </div>
+
+    <div id="addressesList" class="list">
+      <ion-item button class="item" *ngFor="let address of addresses" (click)="searchSelected(address.description)">
+        {{address.description}}
+      </ion-item>
+    </div>
+
+    <ion-button [disabled]="registerForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default">Criar Encontro</ion-button>
+        
+  </form>
+
+  <div id="subpoints" class="subpoints" style="display: none;">
+
+    <ion-list>
+      <ion-list-header>
+        Subpoints pendentes
+      </ion-list-header>
+
+      <ion-item style="margin-top: 20px;">
+        <ion-label>
+          <h3>I'm a big deal</h3>
+        </ion-label>
+        <ion-icon color="turquoise-dark" name="checkmark-circle-outline" slot="end"></ion-icon>
+        <ion-icon color="danger" name="close-circle-outline" slot="end"></ion-icon>
+      </ion-item>
+
+    </ion-list>
+
+  </div>
+
+</ion-content>

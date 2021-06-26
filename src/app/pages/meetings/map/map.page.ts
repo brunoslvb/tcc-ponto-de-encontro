@@ -7,7 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 import { IUser } from 'src/app/interfaces/User';
-import dijkstra from 'dijkstrajs';
 
 declare var google;
 
@@ -36,6 +35,12 @@ export class MapPage implements OnInit {
 
   private groupedUsers = [];
 
+  private groupVertices: any = {
+    _1: {},
+    _2: {},
+    _3: {},
+    _4: {},
+  };
   private group1Vertices = null;
   private group2Vertices = null;
   private group3Vertices = null;
@@ -228,15 +233,66 @@ export class MapPage implements OnInit {
 
   async joinUsersInSameArea() {
 
-    const areas = [this.group1Vertices, this.group2Vertices, this.group3Vertices, this.group4Vertices];
+    const areas = ['_1', '_2', '_3', '_4'];
 
     let area = null;
 
-    for (let i = 0; i < areas.length; i++) {
+    let members = this.users;
 
-      if (Poly.containsLocation({ lat: this.user.location.latitude, lng: this.user.location.longitude }, areas[i])) {
-        area = areas[i];
-        break;
+    const group1 = {
+      id: 'group1',
+      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group1.location : {},
+      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group1.suggestion : {pending: false},
+      members: []
+    }
+
+    const group2 = {
+      id: 'group2',
+      location: this.meeting.subpoints.group2.location ? this.meeting.subpoints.group2.location : {},
+      suggestion: this.meeting.subpoints.group2.suggestion ? this.meeting.subpoints.group2.suggestion : {pending: false},
+      members: []
+    }
+
+    const group3 = {
+      id: 'group3',
+      location: this.meeting.subpoints.group3.location ? this.meeting.subpoints.group3.location : {},
+      suggestion: this.meeting.subpoints.group3.suggestion ? this.meeting.subpoints.group3.suggestion : {pending: false},
+      members: []
+    }
+
+    const group4 = {
+      id: 'group4',
+      location: this.meeting.subpoints.group4.location ? this.meeting.subpoints.group4.location : {},
+      suggestion: this.meeting.subpoints.group4.suggestion ? this.meeting.subpoints.group4.suggestion : {pending: false},
+      members: []
+    }
+
+    
+
+    for (let i = 0; i < members.length; i++) {
+
+      const data = {
+        phone: members[i].phone,
+      }
+
+      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group1Vertices)) {
+        group1.members.push(data);
+        continue;
+      }
+
+      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group2Vertices)) {
+        group2.members.push(data);
+        continue;
+      }
+
+      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group3Vertices)) {
+        group3.members.push(data);
+        continue;
+      }
+
+      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group4Vertices)) {
+        group4.members.push(data);
+        continue;
       }
 
     }
@@ -245,15 +301,38 @@ export class MapPage implements OnInit {
 
     // Promise.all(promises).then(async (response) => {
 
-    this.users.forEach((user: any) => {
+    // this.users.forEach((user: any) => {
 
-      if (Poly.containsLocation({ lat: user.location.latitude, lng: user.location.longitude }, area)) {
-        this.groupedUsers.push(user);
+    //   if (Poly.containsLocation({ lat: user.location.latitude, lng: user.location.longitude }, area)) {
+    //     this.groupedUsers.push(user);
+    //   }
+
+    // });
+
+    console.log('group1', group1);
+    console.log('group2', group2);
+    console.log('group3', group3);
+    console.log('group4', group4);
+
+    console.log(this.meeting);
+
+    const data = {
+      subpoints: {
+        group1,
+        group2,
+        group3,
+        group4
       }
+    }
 
-    });
+    console.log({...data, ...this.meeting});
+    
 
-    this.getBiggerDistance();
+    // delete data.id;
+    
+    await this.meetingService.update(this.meeting.id, data);
+
+    // this.getBiggerDistance();
 
     // const lala = lolo.sort((a, b) => a.location.distance - b.location.distance);
     // console.log(lala);
@@ -300,7 +379,6 @@ export class MapPage implements OnInit {
 
     response.forEach(element => {
       console.log(element);
-
     });
 
 
@@ -308,21 +386,7 @@ export class MapPage implements OnInit {
 
   async loadOrigins() {
 
-    // const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
-
-    // Promise.all(promises).then(async (response) => {
-
     this.origins = this.users.map((user: any) => {
-
-      // const result1 = Poly.containsLocation({lat: user.location.latitude, lng: user.location.longitude}, this.group1Vertices)
-      // const result2 = Poly.containsLocation({lat: user.location.latitude, lng: user.location.longitude}, this.group2Vertices)
-      // const result3 = Poly.containsLocation({lat: user.location.latitude, lng: user.location.longitude}, this.group3Vertices)
-      // const result4 = Poly.containsLocation({lat: user.location.latitude, lng: user.location.longitude}, this.group4Vertices)
-
-      // console.log(`${user.name}: Grupo 1 => ${result1}`);
-      // console.log(`${user.name}: Grupo 2 => ${result2}`);
-      // console.log(`${user.name}: Grupo 3 => ${result3}`);
-      // console.log(`${user.name}: Grupo 4 => ${result4}`);
 
       return this.map.addMarkerSync({
         title: user.name,
@@ -358,8 +422,12 @@ export class MapPage implements OnInit {
 
     let mapOptions: GoogleMapOptions = {
       controls: {
-        zoom: false
-      }
+        zoom: false,
+      },
+      camera: {
+        zoom: 6,
+        target: {lat: -23.4558009, lng: -46.5322912}
+      },
     };
 
     this.map = GoogleMaps.create(this.mapElement, mapOptions);
@@ -373,8 +441,7 @@ export class MapPage implements OnInit {
 
       console.log(this.groupedUsers);
 
-
-      // await this.calcRoute();
+      await this.calcRoute();
 
     } catch (error) {
       console.log(error);
@@ -389,35 +456,51 @@ export class MapPage implements OnInit {
 
   async calcRoute() {
 
-    const origin = this.groupedUsers.sort((a, b) => a - b);
+    // const origin = await this.getBiggerDistance();
 
     const points = new Array<ILatLng>();
 
-    await this.googleMapsDirections.route({
-      origin: {
-        lat: this.user.location.latitude,
-        lng: this.user.location.longitude,
-      },
-      destination: this.destination.getPosition(),
-      travelMode: this.travelMode
-    }, async (response: any) => {
-      response.routes[0].overview_path.forEach(path => {
-        points.push({
-          lat: path.lat(),
-          lng: path.lng()
-        });
-      });
+    // const waypts = this.groupedUsers.filter(user => {      
+    //   if(user !== origin){
+    //     return user;
+    //   }
+    // }).map(user => {
+    //   return {
+    //     location: {lat: user.location.latitude, lng: user.location.longitude},
+    //     stopover: true
+    //   }
+    // });
 
-      await this.map.addPolyline({
-        points: points,
-        color: this.colorMarker,
-        width: 3
-      });
+    // console.log('WAYPTS', waypts);
+    
 
-      this.map.moveCamera({
-        target: points
-      });
-    });
+    // await this.googleMapsDirections.route({
+    //   origin: {
+    //     lat: origin.location.latitude,
+    //     lng: origin.location.longitude,
+    //   },
+    //   destination: this.destination.getPosition(),
+    //   travelMode: this.travelMode,
+    //   // waypoints: waypts,
+    //   // optimizeWaypoints: true,
+    // }, async (response: any) => {
+    //   response.routes[0].overview_path.forEach(path => {
+    //     points.push({
+    //       lat: path.lat(),
+    //       lng: path.lng()
+    //     });
+    //   });
+
+    //   await this.map.addPolyline({
+    //     points: points,
+    //     color: this.colorMarker,
+    //     width: 3
+    //   });
+
+    //   this.map.moveCamera({
+    //     target: points
+    //   });
+    // });
 
   }
 

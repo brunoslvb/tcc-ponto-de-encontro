@@ -9,6 +9,7 @@ import { ModalListContactsComponent } from './components/modal-list-contacts/mod
 import { CreatePage } from './create/create.page';
 import { ListPage } from './list/list.page';
 import { MapPage } from './map/map.page';
+import { SubpointPage } from './subpoint/subpoint.page';
 
 const routes: Routes = [
   { path: '',
@@ -17,6 +18,7 @@ const routes: Routes = [
       { path: 'create', component: CreatePage },
       { path: ':id/chat', component: ChatPage },
       { path: ':id/map', component: MapPage },
+      { path: ':id/subpoint', component: SubpointPage },
     ]
   },
 ];
@@ -34,6 +36,7 @@ const routes: Routes = [
     CreatePage,
     ChatPage,
     MapPage,
+    SubpointPage,
     ModalContactsComponent,
     ModalListContactsComponent
   ],

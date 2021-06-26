@@ -10,6 +10,7 @@ import { UserService } from './user.service';
 })
 export class MeetingService {
 
+  user: IUser = JSON.parse(atob(sessionStorage.getItem('user')));
   private collection: string = 'meetings';
 
   constructor(
@@ -37,6 +38,10 @@ export class MeetingService {
     return this.firestore.collection(this.collection).doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayRemove(userId) });
   }
 
+  update(meetingId: string, data: object) {
+    return this.firestore.collection(this.collection).doc(meetingId).update(data);
+  }
+
   async countNumberOfMembersFromMeeting(meetingId: string) {
 
     let doc: any;
@@ -49,6 +54,20 @@ export class MeetingService {
     
     return this.firestore.collection(this.collection).doc(meetingId).update({ numberOfMembers: doc.members.length });
 
+  }
+
+  async getSubpointGroup(meetingId) {
+    return new Promise((resolve, reject) => {
+      this.firestore.collection(this.collection).doc(meetingId).get().toPromise().then(async (response: any) => {
+        Object.keys(response.data().subpoints).forEach(item => {
+          response.data().subpoints[item].members.forEach(member => {
+            if(this.user.phone === member.phone){
+              resolve(item);
+            }
+          })
+        })
+      })
+    }) 
   }
 
   async deleteChat(meetingId) {
