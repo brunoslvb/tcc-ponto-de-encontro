@@ -9,6 +9,7 @@ export interface ISubpointGroup {
       latitude: number;
       longitude: number;
       pending: boolean;
+      votes?: any;
     },
     id: string;
     members: Array<object>

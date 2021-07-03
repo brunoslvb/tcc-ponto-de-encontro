@@ -28,6 +28,8 @@ export class ChatPage implements OnInit {
 
   messages: Array<IMessage> = [];
 
+  subpointGroup: any;
+
   meeting: IMeeting = {
     id: "",
     name: "",
@@ -67,14 +69,18 @@ export class ChatPage implements OnInit {
     this.chatForm = this.builder.group({
       message: ['', Validators.required],
     });
-
+    
     this.getMessages();
-
+  
     this.loadDataFromMeeting();
+  }
+  
+  ionViewWillEnter(){
   }
 
   ionViewWillLeave(){
     this.dismissPopover();
+    this.listenerMeeting.unsubscribe();
   }
 
   async leaveMeeting(){
@@ -151,6 +157,8 @@ export class ChatPage implements OnInit {
 
     await this.presentToast('Usuários adicionados com sucesso');
 
+    await this.nav.navigateForward(`/meetings/${this.meeting.id}/map`);
+
   }
 
   async loadDataFromMeeting(){
@@ -159,18 +167,36 @@ export class ChatPage implements OnInit {
     try{
       
       this.listenerMeeting = await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
-
+        
         const data: any = response.payload.data(); 
         
         this.meeting = data;
         
         this.meeting.id = response.payload.id;
-
+        
+        await this.subpointOption();
       });
 
+        
     } catch(error) {
       console.error(error);
     } 
+
+  }
+
+  async subpointOption(){
+    
+    this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
+
+    if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
+      (<HTMLInputElement>document.getElementById('subpointOption')).style.display = 'block';      
+
+      if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){
+        (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'gold';
+      }
+
+    }
+
   }
 
   async showPopover(ev: any) {

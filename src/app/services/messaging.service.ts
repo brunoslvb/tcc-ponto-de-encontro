@@ -28,13 +28,13 @@ export class MessagingService {
       console.log(token);
       await this.userService.update({tokenNotification: token});
     }, (err) => {
-      console.error('Unable to get permission to notify.', err);
+      console.error('Notificações não permitidas:', err);
     });
   }
 
   receiveMessage() {
     this.angularFireMessaging.messages.subscribe((payload) => {
-      console.log("new message received. ", payload);
+      console.log('Notificação recebida:', payload);
       this.currentMessage.next(payload);
     });
   }
@@ -44,5 +44,29 @@ export class MessagingService {
     return this.axiosService.post(data);
 
   }
+
+  async buildDataToNotification(title, body, users){
+    const promises = users.map(user => this.userService.getById(user).get().toPromise().then(response => response.data()));
+
+    return Promise.all(promises).then((response) => {
+      
+      const tokens = response.map((user: any) => {
+        return user.receiveNotifications ? user.tokenNotification : null;
+      });
+      
+      const notification: INotification = {
+        notification: {
+          title,
+          body,
+        },
+        registration_ids: tokens
+      }
+  
+      this.sendNotification(notification);
+
+    });
+  }
+
+  
 
 }

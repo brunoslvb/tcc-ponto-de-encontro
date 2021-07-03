@@ -109,6 +109,28 @@ export class CreatePage implements OnInit {
         latitude: this.coords[0],
         longitude: this.coords[1]
       },
+      subpoints: {
+        group1: {
+          location: {},
+          suggestion: {},
+          members: []
+        },
+        group2: {
+          location: {},
+          suggestion: {},
+          members: []
+        },
+        group3: {
+          location: {},
+          suggestion: {},
+          members: []
+        },
+        group4: {
+          location: {},
+          suggestion: {},
+          members: []
+        },
+      },
       members,
       numberOfMembers: members.length
     }
@@ -128,7 +150,9 @@ export class CreatePage implements OnInit {
 
       await this.loading.dismiss();
       await this.presentToast(`Encontro ${data.name} criado com sucesso.`);
-      await this.nav.navigateForward(`/meetings/${id}/chat`);
+      await this.nav.navigateForward(`/meetings/${id}/map`, {
+        replaceUrl: true
+      });
       
     } catch (error) {
       console.error(error);

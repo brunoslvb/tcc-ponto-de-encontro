@@ -64,10 +64,10 @@ export class MeetingService {
             if(this.user.phone === member.phone){
               resolve(item);
             }
-          })
-        })
-      })
-    }) 
+          });
+        });
+      });
+    });
   }
 
   async deleteChat(meetingId) {

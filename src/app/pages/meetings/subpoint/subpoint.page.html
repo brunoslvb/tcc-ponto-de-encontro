@@ -19,8 +19,8 @@
     <div class="input">
       <ion-label position="stacked">Endereço</ion-label>
       <ion-item>
-        <ion-icon color="" name="location-outline" slot="end"></ion-icon>
-        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
+        <ion-icon color="turquoise-dark" name="location-outline" slot="end"></ion-icon>
+        <ion-input type="search" formControlName="address" id="address" placeholder="Endereço do subpoint" (ionChange)="searchAddress()"></ion-input>
       </ion-item>
     </div>
 
@@ -30,24 +30,68 @@
       </ion-item>
     </div>
 
-    <ion-button [disabled]="registerForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default">Criar Encontro</ion-button>
+    <ion-button [disabled]="registerForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default">Sugerir Subpoint</ion-button>
         
   </form>
 
-  <div id="subpoints" class="subpoints" style="display: none;">
+  <div class="subpoints">
 
-    <ion-list>
+    <ion-list mode="ios">
       <ion-list-header>
-        Subpoints pendentes
+        <ion-label>Subpoints Ativos</ion-label>
       </ion-list-header>
 
-      <ion-item style="margin-top: 20px;">
-        <ion-label>
-          <h3>I'm a big deal</h3>
-        </ion-label>
-        <ion-icon color="turquoise-dark" name="checkmark-circle-outline" slot="end"></ion-icon>
-        <ion-icon color="danger" name="close-circle-outline" slot="end"></ion-icon>
-      </ion-item>
+      <div *ngIf="activeSubpoint; else noSubpoints">
+        <ion-item button detail="false" (click)="subpointActive()" style="margin-top: 20px;">
+          <ion-label>
+            <h3>{{activeSubpoint.address}}</h3>
+          </ion-label>
+          <div *ngIf="activeSubpoint.accepted; else rejected">
+            <ion-icon color="danger" size="small" name="exit-outline" slot="end"></ion-icon>
+          </div>
+          <ng-template #rejected>
+            <ion-icon color="turquoise" size="small" name="enter-outline" slot="end"></ion-icon>
+          </ng-template>
+        </ion-item>
+      </div>
+      
+      <ng-template #noSubpoints>
+        <ion-item style="margin-top: 20px;">
+          <ion-label>
+            <h3>Não há nenhum subpoint ativo</h3>
+          </ion-label>
+        </ion-item>
+      </ng-template>
+
+    </ion-list>
+
+  </div>
+
+  <div class="subpoints" style="margin-top: 0px;">
+
+    <ion-list mode="ios">
+      <ion-list-header>
+        <ion-label>Subpoints Pendentes</ion-label>
+      </ion-list-header>
+
+      <div *ngIf="pendingSubpoint; else noSuggestion">
+        <ion-item button detail="false" (click)="subpointSuggestion()" style="margin-top: 20px;">
+          <ion-label>
+            <h3>{{pendingSubpoint.address}}</h3>
+          </ion-label>
+          <div *ngIf="pendingSubpoint">
+            <ion-icon color="warning" size="small" name="open-outline" slot="end"></ion-icon>
+          </div>
+        </ion-item>
+      </div>
+      
+      <ng-template #noSuggestion>
+        <ion-item style="margin-top: 20px;">
+          <ion-label>
+            <h3>Não há nenhuma sugestão</h3>
+          </ion-label>
+        </ion-item>
+      </ng-template>
 
     </ion-list>
 

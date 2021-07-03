@@ -31,16 +31,12 @@ export class MapPage implements OnInit {
   private destination: Marker;
   private travelMode: string = "DRIVING";
 
+  private subpointGroup: any;
+
   private users = [];
 
   private groupedUsers = [];
 
-  private groupVertices: any = {
-    _1: {},
-    _2: {},
-    _3: {},
-    _4: {},
-  };
   private group1Vertices = null;
   private group2Vertices = null;
   private group3Vertices = null;
@@ -104,6 +100,8 @@ export class MapPage implements OnInit {
         this.meeting = data;
 
         this.meeting.id = response.id;
+
+        this.subpointGroup = await this.meetingService.getSubpointGroup(this.meeting.id); 
 
       });
 
@@ -233,41 +231,35 @@ export class MapPage implements OnInit {
 
   async joinUsersInSameArea() {
 
-    const areas = ['_1', '_2', '_3', '_4'];
-
-    let area = null;
-
     let members = this.users;
 
     const group1 = {
       id: 'group1',
       location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group1.location : {},
-      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group1.suggestion : {pending: false},
+      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group1.suggestion : {pending: false, votes: {}},
       members: []
     }
 
     const group2 = {
       id: 'group2',
-      location: this.meeting.subpoints.group2.location ? this.meeting.subpoints.group2.location : {},
-      suggestion: this.meeting.subpoints.group2.suggestion ? this.meeting.subpoints.group2.suggestion : {pending: false},
+      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group2.location : {},
+      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group2.suggestion : {pending: false, votes: {}},
       members: []
     }
 
     const group3 = {
       id: 'group3',
-      location: this.meeting.subpoints.group3.location ? this.meeting.subpoints.group3.location : {},
-      suggestion: this.meeting.subpoints.group3.suggestion ? this.meeting.subpoints.group3.suggestion : {pending: false},
+      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group3.location : {},
+      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group3.suggestion : {pending: false, votes: {}},
       members: []
     }
 
     const group4 = {
       id: 'group4',
-      location: this.meeting.subpoints.group4.location ? this.meeting.subpoints.group4.location : {},
-      suggestion: this.meeting.subpoints.group4.suggestion ? this.meeting.subpoints.group4.suggestion : {pending: false},
+      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group4.location : {},
+      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group4.suggestion : {pending: false, votes: {}},
       members: []
     }
-
-    
 
     for (let i = 0; i < members.length; i++) {
 
@@ -407,6 +399,26 @@ export class MapPage implements OnInit {
 
   }
 
+  async loadSubpoint() {
+
+    await this.map.addMarkerSync({
+      title: 'Subpoint',
+      icon: 'red',
+      animation: GoogleMapsAnimation.BOUNCE,
+      position: {
+        lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
+        lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
+      }
+    });
+
+
+    // console.log(this.origins);
+    // await this.calcRoute();
+
+    // });
+
+  }
+
   async loadMap() {
 
     this.loading = await this.loadingController.create({
@@ -438,10 +450,10 @@ export class MapPage implements OnInit {
       await this.loadDestination();
       await this.loadOrigins();
       await this.joinUsersInSameArea();
+      await this.loadSubpoint();
+      // console.log(this.groupedUsers);
 
-      console.log(this.groupedUsers);
-
-      await this.calcRoute();
+      await this.getRoutes();
 
     } catch (error) {
       console.log(error);
@@ -454,7 +466,76 @@ export class MapPage implements OnInit {
     console.log(ev);
   }
 
-  async calcRoute() {
+  async getRoutes() {
+  
+    console.log('Current group:', this.subpointGroup);
+    
+    let users = [];
+
+    const promises = this.meeting.subpoints[this.subpointGroup].members.map(member => this.userService.getById(member.phone).get().toPromise().then(response => response.data()));
+
+    await Promise.all(promises).then(response => {
+
+      users = response.map((user: any) => user);
+
+    });
+
+    console.log(users);
+    
+
+    for (const user of users) {
+
+      const points = new Array<ILatLng>();
+      
+      let waypts = [];
+
+      console.log('lala');
+      
+
+      if(this.meeting.subpoints[this.subpointGroup].location.members[user.phone]){
+        waypts.push({
+          location: {
+            lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
+            lng: this.meeting.subpoints[this.subpointGroup].location.longitude
+          },
+          stopover: true
+        });
+      }
+
+      await this.googleMapsDirections.route({
+        origin: {
+          lat: user.location.latitude,
+          lng: user.location.longitude,
+        },
+        destination: this.destination.getPosition(),
+        travelMode: this.travelMode,
+        waypoints: waypts,
+        // optimizeWaypoints: true,
+      }, async (response: any) => {
+        response.routes[0].overview_path.forEach(path => {
+          points.push({
+            lat: path.lat(),
+            lng: path.lng()
+          });
+        });
+
+        await this.map.addPolyline({
+          points: points,
+          color: this.colorMarker,
+          width: 3
+        });
+
+        this.map.moveCamera({
+          target: points
+        });
+      });
+
+    }
+
+
+  }
+
+  async calcRoute2() {
 
     // const origin = await this.getBiggerDistance();
 

@@ -10,8 +10,14 @@
       </ion-button>
     </ion-buttons>
     <ion-buttons slot="primary">
+      <ion-button routerLink="/meetings/{{meeting.id}}/map">
+        <ion-icon slot="icon-only" size="small" name="location-outline"></ion-icon>
+      </ion-button>
       <ion-button *ngIf="meeting.members.length > 1" (click)="showModalContacts()">
         <ion-icon slot="icon-only" size="small" name="person-add-outline"></ion-icon>
+      </ion-button>
+      <ion-button id="subpointOption" style="display: none;" routerLink="/meetings/{{meeting.id}}/subpoint">
+        <ion-icon slot="icon-only" size="small" name="bulb-outline"></ion-icon>
       </ion-button>
       <ion-button (click)="showPopover($event)">
         <ion-icon slot="icon-only" size="small" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
