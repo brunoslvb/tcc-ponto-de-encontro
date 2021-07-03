@@ -403,6 +403,13 @@ export class MapPage implements OnInit {
 
     await this.map.addMarkerSync({
       title: 'Subpoint',
+      // icon: {
+      //   url: "../../../../assets/bruno.jpg",
+      //   size: {
+      //     width: 40,
+      //     height: 40
+      //   },
+      // },
       icon: 'red',
       animation: GoogleMapsAnimation.BOUNCE,
       position: {
@@ -483,16 +490,13 @@ export class MapPage implements OnInit {
     console.log(users);
     
 
-    for (const user of users) {
+    // for (const user of users) {
 
       const points = new Array<ILatLng>();
       
       let waypts = [];
-
-      console.log('lala');
       
-
-      if(this.meeting.subpoints[this.subpointGroup].location.members[user.phone]){
+      if(this.meeting.subpoints[this.subpointGroup].location.members[this.user.phone]){
         waypts.push({
           location: {
             lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
@@ -504,8 +508,8 @@ export class MapPage implements OnInit {
 
       await this.googleMapsDirections.route({
         origin: {
-          lat: user.location.latitude,
-          lng: user.location.longitude,
+          lat: this.user.location.latitude,
+          lng: this.user.location.longitude,
         },
         destination: this.destination.getPosition(),
         travelMode: this.travelMode,
@@ -530,7 +534,7 @@ export class MapPage implements OnInit {
         });
       });
 
-    }
+    // }
 
 
   }
