@@ -275,6 +275,9 @@ export class SubpointPage implements OnInit {
 
   async checkVotes(){
 
+    console.log(this.meeting.subpoints[this.subpointGroup]);
+    
+
     if(Object.keys(this.meeting.subpoints[this.subpointGroup].suggestion.votes).length !== this.meeting.subpoints[this.subpointGroup].members.length){
       console.log('Votos incompletos');
       return;
@@ -332,7 +335,7 @@ export class SubpointPage implements OnInit {
 
       await this.meetingService.update(this.meeting.id, data);
       await this.notificationService.buildDataToNotification(this.meeting.name, 'A sugestão foi recusada', [...usersAccepted, ...usersRejected]);
-            
+
     }
     
   }

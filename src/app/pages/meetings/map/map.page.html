@@ -1,23 +1,25 @@
+<div #map class="map">
+
+  <ion-fab class="back" vertical="top" horizontal="start" slot="fixed">
+    <ion-fab-button (click)="back()">
+      <ion-icon name="arrow-back"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 
-<div #map class="map"></div>
+  <ion-segment mode="ios" scrollable value="DRIVING" (ionChange)="changeTravelMode($event)">
+    <ion-segment-button value="DRIVING">
+      <ion-icon name="car-sharp"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="BICYCLING">
+      <ion-icon name="bicycle-sharp"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="WALKING">
+      <ion-icon name="walk-sharp"></ion-icon>
+    </ion-segment-button>
+  </ion-segment>
 
-<ion-fab class="back" vertical="top" horizontal="start" slot="fixed">
-  <ion-fab-button (click)="back()">
-    <ion-icon name="arrow-back"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
-
-
-<ion-segment scrollable value="DRIVING">
-  <ion-segment-button value="DRIVING">
-    <ion-icon name="car-sharp"></ion-icon>
-  </ion-segment-button>
-  <ion-segment-button value="WALKING">
-    <ion-icon name="walk-sharp"></ion-icon>
-  </ion-segment-button>
-</ion-segment>
-
+</div>
 
 <ion-footer>
   <ion-toolbar>
@@ -43,4 +45,3 @@
     </div>
   </ion-toolbar>
 </ion-footer>
-

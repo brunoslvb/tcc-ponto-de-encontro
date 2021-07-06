@@ -112,22 +112,22 @@ export class CreatePage implements OnInit {
       subpoints: {
         group1: {
           location: {},
-          suggestion: {},
+          suggestion: {pending: false, votes: {}},
           members: []
         },
         group2: {
           location: {},
-          suggestion: {},
+          suggestion: {pending: false, votes: {}},
           members: []
         },
         group3: {
           location: {},
-          suggestion: {},
+          suggestion: {pending: false, votes: {}},
           members: []
         },
         group4: {
           location: {},
-          suggestion: {},
+          suggestion: {pending: false, votes: {}},
           members: []
         },
       },

@@ -70,12 +70,11 @@ export class ChatPage implements OnInit {
       message: ['', Validators.required],
     });
     
-    this.getMessages();
-  
-    this.loadDataFromMeeting();
   }
   
   ionViewWillEnter(){
+    this.getMessages();
+    this.loadDataFromMeeting();
   }
 
   ionViewWillLeave(){
@@ -184,6 +183,7 @@ export class ChatPage implements OnInit {
 
   }
 
+  
   async subpointOption(){
     
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
@@ -193,6 +193,8 @@ export class ChatPage implements OnInit {
 
       if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){
         (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'gold';
+      } else {
+        (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'white';
       }
 
     }

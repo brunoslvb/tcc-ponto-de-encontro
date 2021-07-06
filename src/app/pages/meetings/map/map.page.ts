@@ -54,8 +54,6 @@ export class MapPage implements OnInit {
 
   ngOnInit() {
     this.statusBar.overlaysWebView(true);
-
-    // this.loadMap();
   }
 
   ionViewWillEnter() {
@@ -81,33 +79,44 @@ export class MapPage implements OnInit {
 
   async load() {
 
-    await this.loadMeeting();
-    await this.loadUser();
-    await this.loadUsers();
-    await this.loadMap();
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+    await this.loading.present();
+
+    try {
+      await this.loadMap();
+      await this.loadMeeting();
+      await this.loadUser();
+      await this.loadUsers();
+      await this.loadDestination();
+      await this.joinUsersInSameArea();
+      await this.getSubpointGroup();
+      await this.loadOrigins();
+      await this.loadSubpoint();
+      await this.getRoutes();
+
+    } catch (error) {
+      console.error(error);
+
+    }
+
+    await this.loading.dismiss();
 
   }
 
   async loadMeeting() {
     const id = this.route.snapshot.paramMap.get("id");
 
-    try {
+    await this.meetingService.getById(id).get().toPromise().then(async response => {
 
-      await this.meetingService.getById(id).get().toPromise().then(async response => {
+      const data: any = response.data();
 
-        const data: any = response.data();
+      this.meeting = data;
 
-        this.meeting = data;
+      this.meeting.id = response.id;
 
-        this.meeting.id = response.id;
-
-        this.subpointGroup = await this.meetingService.getSubpointGroup(this.meeting.id); 
-
-      });
-
-    } catch (error) {
-      console.error(error);
-    }
+    });
   }
 
   async loadUser() {
@@ -128,16 +137,20 @@ export class MapPage implements OnInit {
   }
 
   async loadUsers() {
+
     const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
 
     await Promise.all(promises).then(async (response) => {
       this.users = response.map((user: any) => user);
     });
+
+  }
+
+  async getSubpointGroup() {
+    this.subpointGroup = await this.meetingService.getSubpointGroup(this.meeting.id);
   }
 
   async loadDestination() {
-
-    console.log(this.meeting);
 
     this.destination = this.map.addMarkerSync({
       title: this.meeting.location.address,
@@ -229,35 +242,36 @@ export class MapPage implements OnInit {
 
   }
 
+
   async joinUsersInSameArea() {
 
     let members = this.users;
 
     const group1 = {
       id: 'group1',
-      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group1.location : {},
-      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group1.suggestion : {pending: false, votes: {}},
+      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group1.location : { members: [] },
+      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group1.suggestion : { pending: false, votes: {} },
       members: []
     }
 
     const group2 = {
       id: 'group2',
-      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group2.location : {},
-      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group2.suggestion : {pending: false, votes: {}},
+      location: this.meeting.subpoints.group2.location ? this.meeting.subpoints.group2.location : { members: [] },
+      suggestion: this.meeting.subpoints.group2.suggestion ? this.meeting.subpoints.group2.suggestion : { pending: false, votes: {} },
       members: []
     }
 
     const group3 = {
       id: 'group3',
-      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group3.location : {},
-      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group3.suggestion : {pending: false, votes: {}},
+      location: this.meeting.subpoints.group3.location ? this.meeting.subpoints.group3.location : { members: [] },
+      suggestion: this.meeting.subpoints.group3.suggestion ? this.meeting.subpoints.group3.suggestion : { pending: false, votes: {} },
       members: []
     }
 
     const group4 = {
       id: 'group4',
-      location: this.meeting.subpoints.group1.location ? this.meeting.subpoints.group4.location : {},
-      suggestion: this.meeting.subpoints.group1.suggestion ? this.meeting.subpoints.group4.suggestion : {pending: false, votes: {}},
+      location: this.meeting.subpoints.group4.location ? this.meeting.subpoints.group4.location : { members: [] },
+      suggestion: this.meeting.subpoints.group4.suggestion ? this.meeting.subpoints.group4.suggestion : { pending: false, votes: {} },
       members: []
     }
 
@@ -289,25 +303,6 @@ export class MapPage implements OnInit {
 
     }
 
-    // const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
-
-    // Promise.all(promises).then(async (response) => {
-
-    // this.users.forEach((user: any) => {
-
-    //   if (Poly.containsLocation({ lat: user.location.latitude, lng: user.location.longitude }, area)) {
-    //     this.groupedUsers.push(user);
-    //   }
-
-    // });
-
-    console.log('group1', group1);
-    console.log('group2', group2);
-    console.log('group3', group3);
-    console.log('group4', group4);
-
-    console.log(this.meeting);
-
     const data = {
       subpoints: {
         group1,
@@ -317,17 +312,7 @@ export class MapPage implements OnInit {
       }
     }
 
-    console.log({...data, ...this.meeting});
-    
-
-    // delete data.id;
-    
     await this.meetingService.update(this.meeting.id, data);
-
-    // this.getBiggerDistance();
-
-    // const lala = lolo.sort((a, b) => a.location.distance - b.location.distance);
-    // console.log(lala);
 
   }
 
@@ -351,7 +336,7 @@ export class MapPage implements OnInit {
 
     let response = null;
 
-    if(distances.length > 1){
+    if (distances.length > 1) {
       response = distances.sort((a, b) => a.location.distance - b.location.distance)[distances.length - 1];
     } else {
       response = distances[0];
@@ -360,19 +345,6 @@ export class MapPage implements OnInit {
     console.log(response);
 
     return response;
-
-  }
-
-
-  async teste() {
-    const response: any = await this.getBiggerDistance();
-    console.log(response);
-    console.log('response');
-
-    response.forEach(element => {
-      console.log(element);
-    });
-
 
   }
 
@@ -428,75 +400,46 @@ export class MapPage implements OnInit {
 
   async loadMap() {
 
-    this.loading = await this.loadingController.create({
-      spinner: 'crescent'
+    return new Promise(async (resolve, reject) => {
+
+      // This code is necessary for browser
+      Environment.setEnv({
+        'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ',
+        'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ'
+      });
+
+      let mapOptions: GoogleMapOptions = {
+        controls: {
+          zoom: false,
+        },
+        camera: {
+          zoom: 6,
+          target: { lat: -23.4558009, lng: -46.5322912 }
+        },
+      };
+
+      this.map = GoogleMaps.create(this.mapElement, mapOptions);
+
+      try {
+        await this.map.one(GoogleMapsEvent.MAP_READY);
+        resolve("");
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+
     });
-    await this.loading.present();
 
-    // This code is necessary for browser
-    Environment.setEnv({
-      'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ',
-      'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ'
-    });
-
-    let mapOptions: GoogleMapOptions = {
-      controls: {
-        zoom: false,
-      },
-      camera: {
-        zoom: 6,
-        target: {lat: -23.4558009, lng: -46.5322912}
-      },
-    };
-
-    this.map = GoogleMaps.create(this.mapElement, mapOptions);
-
-    try {
-      await this.map.one(GoogleMapsEvent.MAP_READY);
-
-      await this.loadDestination();
-      await this.loadOrigins();
-      await this.joinUsersInSameArea();
-      await this.loadSubpoint();
-      // console.log(this.groupedUsers);
-
-      await this.getRoutes();
-
-    } catch (error) {
-      console.log(error);
-    } finally {
-      this.loading.dismiss();
-    }
-  }
-
-  refresh(ev) {
-    console.log(ev);
   }
 
   async getRoutes() {
-  
-    console.log('Current group:', this.subpointGroup);
-    
-    let users = [];
 
-    const promises = this.meeting.subpoints[this.subpointGroup].members.map(member => this.userService.getById(member.phone).get().toPromise().then(response => response.data()));
+    const points = new Array<ILatLng>();
 
-    await Promise.all(promises).then(response => {
+    let waypts = [];
 
-      users = response.map((user: any) => user);
-
-    });
-
-    console.log(users);
-    
-
-    // for (const user of users) {
-
-      const points = new Array<ILatLng>();
-      
-      let waypts = [];
-      
-      if(this.meeting.subpoints[this.subpointGroup].location.members[this.user.phone]){
+    if (this.meeting.subpoints[this.subpointGroup].location.members) {
+      if (this.meeting.subpoints[this.subpointGroup].location.members[this.user.phone]) {
         waypts.push({
           location: {
             lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
@@ -505,176 +448,40 @@ export class MapPage implements OnInit {
           stopover: true
         });
       }
+    }
 
-      await this.googleMapsDirections.route({
-        origin: {
-          lat: this.user.location.latitude,
-          lng: this.user.location.longitude,
-        },
-        destination: this.destination.getPosition(),
-        travelMode: this.travelMode,
-        waypoints: waypts,
-        // optimizeWaypoints: true,
-      }, async (response: any) => {
-        response.routes[0].overview_path.forEach(path => {
-          points.push({
-            lat: path.lat(),
-            lng: path.lng()
-          });
-        });
-
-        await this.map.addPolyline({
-          points: points,
-          color: this.colorMarker,
-          width: 3
-        });
-
-        this.map.moveCamera({
-          target: points
+    await this.googleMapsDirections.route({
+      origin: {
+        lat: this.user.location.latitude,
+        lng: this.user.location.longitude,
+      },
+      destination: this.destination.getPosition(),
+      travelMode: this.travelMode,
+      waypoints: waypts,
+      // optimizeWaypoints: true,
+    }, async (response: any) => {
+      response.routes[0].overview_path.forEach(path => {
+        points.push({
+          lat: path.lat(),
+          lng: path.lng()
         });
       });
 
-    // }
+      await this.map.addPolyline({
+        points: points,
+        color: this.colorMarker,
+        width: 3
+      });
 
-
-  }
-
-  async calcRoute2() {
-
-    // const origin = await this.getBiggerDistance();
-
-    const points = new Array<ILatLng>();
-
-    // const waypts = this.groupedUsers.filter(user => {      
-    //   if(user !== origin){
-    //     return user;
-    //   }
-    // }).map(user => {
-    //   return {
-    //     location: {lat: user.location.latitude, lng: user.location.longitude},
-    //     stopover: true
-    //   }
-    // });
-
-    // console.log('WAYPTS', waypts);
-    
-
-    // await this.googleMapsDirections.route({
-    //   origin: {
-    //     lat: origin.location.latitude,
-    //     lng: origin.location.longitude,
-    //   },
-    //   destination: this.destination.getPosition(),
-    //   travelMode: this.travelMode,
-    //   // waypoints: waypts,
-    //   // optimizeWaypoints: true,
-    // }, async (response: any) => {
-    //   response.routes[0].overview_path.forEach(path => {
-    //     points.push({
-    //       lat: path.lat(),
-    //       lng: path.lng()
-    //     });
-    //   });
-
-    //   await this.map.addPolyline({
-    //     points: points,
-    //     color: this.colorMarker,
-    //     width: 3
-    //   });
-
-    //   this.map.moveCamera({
-    //     target: points
-    //   });
-    // });
+      this.map.moveCamera({
+        target: points
+      });
+    });
 
   }
 
-  // async teste(){
-
-  //   const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
-
-  //   const obj = {};
-
-  //   Promise.all(promises).then(async (data: any) => {  
-
-  //     data.forEach(async item => {
-
-  //       obj[item.name] = {}
-
-  //       data.forEach(async item2 => {
-
-  //         if(item !== item2){
-
-  //           // console.log(`${item.name} => ${item2.name}`);
-
-  //           await this.googleMapsDirections.route({
-  //             origin: {
-  //               lat: item.location.latitude,
-  //               lng: item.location.longitude,
-  //             },
-  //             destination: {
-  //               lat: item2.location.latitude,
-  //               lng: item2.location.longitude,
-  //             },
-  //             travelMode: this.travelMode
-  //           }, async (response: any) => {
-
-  //             console.log(item);
-  //             console.log(response.routes[0].legs[0].distance.value);
-
-  //             obj[item.name][item2.name] = response.routes[0].legs[0].distance.value;
-
-  //           });
-  //         }
-  //       });
-
-  //       // console.log(obj);
-
-  //       // const points = new Array<ILatLng>();
-
-  //       // await this.googleMapsDirections.route({
-  //       //   origin: {
-  //       //     lat: item.location.latitude,
-  //       //     lng: item.location.longitude,
-  //       //   },
-  //       //   destination: this.destination.getPosition(),
-  //       //   travelMode: this.travelMode
-  //       // }, async (response: any) => {
-
-  //       //   console.log(item);
-  //       //   console.log(response.routes[0].legs[0].distance.value);
-
-  //       //   response.routes[0].overview_path.forEach(path => {
-  //       //     points.push({
-  //       //       lat: path.lat(),
-  //       //       lng: path.lng()
-  //       //     });
-  //       //   });
-
-  //         // await this.map.addPolyline({
-  //         //   points: points,
-  //         //   color: this.colorMarker,
-  //         //   width: 3
-  //         // });
-
-  //         // this.map.moveCamera({
-  //         //   target: points
-  //         // });
-  //       // });
-  //     });
-
-  //     // console.log(this.origins);
-  //     // await this.calcRoute();
-  //   });
-
-  //   setTimeout(function(){
-  //     var path = dijkstra.find_path(obj, 'Bárbara', 'Bruno');
-  //     console.log(path);
-  //   }, 10000);
-
-
-  // }
-
-
+  changeTravelMode(event) {
+    this.travelMode = event.detail.value;
+  }
 
 }
