@@ -67,7 +67,7 @@ ion-segment {
   margin: 20px;
   border-radius: 10px;
   height: 30px;
-
+  z-index: 1;
   box-shadow: 0 0 1em gray;
 
   // ion-segment-button:nth-last-child(1n+2) {

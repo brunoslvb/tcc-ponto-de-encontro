@@ -59,6 +59,7 @@ export class MeetingService {
   async getSubpointGroup(meetingId) {
     return new Promise((resolve, reject) => {
       this.firestore.collection(this.collection).doc(meetingId).get().toPromise().then(async (response: any) => {
+        console.log(response.data());
         Object.keys(response.data().subpoints).forEach(item => {
           response.data().subpoints[item].members.forEach(member => {
             if(this.user.phone === member.phone){
@@ -66,6 +67,7 @@ export class MeetingService {
             }
           });
         });
+        reject();
       });
     });
   }
