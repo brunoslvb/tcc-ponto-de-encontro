@@ -29,6 +29,10 @@ export class ChatPage implements OnInit {
   messages: Array<IMessage> = [];
 
   subpointGroup: any;
+  subpointOption: any = {
+    active: false,
+    color: 'white'
+  };
 
   meeting: IMeeting = {
     id: "",
@@ -173,7 +177,7 @@ export class ChatPage implements OnInit {
         
         this.meeting.id = response.payload.id;
         
-        await this.subpointOption();
+        await this.subpointOptionFunction();
       });
 
         
@@ -184,17 +188,16 @@ export class ChatPage implements OnInit {
   }
 
   
-  async subpointOption(){
-    
+  async subpointOptionFunction(){
+    console.log('Ta aqui');
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
-
+    console.log(this.subpointGroup);
     if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
-      (<HTMLInputElement>document.getElementById('subpointOption')).style.display = 'block';      
-
+      this.subpointOption.active = true;
       if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){
-        (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'gold';
+        this.subpointOption.color = 'warning';
       } else {
-        (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'white';
+        this.subpointOption.color = 'white';
       }
 
     }

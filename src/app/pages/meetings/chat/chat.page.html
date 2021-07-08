@@ -1,6 +1,6 @@
 <ion-header class="" mode="md">
   <ion-toolbar>
-    <div class="header-text" routerLink="/">
+    <div class="header-text" routerLink="/meetings/{{meeting.id}}/details">
       <h6 class="">{{meeting.name}}</h6>
       <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers > 1 ? "participantes" : "participante" }}</span>
     </div>
@@ -16,8 +16,8 @@
       <ion-button *ngIf="meeting.members.length > 1" (click)="showModalContacts()">
         <ion-icon slot="icon-only" size="small" name="person-add-outline"></ion-icon>
       </ion-button>
-      <ion-button id="subpointOption" style="display: none;" routerLink="/meetings/{{meeting.id}}/subpoint">
-        <ion-icon slot="icon-only" size="small" name="bulb-outline"></ion-icon>
+      <ion-button *ngIf="subpointOption.active === true" routerLink="/meetings/{{meeting.id}}/subpoint">
+        <ion-icon slot="icon-only" color={{subpointOption.color}} size="small" name="bulb-outline"></ion-icon>
       </ion-button>
       <ion-button (click)="showPopover($event)">
         <ion-icon slot="icon-only" size="small" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
