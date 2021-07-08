@@ -1,0 +1,84 @@
+<ion-header class="" mode="md">
+  <ion-toolbar>
+    <div class="header-text" routerLink="/meetings/{{meeting.id}}/details">
+      <h6 class="">{{meeting.name}}</h6>
+      <span>{{meeting.numberOfMembers}} {{ meeting.numberOfMembers > 1 ? "participantes" : "participante" }}</span>
+    </div>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button routerLink="/meetings/{{meeting.id}}/map">
+        <ion-icon slot="icon-only" size="small" name="location-outline"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="meeting.members.length > 1" (click)="showModalContacts()">
+        <ion-icon slot="icon-only" size="small" name="person-add-outline"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="subpointOption.active === true" routerLink="/meetings/{{meeting.id}}/subpoint">
+        <ion-icon slot="icon-only" color={{subpointOption.color}} size="small" name="bulb-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="showPopover($event)">
+        <ion-icon slot="icon-only" size="small" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="container">
+
+    <!-- <h3>Informações do Grupo <ion-badge color="turquoise-dark"><ion-icon name="pencil-outline" color="light"></ion-icon></ion-badge></h3> -->
+    <h3 class="ion-text-center title">Informações do Grupo</h3>
+
+    <ion-list lines="full">
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{meeting.name}}</ion-label>
+        <ion-icon name="chatbubbles-outline" color="turquoise-dark" slot="start"></ion-icon>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{meeting.location.address}}</ion-label>
+        <ion-icon name="location-outline" color="turquoise-dark" slot="start"></ion-icon>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{meeting.date}}</ion-label>
+        <ion-icon name="calendar-outline" color="turquoise-dark" slot="start"></ion-icon>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{meeting.time}}</ion-label>
+        <ion-icon name="time-outline" color="turquoise-dark" slot="start"></ion-icon>
+      </ion-item>
+    </ion-list>
+
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed" routerLink="/meetings/{{meeting.id}}/edit">
+      <ion-fab-button>
+        <ion-icon name="pencil-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
+    <ion-list lines="full">
+      <ion-list-header lines="inset">
+        <ion-label class="list-title">{{meeting.numberOfMembers}} {{ meeting.numberOfMembers > 1 ? "participantes" : "participante" }}</ion-label>
+      </ion-list-header>
+      <div *ngFor="let member of members">
+        <ion-item>
+          <ion-avatar slot="start">
+            <img src="../../../../../assets/user.png">
+          </ion-avatar>
+          <ion-label>
+            <h2>{{member.name}}</h2>
+            <h3>{{member.phone}}</h3>
+          </ion-label>
+          <ion-icon slot="end" name="trash-outline" color="turquoise-dark"></ion-icon>
+        </ion-item>
+      </div>
+    </ion-list>
+
+    <!-- <ion-button color="turquoise-dark" expand="block" fill="solid" size="small">Editar informações</ion-button> -->
+
+  </div>
+</ion-content>

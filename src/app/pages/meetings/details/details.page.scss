@@ -1,0 +1,49 @@
+ion-header ion-toolbar {
+  --background: #4ECDC4;
+  color: #FFF;
+}
+
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+span {
+  font-size: 8pt;
+}
+
+.container {
+  padding: 20px;
+
+  .title {
+    margin: 40px 0px 30px 0px;
+  }
+
+  .list-title {
+    font-size: 10pt;
+    font-weight: 500;
+  }
+
+  ion-list {
+    margin-bottom: 20px;
+  }
+
+  ion-button {
+    overflow: hidden;
+    margin: auto;
+    width: 250px;
+    --border-radius: 20px;
+  }
+
+  ion-fab-button, ion-icon {
+    color: #FFF;
+    --background: #4ECDC4;
+    --background-activated: #4ECDC4;
+  }
+
+}
