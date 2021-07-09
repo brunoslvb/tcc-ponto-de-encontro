@@ -12,6 +12,8 @@ const window = {
   recaptchaVerifier: undefined
 };
 
+declare var google;
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
@@ -23,6 +25,14 @@ export class RegisterPage implements OnInit {
 
   registerForm: FormGroup;
   ddd: IDDD[] = DDD;
+
+  addresses: Array<{
+    description: string;
+  }> = [];
+  coords: Array<number>;
+
+  private googleMapsPlaces = new google.maps.places.AutocompleteService();
+  private googleMapsGeocoder = new google.maps.Geocoder();
 
   private areaCode: string = "+55";
 
@@ -40,6 +50,7 @@ export class RegisterPage implements OnInit {
       email: ['', [Validators.required]],
       ddd: ['', [Validators.required]],
       phone: ['', [Validators.required, Validators.pattern("^[0-9]{9}$")]],
+      address: ['', [Validators.required]],
     });
 
     this.recaptchaVerifier();
@@ -50,8 +61,34 @@ export class RegisterPage implements OnInit {
     this.authService.isUserLoggedIn();
   }
 
-  register(){
-    console.log(this.registerForm.value);
+  async searchAddress(){    
+    if(!this.registerForm.value.address.trim().length) {      
+      this.addresses = [];
+      return;
+    }; 
+
+    this.googleMapsPlaces.getPlacePredictions({ input: this.registerForm.value.address }, predictions => {
+      this.addresses = predictions;
+    });
+  }
+
+  async searchSelected(address: string) {
+    
+    (<HTMLInputElement>document.getElementById('address')).value = address;
+    
+    this.registerForm.value.address = address;
+    
+    await this.googleMapsGeocoder.geocode({
+      address
+    }, (data) => {
+      
+      this.coords = [data[0].geometry.location.lat(), data[0].geometry.location.lng()];
+      
+    });
+    
+    this.addresses = [];
+    
+    (<HTMLInputElement>document.getElementById('addressesList')).style.display = 'none';
   }
 
   recaptchaVerifier(){
@@ -83,6 +120,11 @@ export class RegisterPage implements OnInit {
       name: this.registerForm.value.name,
       email: this.registerForm.value.email,
       phone: phoneNumber,
+      location: {
+        address: this.registerForm.value.address,
+        latitude: this.coords[0],
+        longitude: this.coords[1]
+      },
       groups: [],
       receiveNotifications: true
     }

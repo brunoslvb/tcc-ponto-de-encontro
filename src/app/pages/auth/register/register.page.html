@@ -49,6 +49,19 @@
       </div>
     </div>
 
+    <div class="input">
+      <ion-item>
+        <ion-icon color="" name="location-outline" slot="end"></ion-icon>
+        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionChange)="searchAddress()"></ion-input>
+      </ion-item>
+    </div>
+
+    <div id="addressesList" class="list">
+      <ion-item button class="item" *ngFor="let address of addresses" (click)="searchSelected(address.description)">
+        {{address.description}}
+      </ion-item>
+    </div>
+
     <ion-button [disabled]="registerForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default"><span>Cadastrar</span></ion-button>
     <ion-button routerLink="/auth/login" color="turquoise-dark" expand="block" fill="clear" size="default"><span>Login</span></ion-button>
 

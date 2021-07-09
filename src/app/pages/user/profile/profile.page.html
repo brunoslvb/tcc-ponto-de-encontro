@@ -12,10 +12,10 @@
 <ion-content class="ion-padding">
 
   <div class="photo">
-    <div class="iconEdit">
+    <!-- <div class="iconEdit">
       <ion-icon button name="camera-outline"></ion-icon>
-    </div>
-    <img src="../../../../assets/bruno.jpg" alt="Ícone usuário">
+    </div> -->
+    <img src="../../../../assets/user.png" alt="Ícone usuário">
   </div>
 
   <form [formGroup]="editForm" (submit)="update()">
@@ -38,6 +38,19 @@
       <ion-item>
         <ion-icon name="call-outline" slot="end"></ion-icon>
         <ion-input type="text" id="phone" formControlName="phone" placeholder="Celular" [value]=(user.phone) disabled></ion-input>
+      </ion-item>
+    </div>
+
+    <div class="input">
+      <ion-item>
+        <ion-icon color="" name="location-outline" slot="end"></ion-icon>
+        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" (ionInput)="searchAddress()" [value]=(user.location.address)></ion-input>
+      </ion-item>
+    </div>
+
+    <div id="addressesList" class="list">
+      <ion-item button class="item" *ngFor="let address of addresses" (click)="searchSelected(address.description)">
+        {{address.description}}
       </ion-item>
     </div>
 
