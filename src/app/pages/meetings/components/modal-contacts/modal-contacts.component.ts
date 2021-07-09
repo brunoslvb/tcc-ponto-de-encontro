@@ -13,7 +13,7 @@ import { UserService } from 'src/app/services/user.service';
 export class ModalContactsComponent implements OnInit {
 
   meeting: IMeeting;
-  contacts: any[];
+  contacts: any[] = [];
   loading: any;
 
   selectedContacts: IUser[] = [];

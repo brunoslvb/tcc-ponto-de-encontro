@@ -1,6 +1,6 @@
 <ion-header class="ion-no-border" mode="">
   <ion-toolbar>
-    <ion-title>Amigos</ion-title>
+    <ion-title>Contatos</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="closeModal()">
         <ion-icon slot="icon-only" size="large" name="close-outline"></ion-icon>
@@ -16,6 +16,10 @@
       <ion-icon name="arrow-forward-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+  <div *ngIf="contacts.length === 0" class="alone">
+    <h3>Nenhum contato encontrado para adicionar ao encontro!</h3>
+  </div>
 
   <ion-list>
     <div *ngFor="let contact of contacts">

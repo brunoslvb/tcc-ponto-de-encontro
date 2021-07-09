@@ -1,6 +1,6 @@
 <ion-header class="ion-no-border" mode="">
   <ion-toolbar>
-    <ion-title>Amigos</ion-title>
+    <ion-title>Contatos</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="closeModal()">
         <ion-icon slot="icon-only" size="large" name="close-outline"></ion-icon>
@@ -11,18 +11,20 @@
 
 <ion-content>
 
-  <ion-list>
-    <div *ngFor="let contact of contacts">
-      <ion-item>
-        <ion-avatar slot="start">
-          <ion-icon name="person-circle-outline" size="large"></ion-icon>
-        </ion-avatar>
-        <ion-label>
-          <h2>{{contact.name}}</h2>
-          <h3>{{contact.phone}}</h3>
-        </ion-label>
-        <ion-icon slot="end" name="trash-outline" (click)="alertDeleteContact(contact)"></ion-icon>
-      </ion-item>
-    </div>
+  <div *ngIf="contacts.length === 0" class="alone">
+    <h3>Você ainda não tem nenhum contato adicionado!</h3>
+  </div>
+
+  <ion-list *ngFor="let contact of contacts">
+    <ion-item>
+      <ion-avatar slot="start">
+        <ion-icon name="person-circle-outline" size="large"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>{{contact.name}}</h2>
+        <h3>{{contact.phone}}</h3>
+      </ion-label>
+      <ion-icon slot="end" name="trash-outline" (click)="alertDeleteContact(contact)"></ion-icon>
+    </ion-item>
   </ion-list>
 </ion-content>

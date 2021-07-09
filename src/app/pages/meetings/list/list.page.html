@@ -7,7 +7,7 @@
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item button (click)="profile()"><ion-avatar slot="start"><img src="../../../../assets/bruno.jpg" alt=""></ion-avatar>Perfil</ion-item>
+        <ion-item button (click)="profile()"><ion-avatar slot="start"><ion-icon name="person-circle-outline" color="turquoise-dark" size="large"></ion-icon></ion-avatar>{{user.name}}</ion-item>
         <ion-item button (click)="showContacts()"><ion-icon slot="start" name="people-outline"></ion-icon>Contatos</ion-item>
         <ion-item button (click)="alertAddContact()"><ion-icon slot="start" name="person-add-outline"></ion-icon>Adicionar amigo</ion-item>
         <ion-item button (click)="alertNotification()"><ion-icon slot="start" name="{{this.user.receiveNotifications ? 'notifications-outline' : 'notifications-off-outline'}}"></ion-icon>Notificações</ion-item>
