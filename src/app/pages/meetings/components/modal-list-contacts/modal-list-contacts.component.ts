@@ -25,11 +25,11 @@ export class ModalListContactsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.loadContactsFromUser();
+    this.loadContacts();
   }
 
 
-  async loadContactsFromUser(){
+  async loadContacts(){
     
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -37,26 +37,31 @@ export class ModalListContactsComponent implements OnInit {
 
     await this.loading.present();
 
-    await this.userService.getContacts().get().toPromise().then(response => {
+    try {
+      const ids = [];
 
-      let contact: any;
-
-      response.docs.forEach(async doc => {
-        
-        contact = doc.data();
-
-        this.contacts.push(contact);
+      await this.userService.getContacts().get().toPromise().then(response => {
+        response.docs.forEach(async doc => ids.push(doc.id));      
       });
 
-    });    
+      const promises = ids.map(id => this.userService.getById(id).get().toPromise().then(response => response.data()));
 
-    await this.loading.dismiss();
+      await Promise.all(promises).then(async (response) => {
+        this.contacts = response.map((user: any) => user);
+      });
+
+    } catch (error) {
+      this.presentToast('Problemas ao carregar contatos. Tente novamente mais tarde.')
+    } finally {
+      await this.loading.dismiss();      
+    }
 
   }
 
   async alertDeleteContact(contact: IUser) {
     const alert = await this.alertController.create({
-      header: `Deseja remover ${contact.name} ?`,
+      header: `Remover`,
+      message: `Deseja remover ${contact.name} ?`,
       backdropDismiss: false,
       buttons: [
         {

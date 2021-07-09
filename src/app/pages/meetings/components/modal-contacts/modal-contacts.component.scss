@@ -4,5 +4,10 @@
 }
 
 ion-fab-button {
-  --background: #FFF;
+
+  --background: var(--ion-color-turquoise);
+  --background-activated: var(--ion-color-turquoise);
+  ion-icon {
+    color: #FFF;
+  }
 }

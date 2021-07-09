@@ -13,7 +13,7 @@ import { UserService } from 'src/app/services/user.service';
 export class ModalContactsComponent implements OnInit {
 
   meeting: IMeeting;
-  contacts: any = [];
+  contacts: any[];
   loading: any;
 
   selectedContacts: IUser[] = [];
@@ -26,12 +26,12 @@ export class ModalContactsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.loadContactsFromUser();
+    this.loadContacts();
   }
 
   getSelectedContacts(ev: any, contact: any) {
 
-    if(ev.detail.checked) {
+    if (ev.detail.checked) {
       this.selectedContacts.push(contact);
     } else {
       this.selectedContacts.splice(this.selectedContacts.indexOf(contact), 1);
@@ -39,43 +39,61 @@ export class ModalContactsComponent implements OnInit {
 
   }
 
-  async loadContactsFromUser(){
-    
+  async loadContacts() {
+
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
     });
 
     await this.loading.present();
 
+    const ids = [];
+
     await this.userService.getContacts().get().toPromise().then(response => {
-
-      let contact: any;
-
-      response.docs.forEach(async doc => {
-        
-        contact = doc.data();
-
-        for (let i = 0; i < this.meeting.members.length; i++) {
-          if(contact.phone === this.meeting.members[i]) {
-            contact.isInTheMeeting = true;
-            break;
-          }
-        }
-
-        this.contacts.push(contact);
-      });
-
+      response.docs.forEach(async doc => ids.push(doc.id));      
     });
 
+    const promises = ids.map(id => this.userService.getById(id).get().toPromise().then(response => response.data()));
+
+    await Promise.all(promises).then(async (response) => {
+      this.contacts = response.map((user: any) => user);
+    });
+        
+    await this.checkContacts();
+    
     await this.loading.dismiss();
 
   }
 
-  async closeModal(){
+  async checkContacts() {
+    
+    let contacts = [];
+
+    this.contacts.forEach(async contact => {
+      
+      for (let i = 0; i < this.meeting.members.length; i++) {
+        if (contact.phone === this.meeting.members[i]) {
+          contact.isInTheMeeting = true;
+          break;
+        }
+      }
+
+      contacts.push(contact)
+
+    });
+
+    this.contacts = contacts;
+
+    console.log(this.contacts);
+    
+
+  }
+
+  async closeModal() {
     await this.modalController.dismiss();
   }
 
-  async submitModal(){
+  async submitModal() {
     await this.modalController.dismiss(this.selectedContacts);
   }
 

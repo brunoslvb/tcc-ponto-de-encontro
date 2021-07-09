@@ -21,14 +21,14 @@
     <div *ngFor="let contact of contacts">
       <ion-item>
         <ion-avatar slot="start">
-          <img src="../../../../../assets/bruno.jpg">
+          <ion-icon name="person-circle-outline" size="large"></ion-icon>
         </ion-avatar>
         <ion-label>
           <h2>{{contact.name}}</h2>
           <h3>{{contact.phone}}</h3>
         </ion-label>
         <div *ngIf="!contact.isInTheMeeting">
-          <ion-checkbox color="dark" value={{contact}} (ionChange)="getSelectedContacts($event, contact)"></ion-checkbox>
+          <ion-checkbox color="turquoise-dark" value={{contact}} (ionChange)="getSelectedContacts($event, contact)"></ion-checkbox>
         </div>
       </ion-item>
     </div>
