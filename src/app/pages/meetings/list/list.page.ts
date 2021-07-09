@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AlertController, LoadingController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
+import { AuthService } from 'src/app/services/auth.service';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { MessagingService } from 'src/app/services/messaging.service';
 import { UserService } from 'src/app/services/user.service';
@@ -30,6 +31,7 @@ export class ListPage implements OnInit {
     private alertController: AlertController,
     private toastController: ToastController,
     private messagingService: MessagingService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit() {
@@ -219,6 +221,52 @@ export class ListPage implements OnInit {
 
   async profile() {
     await this.nav.navigateForward(`/user/${btoa(this.user.phone)}`);
+  }
+
+  async alertLogout(){
+    const alert = await this.alertController.create({
+      header: 'Sair',
+      message: `Quer mesmo sair do aplicativo ?`,
+      backdropDismiss: true,
+      buttons: [
+        {
+          text: 'Sim',
+          role: "ok",
+          handler: () => {
+            this.logout();
+          }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => alert.dismiss()
+        },
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async logout(){
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+
+    await this.loading.present();
+
+    try {
+      await this.authService.logout();
+
+      await this.nav.navigateRoot('/auth', { replaceUrl: true });
+
+    } catch(err) {
+      console.log(err);
+      await this.presentToast("Erro ao tentar sair do sistema");
+    } finally {
+      await this.loading.dismiss();
+    }
+
   }
 
 }

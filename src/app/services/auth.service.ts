@@ -76,7 +76,7 @@ export class AuthService {
             email: data.email
           })));
 
-          this.nav.navigateForward('meetings');
+          this.nav.navigateForward('meetings', { replaceUrl: true });
         }
       });      
     } catch (err) {
@@ -84,6 +84,10 @@ export class AuthService {
     }
 
     await this.loading.dismiss();
+  }
+
+  logout(){
+    return this.auth.signOut();
   }
 
 }

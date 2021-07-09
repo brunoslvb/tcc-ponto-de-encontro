@@ -11,7 +11,7 @@
         <ion-item button (click)="showContacts()"><ion-icon slot="start" name="people-outline"></ion-icon>Contatos</ion-item>
         <ion-item button (click)="alertAddContact()"><ion-icon slot="start" name="person-add-outline"></ion-icon>Adicionar amigo</ion-item>
         <ion-item button (click)="alertNotification()"><ion-icon slot="start" name="{{this.user.receiveNotifications ? 'notifications-outline' : 'notifications-off-outline'}}"></ion-icon>Notificações</ion-item>
-        <ion-item button><ion-icon slot="start" name="log-out-outline"></ion-icon>Sair</ion-item>
+        <ion-item button (click)="alertLogout()"><ion-icon slot="start" name="log-out-outline"></ion-icon>Sair</ion-item>
       </ion-list>
     </ion-content>
     <ion-footer class="ion-no-border" mode="md">
