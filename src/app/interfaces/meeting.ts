@@ -17,5 +17,6 @@ export interface IMeeting {
   date?: string;
   time?: string;
   members?: Array<string>;
+  owner?: string;
   numberOfMembers?: number;
 }

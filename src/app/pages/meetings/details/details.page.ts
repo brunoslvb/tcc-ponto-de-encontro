@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, PopoverController, LoadingController, ToastController, ModalController } from '@ionic/angular';
+import { NavController, PopoverController, LoadingController, ToastController, ModalController, AlertController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { PopoverComponent } from 'src/app/components/popover/popover.component';
 import { IMeeting } from 'src/app/interfaces/Meeting';
@@ -27,7 +27,9 @@ export class DetailsPage implements OnInit {
 
   messages: Array<IMessage> = [];
 
-  members: Array<IUser> = [];
+  members: Array<any> = [];
+
+  contacts: any = [];
 
   subpointGroup: any;
   subpointOption: any = {
@@ -65,6 +67,7 @@ export class DetailsPage implements OnInit {
     private loadingController: LoadingController,
     private toastController: ToastController,
     private modalController: ModalController,
+    private alertController: AlertController,
     private notificationService: MessagingService
   ) { }
 
@@ -82,12 +85,10 @@ export class DetailsPage implements OnInit {
   async load(){
     await this.loadMeeting();
     await this.loadMembers();
+    await this.loadContacts();
   }
 
   async leaveMeeting(){
-
-    this.listenerMeeting.unsubscribe();
-    this.listenerChat.unsubscribe();
 
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -130,7 +131,6 @@ export class DetailsPage implements OnInit {
   }
 
   async addContactsToMeeting(contacts: IUser[]){
-    // this.dismissPopover();
 
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -185,8 +185,32 @@ export class DetailsPage implements OnInit {
 
   }
 
+  async loadContacts(){
+
+    await this.userService.getContacts().get().toPromise().then(response => {
+
+      this.contacts = this.members.map(member => {
+
+        response.docs.forEach(async doc => {
+
+          console.log(`${doc.id} === ${member.phone}`);
+
+          if(doc.id == member.phone) {
+            member.myContact = true;
+          } else {
+            member.myContact = false;
+          }
+
+        });
+
+        return member;
+      });      
+
+    });
+
+  }
+
   async loadMembers(){
-    console.log('ta aqui');
     
     const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
 
@@ -194,27 +218,18 @@ export class DetailsPage implements OnInit {
       this.members = response.map((user: any) => user);
     });
 
-    console.log(this.members);
-
   }
   
   async subpointOptionFunction(){
-    console.log('Ta aqui');
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
-    console.log(this.subpointGroup);
     if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
-      // (<HTMLInputElement>document.getElementById('subpointOption')).style.display = 'block';
       this.subpointOption.active = true;
       if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){
-        // (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'gold';
         this.subpointOption.color = 'warning';
       } else {
-        // (<HTMLInputElement>document.getElementById('subpointOption')).style.color = 'white';
         this.subpointOption.color = 'white';
       }
-
     }
-
   }
 
   async showPopover(ev: any) {
@@ -253,8 +268,62 @@ export class DetailsPage implements OnInit {
     }
   }
 
+  async removeUser(user){
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+    await this.loading.present();
+
+    try{
+
+      await this.userService.removeMeetingFromUser(user.phone, this.meeting.id);
+      
+      await this.meetingService.removeUserFromMeeting(this.meeting.id, user.phone);
+      
+      await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
+
+      await this.chatService.saveMessage(this.meeting.id, {
+        message: `${user.name} foi removido do encontro`,
+        type: "event",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      await this.presentToast(`${user.name} foi removido com sucesso`);
+
+      await this.load();
+
+    } catch(err) {
+      console.error(err);
+    } finally {
+      await this.loading.dismiss();
+    }
+  }
+
+  async alertConfirmRemove(user){
+
+    const alert = await this.alertController.create({
+      header: 'Remover',
+      message: 'Tem certeza que deseja remover este usuário do encontro?',
+      backdropDismiss: true,
+      buttons: [
+        {
+          text: 'Aceitar',
+          handler: () => this.removeUser(user)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+      ],
+    });
+
+    await alert.present();
+
+  }
+
   async back(){
-    await this.nav.navigateForward('/meetings', { animationDirection: 'back' });
+    await this.nav.back();
   }
 
   async presentToast(message: string) {

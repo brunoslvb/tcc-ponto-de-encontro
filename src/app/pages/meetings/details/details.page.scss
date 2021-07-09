@@ -39,11 +39,11 @@ span {
     width: 250px;
     --border-radius: 20px;
   }
+  
+}
 
-  ion-fab-button, ion-icon {
-    color: #FFF;
-    --background: #4ECDC4;
-    --background-activated: #4ECDC4;
-  }
-
+ion-fab-button, ion-icon {
+  color: #FFF;
+  --background: #4ECDC4;
+  --background-activated: #4ECDC4;
 }

@@ -29,7 +29,6 @@
 <ion-content>
   <div class="container">
 
-    <!-- <h3>Informações do Grupo <ion-badge color="turquoise-dark"><ion-icon name="pencil-outline" color="light"></ion-icon></ion-badge></h3> -->
     <h3 class="ion-text-center title">Informações do Grupo</h3>
 
     <ion-list lines="full">
@@ -54,31 +53,34 @@
       </ion-item>
     </ion-list>
 
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed" routerLink="/meetings/{{meeting.id}}/edit">
-      <ion-fab-button>
-        <ion-icon name="pencil-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-
     <ion-list lines="full">
       <ion-list-header lines="inset">
-        <ion-label class="list-title">{{meeting.numberOfMembers}} {{ meeting.numberOfMembers > 1 ? "participantes" : "participante" }}</ion-label>
+        <ion-label class="list-title">{{meeting.numberOfMembers}} {{ meeting.numberOfMembers > 1 ? "participantes" :
+          "participante" }}</ion-label>
       </ion-list-header>
-      <div *ngFor="let member of members">
+      <div *ngFor="let contact of contacts">
         <ion-item>
           <ion-avatar slot="start">
-            <img src="../../../../../assets/user.png">
+            <ion-icon name="person-circle-outline" color="turquoise-dark" size="large"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2>{{member.name}}</h2>
-            <h3>{{member.phone}}</h3>
+            <h2>{{contact.name}}</h2>
+            <h3>{{contact.phone}}</h3>
+            <h4 *ngIf="meeting.owner === contact.phone">Administrador</h4>
           </ion-label>
-          <ion-icon slot="end" name="trash-outline" color="turquoise-dark"></ion-icon>
+          <div *ngIf="meeting.owner === user.phone && contact.phone !== user.phone">
+            <ion-icon slot="end" name="trash-outline" color="turquoise-dark" (click)="alertConfirmRemove(contact)"></ion-icon>
+          </div>
         </ion-item>
       </div>
     </ion-list>
 
-    <!-- <ion-button color="turquoise-dark" expand="block" fill="solid" size="small">Editar informações</ion-button> -->
-
   </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" routerLink="/meetings/{{meeting.id}}/edit">
+    <ion-fab-button>
+      <ion-icon name="pencil-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>
