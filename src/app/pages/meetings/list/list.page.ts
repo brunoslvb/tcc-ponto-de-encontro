@@ -77,7 +77,7 @@ export class ListPage implements OnInit {
 
   }
 
-  async alertAddContact() {        
+  async alertAddContact() {
 
     const alert = await this.alertController.create({
       header: 'Adicione um amigo',
@@ -115,6 +115,10 @@ export class ListPage implements OnInit {
 
     if(phone === null || phone === "") return;
 
+    if(phone === this.user.phone) {
+      return await this.presentToast("Não é possível adicionar você mesmo");
+    }
+
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
     });
@@ -149,7 +153,8 @@ export class ListPage implements OnInit {
   async alertNotification(){
 
     const alert = await this.alertController.create({
-      header: `${ this.user.receiveNotifications ? "Desativar" : "Ativar"} notificações`,
+      header: 'Notificações',
+      message: `${ this.user.receiveNotifications ? "Desativar" : "Ativar"} notificações`,
       backdropDismiss: false,
       buttons: [
         {
