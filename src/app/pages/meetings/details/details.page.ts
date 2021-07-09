@@ -1,32 +1,35 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, PopoverController, LoadingController, ToastController, ModalController } from '@ionic/angular';
-import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
+import { NavController, PopoverController, LoadingController, ToastController, ModalController, AlertController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { PopoverComponent } from 'src/app/components/popover/popover.component';
 import { IMeeting } from 'src/app/interfaces/Meeting';
-import { MeetingService } from 'src/app/services/meeting.service';
-import { UserService } from 'src/app/services/user.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ChatService } from 'src/app/services/chat.service';
 import { IMessage } from 'src/app/interfaces/Message';
-import firebase from 'firebase/app';
 import { IUser } from 'src/app/interfaces/User';
-import { Observable, Subscription } from 'rxjs';
+import { ChatService } from 'src/app/services/chat.service';
+import { MeetingService } from 'src/app/services/meeting.service';
 import { MessagingService } from 'src/app/services/messaging.service';
-import { INotification } from 'src/app/interfaces/Notification';
+import { UserService } from 'src/app/services/user.service';
+import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
+import firebase from 'firebase/app';
 
 @Component({
-  selector: 'app-chat',
-  templateUrl: './chat.page.html',
-  styleUrls: ['./chat.page.scss'],
+  selector: 'app-details',
+  templateUrl: './details.page.html',
+  styleUrls: ['./details.page.scss'],
 })
-export class ChatPage implements OnInit {
+export class DetailsPage implements OnInit {
 
   user: IUser = JSON.parse(atob(sessionStorage.getItem("user")));
 
   chatForm: FormGroup;
 
   messages: Array<IMessage> = [];
+
+  members: Array<any> = [];
+
+  contacts: any = [];
 
   subpointGroup: any;
   subpointOption: any = {
@@ -64,32 +67,28 @@ export class ChatPage implements OnInit {
     private loadingController: LoadingController,
     private toastController: ToastController,
     private modalController: ModalController,
-    private builder: FormBuilder,
+    private alertController: AlertController,
     private notificationService: MessagingService
   ) { }
 
   ngOnInit() {
-
-    this.chatForm = this.builder.group({
-      message: ['', Validators.required],
-    });
-    
   }
   
   ionViewWillEnter(){
-    this.getMessages();
-    this.loadDataFromMeeting();
+    this.load();
   }
 
   ionViewWillLeave(){
     this.dismissPopover();
-    this.listenerMeeting.unsubscribe();
+  }
+
+  async load(){
+    await this.loadMeeting();
+    await this.loadMembers();
+    await this.loadContacts();
   }
 
   async leaveMeeting(){
-
-    this.listenerMeeting.unsubscribe();
-    this.listenerChat.unsubscribe();
 
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -132,7 +131,6 @@ export class ChatPage implements OnInit {
   }
 
   async addContactsToMeeting(contacts: IUser[]){
-    // this.dismissPopover();
 
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -164,18 +162,18 @@ export class ChatPage implements OnInit {
 
   }
 
-  async loadDataFromMeeting(){
+  async loadMeeting(){
     const id = this.route.snapshot.paramMap.get("id");
 
     try{
       
-      this.listenerMeeting = await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
+      await this.meetingService.getById(id).get().toPromise().then(async response => {
         
-        const data: any = response.payload.data(); 
+        const data: any = response.data(); 
         
         this.meeting = data;
         
-        this.meeting.id = response.payload.id;
+        this.meeting.id = response.id;
         
         await this.subpointOptionFunction();
       });
@@ -187,11 +185,43 @@ export class ChatPage implements OnInit {
 
   }
 
+  async loadContacts(){
+
+    await this.userService.getContacts().get().toPromise().then(response => {
+
+      this.contacts = this.members.map(member => {
+
+        response.docs.forEach(async doc => {
+
+          console.log(`${doc.id} === ${member.phone}`);
+
+          if(doc.id == member.phone) {
+            member.myContact = true;
+          } else {
+            member.myContact = false;
+          }
+
+        });
+
+        return member;
+      });      
+
+    });
+
+  }
+
+  async loadMembers(){
+    
+    const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
+
+    await Promise.all(promises).then(async (response) => {
+      this.members = response.map((user: any) => user);
+    });
+
+  }
   
   async subpointOptionFunction(){
-    console.log('Ta aqui');
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
-    console.log(this.subpointGroup);
     if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
       this.subpointOption.active = true;
       if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){
@@ -199,9 +229,7 @@ export class ChatPage implements OnInit {
       } else {
         this.subpointOption.color = 'white';
       }
-
     }
-
   }
 
   async showPopover(ev: any) {
@@ -240,8 +268,62 @@ export class ChatPage implements OnInit {
     }
   }
 
+  async removeUser(user){
+
+    this.loading = await this.loadingController.create({
+      spinner: 'crescent'
+    });
+    await this.loading.present();
+
+    try{
+
+      await this.userService.removeMeetingFromUser(user.phone, this.meeting.id);
+      
+      await this.meetingService.removeUserFromMeeting(this.meeting.id, user.phone);
+      
+      await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
+
+      await this.chatService.saveMessage(this.meeting.id, {
+        message: `${user.name} foi removido do encontro`,
+        type: "event",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      await this.presentToast(`${user.name} foi removido com sucesso`);
+
+      await this.load();
+
+    } catch(err) {
+      console.error(err);
+    } finally {
+      await this.loading.dismiss();
+    }
+  }
+
+  async alertConfirmRemove(user){
+
+    const alert = await this.alertController.create({
+      header: 'Remover',
+      message: 'Tem certeza que deseja remover este usuário do encontro?',
+      backdropDismiss: true,
+      buttons: [
+        {
+          text: 'Aceitar',
+          handler: () => this.removeUser(user)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+      ],
+    });
+
+    await alert.present();
+
+  }
+
   async back(){
-    await this.nav.navigateForward('/meetings', { animationDirection: 'back' });
+    await this.nav.back();
   }
 
   async presentToast(message: string) {
@@ -274,65 +356,5 @@ export class ChatPage implements OnInit {
 
   }
 
-  async getMessages(){
-
-    let messages: Array<IMessage> = [];
-
-    this.listenerChat = await this.chatService.getMessages(this.route.snapshot.paramMap.get("id")).subscribe(async (response: any) => {  
-    
-      messages = [];
-
-      response.forEach((item: any) => {
-
-        const data: IMessage = item.payload.doc.data();
-        
-        data.myMessage = data.from === this.user.phone;
-
-        messages.push(data);
-      });
-
-      this.messages = messages;
-
-      console.log("Passou aqui");
-      
-    });
-
-  }
-
-  async sendMessage(){
-    
-    const data = {
-      from: this.user.phone,
-      fromName: this.user.name,
-      message: this.chatForm.value.message,
-      type: "message",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }
-
-    this.chatForm.reset();
-    
-    await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), data);
-
-    const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
-
-    Promise.all(promises).then((response) => {
-      
-      const tokens = response.map((user: any) => {
-        return user.receiveNotifications ? user.tokenNotification : null;
-      });
-      
-      const notification: INotification = {
-        notification: {
-          title: this.meeting.name,
-          body: 'Você possui novas mensagens',
-        },
-        registration_ids: tokens
-      }
-  
-      this.notificationService.sendNotification(notification);
-
-    });    
-
-  }
 
 }

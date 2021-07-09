@@ -1,0 +1,55 @@
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" size="large" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Editar encontro</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <form [formGroup]="editForm" (submit)="editMeeting()">
+    
+    <div class="input">
+      <ion-label position="stacked">Nome do grupo</ion-label>
+      <ion-item>
+        <ion-icon color="" name="chatbubbles-outline" slot="end"></ion-icon>
+        <ion-input type="text" formControlName="name" placeholder="Nome do grupo" value={{meeting.name}} autofocus="true"></ion-input>
+      </ion-item>
+    </div>
+    <div class="input">
+      <ion-label position="stacked">Endereço</ion-label>
+      <ion-item>
+        <ion-icon color="" name="location-outline" slot="end"></ion-icon>
+        <ion-input type="search" formControlName="address" id="address" placeholder="Ponto de Encontro" value={{meeting.location.address}} (ionInput)="searchAddress()"></ion-input>
+      </ion-item>
+    </div>
+
+    <div id="addressesList" class="list">
+      <ion-item button class="item" *ngFor="let address of addresses" (click)="searchSelected(address.description)">
+        {{address.description}}
+      </ion-item>
+    </div>
+    
+    <div class="input">
+      <ion-label position="stacked">Data do encontro</ion-label>
+      <ion-item>
+        <ion-input type="date" formControlName="date" placeholder="Data do Encontro" value={{meeting.date}}></ion-input>
+      </ion-item>
+    </div>
+    
+    <div class="input">
+      <ion-label position="stacked">Horário do encontro</ion-label>
+      <ion-item>
+        <ion-input type="time" formControlName="time" placeholder="Horário do Encontro" value={{meeting.time}}></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-button [disabled]="editForm.invalid" type="submit" color="turquoise-dark" expand="block" fill="solid" size="default">Editar Encontro</ion-button>
+        
+  </form>
+
+</ion-content>

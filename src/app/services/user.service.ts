@@ -36,7 +36,7 @@ export class UserService {
   }
 
   addContact(user: IUser) {
-    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection("contacts").doc(user.phone).set(user);
+    return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection("contacts").doc(user.phone).set({});
   }
 
   update(user: IUser){
