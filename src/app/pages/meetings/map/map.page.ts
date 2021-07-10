@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 import { IUser } from 'src/app/interfaces/User';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 declare var google;
 
@@ -25,11 +26,14 @@ export class MapPage implements OnInit {
   private colorMarker: string = "#0d476b";
 
   private loading: any;
-  private map: GoogleMap;
+  private map: any;
   private googleMapsDirections = new google.maps.DirectionsService();
+  private googleMapsDisplay = new google.maps.DirectionsRenderer();
   private origins: Marker[];
-  private destination: Marker;
+  private destination: any;
   private travelMode: string = "DRIVING";
+
+  private watchPosition: any;
 
   private subpointGroup: any;
 
@@ -37,10 +41,17 @@ export class MapPage implements OnInit {
 
   private groupedUsers = [];
 
+  private markers: any[] = [];
+
   private group1Vertices = null;
   private group2Vertices = null;
   private group3Vertices = null;
   private group4Vertices = null;
+
+  private group1Polygon = null;
+  private group2Polygon = null;
+  private group3Polygon = null;
+  private group4Polygon = null;
 
   constructor(
     private nav: NavController,
@@ -49,7 +60,8 @@ export class MapPage implements OnInit {
     private statusBar: StatusBar,
     private meetingService: MeetingService,
     private userService: UserService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private geolocation: Geolocation,
   ) { }
 
   ngOnInit() {
@@ -90,11 +102,12 @@ export class MapPage implements OnInit {
       await this.loadUser();
       await this.loadUsers();
       await this.loadDestination();
+      // await this.getSubpointGroup();
       await this.joinUsersInSameArea();
-      await this.getSubpointGroup();
       await this.loadOrigins();
       await this.loadSubpoint();
       await this.getRoutes();
+      this.getMarkers();
 
     } catch (error) {
       console.error(error);
@@ -103,6 +116,14 @@ export class MapPage implements OnInit {
 
     await this.loading.dismiss();
 
+  }
+
+  async getCurrentLocation(){
+    this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 });
+
+    this.watchPosition.subscribe(data => {
+      console.log(data);
+    });
   }
 
   async loadMeeting() {
@@ -148,35 +169,42 @@ export class MapPage implements OnInit {
 
   async getSubpointGroup() {
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.meeting.id);
+    // this.subpointGroup = "group1";
+    console.log(this.subpointGroup);
+
   }
 
   async loadDestination() {
 
-    this.destination = this.map.addMarkerSync({
+    this.destination = new google.maps.Marker({
       title: this.meeting.location.address,
-      icon: this.colorMarker,
-      animation: GoogleMapsAnimation.BOUNCE,
       position: {
         lat: this.meeting.location.latitude,
         lng: this.meeting.location.longitude,
-      }
+      },
+      map: this.map
     });
 
-    const { lat, lng } = this.destination.getPosition();
+    this.markers.push(this.destination);
+
+    // const { lat, lng } = this.destination.getPosition();
+
+    const lat = this.meeting.location.latitude;
+    const lng = this.meeting.location.longitude;
 
     const yOffset = 85;
     const xOffset = 50;
 
     this.group1Vertices = [
-      { lat, lng },
+      { lat: lat, lng },
       { lat: lat + (yOffset - lat), lng },
       { lat: lat + (yOffset - lat), lng: lng + xOffset },
       { lat, lng: lng + xOffset }
     ];
 
     //group1 lat > t.lat ; lng > t.lng
-    await this.map.addPolygon({
-      points: this.group1Vertices,
+    this.group1Polygon = new google.maps.Polygon({
+      paths: this.group1Vertices,
       strokeColor: "transparent",
       strokeOpacity: 1.0,
       strokeWeight: 2,
@@ -192,8 +220,8 @@ export class MapPage implements OnInit {
       { lat, lng: lng - xOffset }
     ];
 
-    await this.map.addPolygon({
-      points: this.group2Vertices,
+    this.group2Polygon = new google.maps.Polygon({
+      paths: this.group2Vertices,
       strokeColor: "transparent",
       strokeOpacity: 1.0,
       strokeWeight: 2,
@@ -211,8 +239,8 @@ export class MapPage implements OnInit {
       { lat: lat, lng: lng - xOffset }
     ];
 
-    await this.map.addPolygon({
-      points: this.group3Vertices,
+    this.group3Polygon = new google.maps.Polygon({
+      paths: this.group3Vertices,
       strokeColor: "transparent",
       strokeOpacity: 1.0,
       strokeWeight: 2,
@@ -230,8 +258,8 @@ export class MapPage implements OnInit {
       { lat, lng: lng + xOffset }
     ];
 
-    await this.map.addPolygon({
-      points: this.group4Vertices,
+    this.group4Polygon = new google.maps.Polygon({
+      paths: this.group4Vertices,
       strokeColor: "transparent",
       strokeOpacity: 1.0,
       strokeWeight: 2,
@@ -240,10 +268,17 @@ export class MapPage implements OnInit {
       clickable: true
     });
 
+    this.group1Polygon.setMap(this.map);
+    this.group2Polygon.setMap(this.map);
+    this.group3Polygon.setMap(this.map);
+    this.group4Polygon.setMap(this.map);
+
   }
 
 
   async joinUsersInSameArea() {
+
+    console.log("Join users ...");
 
     let members = this.users;
 
@@ -281,22 +316,22 @@ export class MapPage implements OnInit {
         phone: members[i].phone,
       }
 
-      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group1Vertices)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group1Polygon)) {
         group1.members.push(data);
         continue;
       }
 
-      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group2Vertices)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group2Polygon)) {
         group2.members.push(data);
         continue;
       }
 
-      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group3Vertices)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group3Polygon)) {
         group3.members.push(data);
         continue;
       }
 
-      if (Poly.containsLocation({ lat: members[i].location.latitude, lng: members[i].location.longitude }, this.group4Vertices)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group4Polygon)) {
         group4.members.push(data);
         continue;
       }
@@ -313,6 +348,8 @@ export class MapPage implements OnInit {
     }
 
     await this.meetingService.update(this.meeting.id, data);
+
+    await this.getSubpointGroup();
 
   }
 
@@ -350,45 +387,27 @@ export class MapPage implements OnInit {
 
   async loadOrigins() {
 
-    this.origins = this.users.map((user: any) => {
-
-      return this.map.addMarkerSync({
+    this.users.forEach((user: any) => {
+      this.markers.push(new google.maps.Marker({
         title: user.name,
-        icon: this.colorMarker,
-        animation: GoogleMapsAnimation.BOUNCE,
-        position: {
-          lat: user.location.latitude,
-          lng: user.location.longitude,
-        }
-      });
+        position: new google.maps.LatLng(user.location.latitude, user.location.longitude),
+        map: this.map
+      }));
 
     });
-
-    // console.log(this.origins);
-    // await this.calcRoute();
-
-    // });
 
   }
 
   async loadSubpoint() {
 
-    await this.map.addMarkerSync({
+    this.markers.push(new google.maps.Marker({
       title: 'Subpoint',
-      // icon: {
-      //   url: "../../../../assets/bruno.jpg",
-      //   size: {
-      //     width: 40,
-      //     height: 40
-      //   },
-      // },
-      icon: 'red',
-      animation: GoogleMapsAnimation.BOUNCE,
       position: {
         lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
         lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
-      }
-    });
+      },
+      map: this.map,
+    }));
 
 
     // console.log(this.origins);
@@ -398,37 +417,33 @@ export class MapPage implements OnInit {
 
   }
 
-  async loadMap() {
-
-    return new Promise(async (resolve, reject) => {
-
-      // This code is necessary for browser
-      Environment.setEnv({
-        'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ',
-        'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ'
+  async getMarkers() {
+    this.markers.forEach(marker => {
+      var infoWindow = new google.maps.InfoWindow({
+        content: marker.title
       });
 
-      let mapOptions: GoogleMapOptions = {
-        controls: {
-          zoom: false,
-        },
-        camera: {
-          zoom: 6,
-          target: { lat: -23.4558009, lng: -46.5322912 }
-        },
-      };
+      google.maps.event.addListener(marker, 'click', function () {
+        infoWindow.open(this.map, marker);
+      });
+    })
+  }
 
-      this.map = GoogleMaps.create(this.mapElement, mapOptions);
+  async loadMap() {
 
-      try {
-        await this.map.one(GoogleMapsEvent.MAP_READY);
-        resolve("");
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
-
+    Environment.setEnv({
+      'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ',
+      'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ'
     });
+
+    this.map = new google.maps.Map(this.mapElement, {
+      zoom: 6,
+      center: { lat: -23.4558009, lng: -46.5322912 },
+      disableDefaultUI: true,
+    });
+
+    this.googleMapsDisplay.setMap(this.map);
+    this.googleMapsDisplay.setOptions({ suppressMarkers: true });
 
   }
 
@@ -459,29 +474,18 @@ export class MapPage implements OnInit {
       travelMode: this.travelMode,
       waypoints: waypts,
       // optimizeWaypoints: true,
-    }, async (response: any) => {
-      response.routes[0].overview_path.forEach(path => {
-        points.push({
-          lat: path.lat(),
-          lng: path.lng()
-        });
-      });
+    }).then(result => {
+      console.log(result);
 
-      await this.map.addPolyline({
-        points: points,
-        color: this.colorMarker,
-        width: 3
-      });
-
-      this.map.moveCamera({
-        target: points
-      });
+      this.googleMapsDisplay.setDirections(result);
     });
 
   }
 
   changeTravelMode(event) {
     this.travelMode = event.detail.value;
+    this.getRoutes();
   }
 
 }
+
