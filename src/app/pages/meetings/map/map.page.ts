@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 import { IUser } from 'src/app/interfaces/User';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 declare var google;
 
@@ -32,11 +33,15 @@ export class MapPage implements OnInit {
   private destination: any;
   private travelMode: string = "DRIVING";
 
+  private watchPosition: any;
+
   private subpointGroup: any;
 
   private users = [];
 
   private groupedUsers = [];
+
+  private markers: any[] = [];
 
   private group1Vertices = null;
   private group2Vertices = null;
@@ -55,7 +60,8 @@ export class MapPage implements OnInit {
     private statusBar: StatusBar,
     private meetingService: MeetingService,
     private userService: UserService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private geolocation: Geolocation,
   ) { }
 
   ngOnInit() {
@@ -100,12 +106,8 @@ export class MapPage implements OnInit {
       await this.joinUsersInSameArea();
       await this.loadOrigins();
       await this.loadSubpoint();
-      const myoverlay = new google.maps.OverlayView();
-      myoverlay.draw = function () {
-          this.getPanes().markerLayer.id='markerLayer';
-      };
-      myoverlay.setMap(this.map);
       await this.getRoutes();
+      this.getMarkers();
 
     } catch (error) {
       console.error(error);
@@ -114,6 +116,14 @@ export class MapPage implements OnInit {
 
     await this.loading.dismiss();
 
+  }
+
+  async getCurrentLocation(){
+    this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 });
+
+    this.watchPosition.subscribe(data => {
+      console.log(data);
+    });
   }
 
   async loadMeeting() {
@@ -161,7 +171,7 @@ export class MapPage implements OnInit {
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.meeting.id);
     // this.subpointGroup = "group1";
     console.log(this.subpointGroup);
-    
+
   }
 
   async loadDestination() {
@@ -174,6 +184,8 @@ export class MapPage implements OnInit {
       },
       map: this.map
     });
+
+    this.markers.push(this.destination);
 
     // const { lat, lng } = this.destination.getPosition();
 
@@ -207,7 +219,7 @@ export class MapPage implements OnInit {
       { lat: lat + (yOffset - lat), lng: lng - xOffset },
       { lat, lng: lng - xOffset }
     ];
-    
+
     this.group2Polygon = new google.maps.Polygon({
       paths: this.group2Vertices,
       strokeColor: "transparent",
@@ -217,16 +229,16 @@ export class MapPage implements OnInit {
       fillOpacity: 0.35,
       clickable: true
     });
-    
+
     //group3 lat < t.lat; lng < t.lng
-    
+
     this.group3Vertices = [
       { lat, lng },
       { lat: lat - (yOffset - lat), lng },
       { lat: lat - (yOffset - lat), lng: lng - xOffset },
       { lat: lat, lng: lng - xOffset }
     ];
-    
+
     this.group3Polygon = new google.maps.Polygon({
       paths: this.group3Vertices,
       strokeColor: "transparent",
@@ -236,16 +248,16 @@ export class MapPage implements OnInit {
       fillOpacity: 0.35,
       clickable: true,
     });
-    
+
     //group4 lat < t.lat; lng > t.lng
-    
+
     this.group4Vertices = [
       { lat, lng },
       { lat: lat - (yOffset - lat), lng },
       { lat: lat - (yOffset - lat), lng: lng + xOffset },
       { lat, lng: lng + xOffset }
     ];
-    
+
     this.group4Polygon = new google.maps.Polygon({
       paths: this.group4Vertices,
       strokeColor: "transparent",
@@ -376,42 +388,26 @@ export class MapPage implements OnInit {
   async loadOrigins() {
 
     this.users.forEach((user: any) => {
-      console.log(user);
-      
-      const teste = new google.maps.Marker({
+      this.markers.push(new google.maps.Marker({
         title: user.name,
-
         position: new google.maps.LatLng(user.location.latitude, user.location.longitude),
-      });
-
-      teste.setMap(this.map);
+        map: this.map
+      }));
 
     });
-
-    // console.log(this.origins);
-    // await this.calcRoute();
-
-    // });
 
   }
 
   async loadSubpoint() {
 
-    const markerImage = new google.maps.MarkerImage(
-      
-    );
-
-    await new google.maps.Marker({
+    this.markers.push(new google.maps.Marker({
       title: 'Subpoint',
-      // icon: "../../../../assets/bruno.jpg",
-      // animation: GoogleMapsAnimation.BOUNCE,
       position: {
         lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
         lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
       },
       map: this.map,
-      optimized: false
-    });
+    }));
 
 
     // console.log(this.origins);
@@ -421,38 +417,19 @@ export class MapPage implements OnInit {
 
   }
 
+  async getMarkers() {
+    this.markers.forEach(marker => {
+      var infoWindow = new google.maps.InfoWindow({
+        content: marker.title
+      });
+
+      google.maps.event.addListener(marker, 'click', function () {
+        infoWindow.open(this.map, marker);
+      });
+    })
+  }
+
   async loadMap() {
-
-    // return new Promise(async (resolve, reject) => {
-
-    //   // This code is necessary for browser
-    //   Environment.setEnv({
-    //     'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ',
-    //     'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ'
-    //   });
-
-    //   let mapOptions: GoogleMapOptions = {
-    //     controls: {
-    //       zoom: false,
-    //     },
-    //     camera: {
-    //       zoom: 6,
-    //       target: { lat: -23.4558009, lng: -46.5322912 }
-    //     },
-    //   };
-
-      
-    //   try {
-    //     this.map = new google.maps.Map(this.mapElement, mapOptions);
-    //     this.googleMapsDisplay.setMap(this.map);
-    //     // await this.map.one(GoogleMapsEvent.MAP_READY);
-    //     resolve("");
-    //   } catch (error) {
-    //     console.log(error);
-    //     reject(error);
-    //   }
-
-    // });
 
     Environment.setEnv({
       'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyCQW7UBbaXZdVAmA0RizRc3XqST8hpUrvQ',
@@ -466,13 +443,12 @@ export class MapPage implements OnInit {
     });
 
     this.googleMapsDisplay.setMap(this.map);
+    this.googleMapsDisplay.setOptions({ suppressMarkers: true });
 
   }
 
   async getRoutes() {
 
-    console.log('lala');
-    
     const points = new Array<ILatLng>();
 
     let waypts = [];
@@ -500,7 +476,7 @@ export class MapPage implements OnInit {
       // optimizeWaypoints: true,
     }).then(result => {
       console.log(result);
-      
+
       this.googleMapsDisplay.setDirections(result);
     });
 
