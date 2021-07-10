@@ -19,28 +19,51 @@
   </ion-segment-button>
 </ion-segment>
 
+<ion-fab class="my-location" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="getCurrentLocation()">
+    <ion-icon name="locate"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 
 <ion-footer>
   <ion-toolbar>
-    <div class="list">
-      <ion-item button class="item">
-        <p>Bruno <span>está a 8 minutos de distância</span></p>
+    <ion-list mode="ios">
+      <ion-item button>
+        <ion-label>
+          <h3>Bruno <span>está a 4 minutos de distância</span></h3>
+          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+        </ion-label>
       </ion-item>
-      <ion-item button class="item">
-        <p>Bárbara <span>está a 9 minutos de distância</span></p>
+      <ion-item button>
+        <ion-label>
+          <h3>Bárbara <span>está a 32 minutos de distância</span></h3>
+          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+        </ion-label>
       </ion-item>
-      <ion-item button class="item">
-        <p>Lucas <span>está a 11 minutos de distância</span></p>
+      <ion-item button>
+        <ion-label>
+          <h3>João <span>está a 23 minutos de distância</span></h3>
+          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+        </ion-label>
       </ion-item>
-      <ion-item button class="item">
-        <p>Guilherme <span>está a 15 minutos de distância</span></p>
+      <ion-item button>
+        <ion-label>
+          <h3>Lucas <span>está a 15 minutos de distância</span></h3>
+          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+        </ion-label>
       </ion-item>
-      <ion-item button class="item">
-        <p>João <span>está a 19 minutos de distância</span></p>
+      <ion-item button>
+        <ion-label>
+          <h3>Guilherme <span>está a 2 minutos de distância</span></h3>
+          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+        </ion-label>
       </ion-item>
-      <ion-item button class="item">
-        <p>Romildo <span>está a 23 minutos de distância</span></p>
+      <ion-item button>
+        <ion-label>
+          <h3>Alexandra <span>está a 10 minutos de distância</span></h3>
+          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+        </ion-label>
       </ion-item>
-    </div>
+    </ion-list>
   </ion-toolbar>
 </ion-footer>

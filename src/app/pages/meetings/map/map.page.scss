@@ -4,17 +4,19 @@
   outline: 0;
 }
 
-.back {
-  
-  ion-fab-button {
-    --background: #FFF;
-  }
+ion-fab-button {
+  --background: #FFF;
+  --background-activated: #FFF;
+}
+
+
+.my-location {
+  margin-bottom: 210px;
 
   ion-icon {
     color: #000;
   }
 }
-
 
 ion-toolbar { 
   position: fixed;
@@ -23,20 +25,17 @@ ion-toolbar {
   bottom: 0;
   z-index: 1;
 
-  .list {
+  ion-list {
     font-weight: 200;
     max-height: 200px;
     overflow-y: auto;
   
-    .item {
-      padding: 0px 10px 0px 10px;
+    ion-item {
       font-size: 10pt;
-      font-weight: 400;
-      font-style: italic;
-      --border-radius: 20px;
-      margin: 0px;
       color: #000;
       cursor: pointer;
+      font-weight: 400;
+      font-style: italic;
       
       span {
         color: #999999;
@@ -49,15 +48,6 @@ ion-toolbar {
 .map {
   z-index: 1;
   color: #000;
-}
-
-.segment {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 10px;
-  width: 100px;
-  height: 20px;
 }
 
 ion-segment {
