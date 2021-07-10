@@ -14,6 +14,7 @@ import { IUser } from 'src/app/interfaces/User';
 import { Observable, Subscription } from 'rxjs';
 import { MessagingService } from 'src/app/services/messaging.service';
 import { INotification } from 'src/app/interfaces/Notification';
+import { FunctionsService } from 'src/app/services/functions.service';
 
 @Component({
   selector: 'app-chat',
@@ -65,7 +66,8 @@ export class ChatPage implements OnInit {
     private toastController: ToastController,
     private modalController: ModalController,
     private builder: FormBuilder,
-    private notificationService: MessagingService
+    private notificationService: MessagingService,
+    private functionsService: FunctionsService
   ) { }
 
   ngOnInit() {
@@ -88,9 +90,6 @@ export class ChatPage implements OnInit {
 
   async leaveMeeting(){
 
-    this.listenerMeeting.unsubscribe();
-    this.listenerChat.unsubscribe();
-
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
     });
@@ -98,33 +97,14 @@ export class ChatPage implements OnInit {
 
     try{
 
-      await this.userService.removeMeetingFromUser(this.user.phone, this.meeting.id);
-      
-      if(this.meeting.numberOfMembers > 1){
-        
-        await this.meetingService.removeUserFromMeeting(this.meeting.id, this.user.phone);
-        
-        await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
-
-        await this.chatService.saveMessage(this.meeting.id, {
-          message: `${this.user.name} saiu do encontro`,
-          type: "event",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-      } else {
-        
-        await this.meetingService.deleteChat(this.meeting.id);
-        await this.meetingService.deleteMeeting(this.meeting.id);
-      
-      }
+      await this.functionsService.leaveMeeting(this.user, this.meeting);
 
       await this.nav.navigateForward('/meetings', {
         replaceUrl: true
       });
 
     } catch(err) {
-      console.error(err);
+      await this.presentToast('Problemas ao sair do grupo. Tente novamente mais tarde.');
     } finally {
       await this.loading.dismiss();
     }
@@ -132,7 +112,6 @@ export class ChatPage implements OnInit {
   }
 
   async addContactsToMeeting(contacts: IUser[]){
-    // this.dismissPopover();
 
     this.loading = await this.loadingController.create({
       spinner: 'crescent'
@@ -140,27 +119,18 @@ export class ChatPage implements OnInit {
 
     await this.loading.present();
 
-    await contacts.forEach(async (contact: any) => {
+    try {
+      await this.functionsService.addContactsToMeeting(contacts, this.meeting);
+    
+      await this.presentToast('Usuários adicionados com sucesso');
+  
+      await this.nav.navigateForward(`/meetings/${this.meeting.id}/map`);
 
-      await this.meetingService.addUserToMeeting(this.meeting.id, contact.phone);
-
-      await this.userService.addMeetingToUser(contact.phone, this.meeting.id);
-
-      await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), {
-        message: `${contact.name} foi adicionado ao encontro`,
-        type: "event",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-    });
-
-    await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
-
-    await this.loading.dismiss();
-
-    await this.presentToast('Usuários adicionados com sucesso');
-
-    await this.nav.navigateForward(`/meetings/${this.meeting.id}/map`);
+    } catch (error) {
+      await this.presentToast('Problemas ao adicionar contatos. Tente novamente mais tarde.');
+    } finally {
+      await this.loading.dismiss();
+    }
 
   }
 
@@ -266,7 +236,7 @@ export class ChatPage implements OnInit {
       if (!response.data || !response.data.length){
         console.log('Nenhum contato a ser adicionado')
         return;
-      }
+      }      
 
       await this.addContactsToMeeting(response.data);
 
@@ -313,25 +283,7 @@ export class ChatPage implements OnInit {
     
     await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), data);
 
-    const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
-
-    Promise.all(promises).then((response) => {
-      
-      const tokens = response.map((user: any) => {
-        return user.receiveNotifications ? user.tokenNotification : null;
-      });
-      
-      const notification: INotification = {
-        notification: {
-          title: this.meeting.name,
-          body: 'Você possui novas mensagens',
-        },
-        registration_ids: tokens
-      }
-  
-      this.notificationService.sendNotification(notification);
-
-    });    
+    await this.notificationService.buildDataToNotification(this.meeting.name, 'Você possui novas mensagens', Object.keys(this.meeting.members));
 
   }
 

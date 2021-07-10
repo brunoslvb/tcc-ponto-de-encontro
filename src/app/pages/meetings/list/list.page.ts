@@ -40,6 +40,9 @@ export class ListPage implements OnInit {
     this.messagingService.receiveMessage();
     this.message = this.messagingService.currentMessage;
 
+  }
+  
+  ionViewWillEnter(){
     this.getMeetingsFromUser();
   }
 

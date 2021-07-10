@@ -16,7 +16,7 @@ export interface IMeeting {
   };
   date?: string;
   time?: string;
-  members?: Array<string>;
+  members?: any;
   owner?: string;
   numberOfMembers?: number;
 }

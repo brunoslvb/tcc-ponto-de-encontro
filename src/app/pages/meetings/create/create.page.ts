@@ -95,9 +95,9 @@ export class CreatePage implements OnInit {
 
     await this.loading.present();
     
-    const members: Array<string> = [
-      this.user.phone
-    ];
+    const members: any = {
+      [this.user.phone]: {}
+    };
 
     const data = {
       owner: this.user.phone,
@@ -132,13 +132,13 @@ export class CreatePage implements OnInit {
         },
       },
       members,
-      numberOfMembers: members.length
+      numberOfMembers: Object.keys(members).length
     }
 
     try {
       const { id } = await this.meetingService.createMeeting(data);
 
-      await data.members.forEach(async member => {
+      await Object.keys(data.members).forEach(async member => {
         await this.userService.addMeetingToUser(member, id);
       });
 

@@ -18,18 +18,22 @@ ion-fab-button {
   }
 }
 
+.refresh {
+  margin-bottom: 280px;
+}
+
 ion-toolbar { 
   position: fixed;
   margin: 0;
   padding: 0;
   bottom: 0;
   z-index: 1;
+  max-height: 200px;
+  overflow-y: auto;
 
   ion-list {
     font-weight: 200;
-    max-height: 200px;
-    overflow-y: auto;
-  
+
     ion-item {
       font-size: 10pt;
       color: #000;

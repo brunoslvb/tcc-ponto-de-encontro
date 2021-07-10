@@ -8,6 +8,8 @@ import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 import { IUser } from 'src/app/interfaces/User';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Subscription } from 'rxjs';
+import loadsh from 'lodash';
 
 declare var google;
 
@@ -33,11 +35,14 @@ export class MapPage implements OnInit {
   private destination: any;
   private travelMode: string = "DRIVING";
 
+  private listener: Subscription;
+  refreshFlag: boolean = false;
+
   private watchPosition: any;
 
   private subpointGroup: any;
 
-  private users = [];
+  users = [];
 
   private groupedUsers = [];
 
@@ -76,6 +81,7 @@ export class MapPage implements OnInit {
     this.statusBar.styleDefault();
     this.statusBar.overlaysWebView(false);
     this.statusBar.backgroundColorByHexString('#d3d6e7');
+    // this.listener.unsubscribe();
   }
 
   ngAfterViewInit() {
@@ -98,16 +104,10 @@ export class MapPage implements OnInit {
 
     try {
       await this.loadMap();
-      await this.loadMeeting();
       await this.loadUser();
-      await this.loadUsers();
-      await this.loadDestination();
-      // await this.getSubpointGroup();
-      await this.joinUsersInSameArea();
-      await this.loadOrigins();
-      await this.loadSubpoint();
-      await this.getRoutes();
-      this.getMarkers();
+      await this.loadMeeting();
+      await this.loadMapObjects();
+      // await this.loadMeetingListener();
 
     } catch (error) {
       console.error(error);
@@ -118,12 +118,30 @@ export class MapPage implements OnInit {
 
   }
 
-  async getCurrentLocation(){
+  async loadMapObjects() {
+    await this.loadUsers();
+    await this.loadDestination();
+    await this.joinUsersInSameArea();
+    await this.loadOrigins();
+    await this.loadSubpoint();
+    await this.getRoutes();
+    this.getMarkers();
+  }
+
+  async getCurrentLocation() {
     this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 });
 
-    this.watchPosition.subscribe(data => {
-      console.log(data);
+    this.watchPosition.subscribe(async response => {
+
+      this.meeting.members[this.user.phone] = {
+        latitude: response.coords.latitude,
+        longitude: response.coords.longitude,
+      }
+
+      await this.getRoutes();
+
     });
+
   }
 
   async loadMeeting() {
@@ -139,6 +157,30 @@ export class MapPage implements OnInit {
 
     });
   }
+
+  // async loadMeetingListener() {
+  //   const id = this.route.snapshot.paramMap.get("id");
+
+  //   this.listener = await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
+
+  //     const data: any = response.payload.data();
+
+  //     this.meeting = data;
+
+  //     this.meeting.id = response.payload.id;
+
+  //     await this.clearMapObjects();
+
+  //     await this.loadUsers();
+  //     await this.loadDestination();
+  //     await this.joinUsersInSameArea();
+  //     await this.loadOrigins();
+  //     await this.loadSubpoint();
+  //     await this.getRoutes();
+  //     this.getMarkers();
+
+  //   });
+  // }
 
   async loadUser() {
 
@@ -159,10 +201,22 @@ export class MapPage implements OnInit {
 
   async loadUsers() {
 
-    const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
+    const promises = Object.keys(this.meeting.members).map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
 
     await Promise.all(promises).then(async (response) => {
-      this.users = response.map((user: any) => user);
+      
+      this.users = response.map((user: any) => {
+        
+        if(Object.keys(this.meeting.members[user.phone]).length !== 0) {
+          user.temp = this.meeting.members[user.phone];
+        } else {
+          user.temp = {};
+        }
+
+        return user;
+        
+      });
+
     });
 
   }
@@ -275,7 +329,6 @@ export class MapPage implements OnInit {
 
   }
 
-
   async joinUsersInSameArea() {
 
     console.log("Join users ...");
@@ -347,7 +400,14 @@ export class MapPage implements OnInit {
       }
     }
 
-    await this.meetingService.update(this.meeting.id, data);
+    // console.log(this.meeting);
+    // console.log({...this.meeting, ...data});
+
+    // console.log(loadsh.isEqual(this.meeting, {...this.meeting, ...data}));
+
+    if (!loadsh.isEqual(this.meeting, { ...this.meeting, ...data })) {
+      await this.meetingService.update(this.meeting.id, data);
+    }
 
     await this.getSubpointGroup();
 
@@ -388,9 +448,21 @@ export class MapPage implements OnInit {
   async loadOrigins() {
 
     this.users.forEach((user: any) => {
+
+      let latitude = null;
+      let longitude = null;
+
+      if (this.meeting.members[this.user.phone].latitude) {
+        latitude = this.meeting.members[this.user.phone].latitude;
+        longitude = this.meeting.members[this.user.phone].longitude;
+      } else {
+        latitude = user.location.latitude;
+        longitude = user.location.longitude;
+      }
+
       this.markers.push(new google.maps.Marker({
         title: user.name,
-        position: new google.maps.LatLng(user.location.latitude, user.location.longitude),
+        position: new google.maps.LatLng(latitude, longitude),
         map: this.map
       }));
 
@@ -400,14 +472,18 @@ export class MapPage implements OnInit {
 
   async loadSubpoint() {
 
-    this.markers.push(new google.maps.Marker({
-      title: 'Subpoint',
-      position: {
-        lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
-        lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
-      },
-      map: this.map,
-    }));
+    console.log(this.meeting.subpoints[this.subpointGroup]);
+
+    if (this.meeting.subpoints[this.subpointGroup].location.latitude !== undefined) {
+      this.markers.push(new google.maps.Marker({
+        title: 'Subpoint',
+        position: {
+          lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
+          lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
+        },
+        map: this.map,
+      }));
+    }
 
 
     // console.log(this.origins);
@@ -451,6 +527,21 @@ export class MapPage implements OnInit {
 
     const points = new Array<ILatLng>();
 
+    let latitude = null;
+    let longitude = null;
+
+    if (this.meeting.members[this.user.phone].latitude) {
+      latitude = this.meeting.members[this.user.phone].latitude;
+      longitude = this.meeting.members[this.user.phone].longitude;
+    } else {
+      latitude = this.user.location.latitude;
+      longitude = this.user.location.longitude;
+    }
+
+    console.log(latitude);
+    console.log(longitude);
+
+
     let waypts = [];
 
     if (this.meeting.subpoints[this.subpointGroup].location.members) {
@@ -467,19 +558,63 @@ export class MapPage implements OnInit {
 
     await this.googleMapsDirections.route({
       origin: {
-        lat: this.user.location.latitude,
-        lng: this.user.location.longitude,
+        lat: latitude,
+        lng: longitude,
       },
       destination: this.destination.getPosition(),
-      travelMode: this.travelMode,
+      travelMode: this.meeting.members[this.user.phone].travelMode ? this.meeting.members[this.user.phone].travelMode : 'DRIVING',
       waypoints: waypts,
       // optimizeWaypoints: true,
-    }).then(result => {
+    }).then(async result => {
+
       console.log(result);
+
+      let duration = 0;
+
+      result.routes[0].legs.forEach(route => {
+        duration += Math.round(route.duration.value / 60);
+      });
+
+      console.log(`Faltam ${duration} minutos`);
+
+      this.meeting.members[this.user.phone].duration = duration;
+      this.meeting.members[this.user.phone].updatedAt = new Date().toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      await this.meetingService.update(this.meeting.id, this.meeting);
 
       this.googleMapsDisplay.setDirections(result);
     });
 
+  }
+
+  async refresh() {
+
+    try {
+      this.refreshFlag = true;
+      await this.loadMeeting();
+      await this.clearMapObjects();
+      await this.loadMapObjects();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.refreshFlag = false;
+    }
+
+  }
+
+  clearMapObjects() {
+    this.markers.forEach(marker => {
+      marker.setMap(null);
+    });
+
+    this.markers = [];
   }
 
   changeTravelMode(event) {

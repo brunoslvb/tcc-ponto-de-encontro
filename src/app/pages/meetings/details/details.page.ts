@@ -13,6 +13,7 @@ import { MessagingService } from 'src/app/services/messaging.service';
 import { UserService } from 'src/app/services/user.service';
 import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
 import firebase from 'firebase/app';
+import { FunctionsService } from 'src/app/services/functions.service';
 
 @Component({
   selector: 'app-details',
@@ -68,7 +69,8 @@ export class DetailsPage implements OnInit {
     private toastController: ToastController,
     private modalController: ModalController,
     private alertController: AlertController,
-    private notificationService: MessagingService
+    private notificationService: MessagingService,
+    private functionsService: FunctionsService
   ) { }
 
   ngOnInit() {
@@ -84,6 +86,7 @@ export class DetailsPage implements OnInit {
 
   async load(){
     await this.loadMeeting();
+    await this.subpointOptionFunction();
     await this.loadMembers();
     await this.loadContacts();
   }
@@ -97,33 +100,14 @@ export class DetailsPage implements OnInit {
 
     try{
 
-      await this.userService.removeMeetingFromUser(this.user.phone, this.meeting.id);
-      
-      if(this.meeting.numberOfMembers > 1){
-        
-        await this.meetingService.removeUserFromMeeting(this.meeting.id, this.user.phone);
-        
-        await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
-
-        await this.chatService.saveMessage(this.meeting.id, {
-          message: `${this.user.name} saiu do encontro`,
-          type: "event",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-      } else {
-        
-        await this.meetingService.deleteChat(this.meeting.id);
-        await this.meetingService.deleteMeeting(this.meeting.id);
-      
-      }
+      await this.functionsService.leaveMeeting(this.user, this.meeting);
 
       await this.nav.navigateForward('/meetings', {
         replaceUrl: true
       });
 
     } catch(err) {
-      console.error(err);
+      await this.presentToast('Problemas ao sair do grupo. Tente novamente mais tarde.');
     } finally {
       await this.loading.dismiss();
     }
@@ -138,27 +122,18 @@ export class DetailsPage implements OnInit {
 
     await this.loading.present();
 
-    await contacts.forEach(async (contact: any) => {
+    try {
+      await this.functionsService.addContactsToMeeting(contacts, this.meeting);
+    
+      await this.presentToast('Usuários adicionados com sucesso');
+  
+      await this.nav.navigateForward(`/meetings/${this.meeting.id}/map`);
 
-      await this.meetingService.addUserToMeeting(this.meeting.id, contact.phone);
-
-      await this.userService.addMeetingToUser(contact.phone, this.meeting.id);
-
-      await this.chatService.saveMessage(this.route.snapshot.paramMap.get("id"), {
-        message: `${contact.name} foi adicionado ao encontro`,
-        type: "event",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-    });
-
-    await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
-
-    await this.loading.dismiss();
-
-    await this.presentToast('Usuários adicionados com sucesso');
-
-    await this.nav.navigateForward(`/meetings/${this.meeting.id}/map`);
+    } catch (error) {
+      await this.presentToast('Problemas ao adicionar contatos. Tente novamente mais tarde.');
+    } finally {
+      await this.loading.dismiss();
+    }
 
   }
 
@@ -175,7 +150,6 @@ export class DetailsPage implements OnInit {
         
         this.meeting.id = response.id;
         
-        await this.subpointOptionFunction();
       });
 
         
@@ -212,7 +186,7 @@ export class DetailsPage implements OnInit {
 
   async loadMembers(){
     
-    const promises = this.meeting.members.map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
+    const promises = Object.keys(this.meeting.members).map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
 
     await Promise.all(promises).then(async (response) => {
       this.members = response.map((user: any) => user);
@@ -277,9 +251,13 @@ export class DetailsPage implements OnInit {
 
     try{
 
-      await this.userService.removeMeetingFromUser(user.phone, this.meeting.id);
+      const data = this.meeting;
       
-      await this.meetingService.removeUserFromMeeting(this.meeting.id, user.phone);
+      delete data.members[user.phone];
+
+      await this.userService.removeMeetingFromUser(user.phone, this.meeting.id);
+
+      await this.meetingService.update(this.meeting.id, data);
       
       await this.meetingService.countNumberOfMembersFromMeeting(this.meeting.id);
 

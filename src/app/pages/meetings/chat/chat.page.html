@@ -13,7 +13,7 @@
       <ion-button routerLink="/meetings/{{meeting.id}}/map">
         <ion-icon slot="icon-only" size="small" name="location-outline"></ion-icon>
       </ion-button>
-      <ion-button *ngIf="meeting.members.length > 1" (click)="showModalContacts()">
+      <ion-button *ngIf="meeting.numberOfMembers > 1" (click)="showModalContacts()">
         <ion-icon slot="icon-only" size="small" name="person-add-outline"></ion-icon>
       </ion-button>
       <ion-button *ngIf="subpointOption.active === true" routerLink="/meetings/{{meeting.id}}/subpoint">
@@ -28,7 +28,7 @@
 
 <ion-content>
 
-  <div *ngIf="meeting.members.length > 1">
+  <div *ngIf="meeting.numberOfMembers > 1">
     <div id="messages">
       <ion-grid *ngFor="let message of messages">
         <div *ngIf="message.type === 'message'">
@@ -63,7 +63,7 @@
     </form>
   </div>
 
-  <div *ngIf="meeting.members.length < 2" class="alone">
+  <div *ngIf="meeting.numberOfMembers < 2" class="alone">
 
     <h4>Um sonho sonhado sozinho é um sonho. Um sonho sonhado junto é realidade!</h4>
 

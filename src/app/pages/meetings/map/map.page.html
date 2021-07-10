@@ -25,43 +25,19 @@
   </ion-fab-button>
 </ion-fab>
 
+<ion-fab class="refresh" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="refresh()" disabled={{refreshFlag}}>
+    <ion-icon name="refresh"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-footer>
   <ion-toolbar>
-    <ion-list mode="ios">
+    <ion-list mode="ios" *ngFor="let user of users">
       <ion-item button>
         <ion-label>
-          <h3>Bruno <span>está a 4 minutos de distância</span></h3>
-          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
-        </ion-label>
-      </ion-item>
-      <ion-item button>
-        <ion-label>
-          <h3>Bárbara <span>está a 32 minutos de distância</span></h3>
-          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
-        </ion-label>
-      </ion-item>
-      <ion-item button>
-        <ion-label>
-          <h3>João <span>está a 23 minutos de distância</span></h3>
-          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
-        </ion-label>
-      </ion-item>
-      <ion-item button>
-        <ion-label>
-          <h3>Lucas <span>está a 15 minutos de distância</span></h3>
-          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
-        </ion-label>
-      </ion-item>
-      <ion-item button>
-        <ion-label>
-          <h3>Guilherme <span>está a 2 minutos de distância</span></h3>
-          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
-        </ion-label>
-      </ion-item>
-      <ion-item button>
-        <ion-label>
-          <h3>Alexandra <span>está a 10 minutos de distância</span></h3>
-          <h4>Última atualização: <span>23/09/20 11:50:45</span></h4>
+          <h3>{{user.name}} <span>{{user.temp.duration !== undefined ? 'está a ' + user.temp.duration + (user.temp.duration > 1 ? ' minutos' : ' minuto') + ' de distância' : 'Localização desconhecida'}}</span></h3>
+          <h4>Última atualização: <span>{{user.temp.updatedAt !== undefined ? user.temp.updatedAt : 'Desconhecido'}}</span></h4>
         </ion-label>
       </ion-item>
     </ion-list>

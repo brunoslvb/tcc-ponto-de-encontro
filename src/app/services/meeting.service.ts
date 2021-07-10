@@ -30,8 +30,8 @@ export class MeetingService {
     return this.firestore.collection(this.collection).add(meeting);
   }
 
-  addUserToMeeting(meetingId: string, userId: string){
-    return this.firestore.collection(this.collection).doc(meetingId).update({ members: firebase.firestore.FieldValue.arrayUnion(userId) });
+  addUserToMeeting(meetingId: string, user: object){
+    return this.firestore.collection(this.collection).doc(meetingId).update(user);
   }
 
   removeUserFromMeeting(meetingId: string, userId: string){
@@ -52,7 +52,7 @@ export class MeetingService {
       
     });
     
-    return this.firestore.collection(this.collection).doc(meetingId).update({ numberOfMembers: doc.members.length });
+    return this.firestore.collection(this.collection).doc(meetingId).update({ numberOfMembers: Object.keys(doc.members).length });
 
   }
 

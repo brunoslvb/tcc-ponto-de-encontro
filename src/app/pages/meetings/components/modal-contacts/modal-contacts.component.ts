@@ -67,12 +67,20 @@ export class ModalContactsComponent implements OnInit {
 
   async checkContacts() {
     
+    // Object.keys(this.meeting.members).forEach(item => {
+    //   console.log(item);
+    // })
+    
+    // for (const item of Object.keys(this.meeting.members)) {
+    //   console.log(item);
+    // }
+
     let contacts = [];
 
     this.contacts.forEach(async contact => {
-      
-      for (let i = 0; i < this.meeting.members.length; i++) {
-        if (contact.phone === this.meeting.members[i]) {
+              
+      for (const member of Object.keys(this.meeting.members)) {
+        if (contact.phone === member) {
           contact.isInTheMeeting = true;
           break;
         }
