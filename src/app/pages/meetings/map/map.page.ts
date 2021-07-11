@@ -33,7 +33,8 @@ export class MapPage implements OnInit {
   private googleMapsDisplay = new google.maps.DirectionsRenderer();
   private origins: Marker[];
   private destination: any;
-  private travelMode: string = "DRIVING";
+  travelMode: string = null;
+  travelModeAux: string = null;
 
   private listener: Subscription;
   refreshFlag: boolean = false;
@@ -154,6 +155,8 @@ export class MapPage implements OnInit {
       this.meeting = data;
 
       this.meeting.id = response.id;
+
+      this.travelMode = this.meeting.members[this.user.phone].travelMode ? this.meeting.members[this.user.phone].travelMode : 'DRIVING';
 
     });
   }
@@ -538,10 +541,6 @@ export class MapPage implements OnInit {
       longitude = this.user.location.longitude;
     }
 
-    console.log(latitude);
-    console.log(longitude);
-
-
     let waypts = [];
 
     if (this.meeting.subpoints[this.subpointGroup].location.members) {
@@ -562,7 +561,7 @@ export class MapPage implements OnInit {
         lng: longitude,
       },
       destination: this.destination.getPosition(),
-      travelMode: this.meeting.members[this.user.phone].travelMode ? this.meeting.members[this.user.phone].travelMode : 'DRIVING',
+      travelMode: this.travelMode,
       waypoints: waypts,
       // optimizeWaypoints: true,
     }).then(async result => {
@@ -578,6 +577,7 @@ export class MapPage implements OnInit {
       console.log(`Faltam ${duration} minutos`);
 
       this.meeting.members[this.user.phone].duration = duration;
+      this.meeting.members[this.user.phone].travelMode = this.travelMode;
       this.meeting.members[this.user.phone].updatedAt = new Date().toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -618,6 +618,11 @@ export class MapPage implements OnInit {
   }
 
   changeTravelMode(event) {
+    if(this.travelModeAux === null) {
+      this.travelMode = event.detail.value;
+      this.travelModeAux = event.detail.value;
+      return;
+    }
     this.travelMode = event.detail.value;
     this.getRoutes();
   }

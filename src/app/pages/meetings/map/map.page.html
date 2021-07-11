@@ -7,7 +7,7 @@
 </ion-fab>
 
 
-<ion-segment mode="ios" scrollable value="DRIVING" (ionChange)="changeTravelMode($event)">
+<ion-segment mode="ios" scrollable value={{travelMode}} (ionChange)="changeTravelMode($event)">
   <ion-segment-button value="DRIVING">
     <ion-icon name="car-sharp"></ion-icon>
   </ion-segment-button>
