@@ -32,6 +32,7 @@ export class MapPage implements OnInit {
   private googleMapsDirections = new google.maps.DirectionsService();
   private googleMapsDisplay = new google.maps.DirectionsRenderer();
   private origins: Marker[];
+  private myOrigin: any;
   private destination: any;
   travelMode: string = null;
   travelModeAux: string = null;
@@ -39,7 +40,7 @@ export class MapPage implements OnInit {
   private listener: Subscription;
   refreshFlag: boolean = false;
 
-  private watchPosition: any;
+  private watchPosition: any = null;
 
   private subpointGroup: any;
 
@@ -123,6 +124,7 @@ export class MapPage implements OnInit {
     await this.loadUsers();
     await this.loadDestination();
     await this.joinUsersInSameArea();
+    await this.loadMyOrigin();
     await this.loadOrigins();
     await this.loadSubpoint();
     await this.getRoutes();
@@ -130,6 +132,11 @@ export class MapPage implements OnInit {
   }
 
   async getCurrentLocation() {
+    
+    if(this.watchPosition) {      
+      return;
+    }
+
     this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 });
 
     this.watchPosition.subscribe(async response => {
@@ -139,6 +146,8 @@ export class MapPage implements OnInit {
         longitude: response.coords.longitude,
       }
 
+      this.myOrigin.setMap(null);
+      await this.loadMyOrigin();
       await this.getRoutes();
 
     });
@@ -161,37 +170,13 @@ export class MapPage implements OnInit {
     });
   }
 
-  // async loadMeetingListener() {
-  //   const id = this.route.snapshot.paramMap.get("id");
-
-  //   this.listener = await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
-
-  //     const data: any = response.payload.data();
-
-  //     this.meeting = data;
-
-  //     this.meeting.id = response.payload.id;
-
-  //     await this.clearMapObjects();
-
-  //     await this.loadUsers();
-  //     await this.loadDestination();
-  //     await this.joinUsersInSameArea();
-  //     await this.loadOrigins();
-  //     await this.loadSubpoint();
-  //     await this.getRoutes();
-  //     this.getMarkers();
-
-  //   });
-  // }
-
   async loadUser() {
 
     try {
 
-      await this.userService.getById(this.user.phone).snapshotChanges().subscribe(async response => {
+      await this.userService.getById(this.user.phone).get().toPromise().then(async response => {
 
-        const data: any = response.payload.data();
+        const data: any = response.data();
 
         this.user = data;
 
@@ -448,29 +433,51 @@ export class MapPage implements OnInit {
 
   }
 
-  async loadOrigins() {
+  async loadMyOrigin(){
+
+    const { latitude, longitude } = this.getLatLng(this.user, this.meeting);
+
+    this.myOrigin = new google.maps.Marker({
+      title: this.user.name,
+      position: new google.maps.LatLng(latitude, longitude),
+      map: this.map
+    });
+
+    this.setInfoWindow(this.myOrigin);
+
+  }
+
+  async loadOrigins() {    
 
     this.users.forEach((user: any) => {
 
-      let latitude = null;
-      let longitude = null;
+      if(user.phone !== this.user.phone){
+        
+        const { latitude, longitude } = this.getLatLng(user, this.meeting);
 
-      if (this.meeting.members[this.user.phone].latitude) {
-        latitude = this.meeting.members[this.user.phone].latitude;
-        longitude = this.meeting.members[this.user.phone].longitude;
-      } else {
-        latitude = user.location.latitude;
-        longitude = user.location.longitude;
+        this.markers.push(new google.maps.Marker({
+          title: user.name,
+          position: new google.maps.LatLng(latitude, longitude),
+          map: this.map
+        }));
       }
-
-      this.markers.push(new google.maps.Marker({
-        title: user.name,
-        position: new google.maps.LatLng(latitude, longitude),
-        map: this.map
-      }));
-
     });
 
+  }
+
+  getLatLng(user, meeting){
+    let latitude = null;
+    let longitude = null;
+
+    if (meeting.members[user.phone].latitude) {
+      latitude = meeting.members[user.phone].latitude;
+      longitude = meeting.members[user.phone].longitude;
+    } else {
+      latitude = user.location.latitude;
+      longitude = user.location.longitude;
+    }
+
+    return { latitude, longitude};
   }
 
   async loadSubpoint() {
@@ -496,15 +503,19 @@ export class MapPage implements OnInit {
 
   }
 
+  setInfoWindow(marker){
+    const infoWindow = new google.maps.InfoWindow({
+      content: marker.title
+    });
+
+    google.maps.event.addListener(marker, 'click', function () {
+      infoWindow.open(this.map, marker);
+    });
+  }
+
   async getMarkers() {
     this.markers.forEach(marker => {
-      var infoWindow = new google.maps.InfoWindow({
-        content: marker.title
-      });
-
-      google.maps.event.addListener(marker, 'click', function () {
-        infoWindow.open(this.map, marker);
-      });
+      this.setInfoWindow(marker);
     })
   }
 
@@ -530,16 +541,7 @@ export class MapPage implements OnInit {
 
     const points = new Array<ILatLng>();
 
-    let latitude = null;
-    let longitude = null;
-
-    if (this.meeting.members[this.user.phone].latitude) {
-      latitude = this.meeting.members[this.user.phone].latitude;
-      longitude = this.meeting.members[this.user.phone].longitude;
-    } else {
-      latitude = this.user.location.latitude;
-      longitude = this.user.location.longitude;
-    }
+    const { latitude, longitude } = this.getLatLng(this.user, this.meeting);
 
     let waypts = [];
 
@@ -613,6 +615,8 @@ export class MapPage implements OnInit {
     this.markers.forEach(marker => {
       marker.setMap(null);
     });
+
+    this.myOrigin.setMap(null);
 
     this.markers = [];
   }
