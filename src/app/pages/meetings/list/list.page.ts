@@ -3,9 +3,11 @@ import { AlertController, LoadingController, ModalController, NavController, Toa
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
 import { AuthService } from 'src/app/services/auth.service';
+import { MapService } from 'src/app/services/map.service';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { MessagingService } from 'src/app/services/messaging.service';
 import { UserService } from 'src/app/services/user.service';
+import watchers from 'src/environments/globals';
 import { ModalListContactsComponent } from '../components/modal-list-contacts/modal-list-contacts.component';
 
 @Component({
@@ -32,6 +34,7 @@ export class ListPage implements OnInit {
     private toastController: ToastController,
     private messagingService: MessagingService,
     private authService: AuthService,
+    private mapService: MapService
   ) { }
 
   ngOnInit() {
@@ -54,25 +57,30 @@ export class ListPage implements OnInit {
 
       let meetingsAux = [];
       
-      user.payload.data().groups.forEach(group => {
+      this.mapService.checkActiveLocations(this.user);
 
-        this.meetingService.getById(group).snapshotChanges().subscribe(doc => {
+      if(Object.keys(this.user.groups).length !== 0) {
 
-          let data: any = doc.payload.data();
+        Object.keys(this.user.groups).forEach(group => {
 
-          data.id = doc.payload.id;
+          this.meetingService.getById(group).snapshotChanges().subscribe(doc => {
 
-          let aux = meetingsAux.findIndex(meeting => meeting.id === data.id);
+            let data: any = doc.payload.data();
 
-          if(aux != -1){
-            meetingsAux[aux] = data;
-          } else {
-            meetingsAux.push(data);
-          }
+            data.id = doc.payload.id;
+
+            let aux = meetingsAux.findIndex(meeting => meeting.id === data.id);
+
+            if(aux != -1){
+              meetingsAux[aux] = data;
+            } else {
+              meetingsAux.push(data);
+            }
+
+          });
 
         });
-
-      });
+      }
 
       this.meetings = meetingsAux;
 

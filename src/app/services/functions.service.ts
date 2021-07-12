@@ -8,6 +8,8 @@ import { MessagingService } from './messaging.service';
 import { UserService } from './user.service';
 
 import firebase from 'firebase';
+import watchers from 'src/environments/globals';
+import { MapService } from './map.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +22,16 @@ export class FunctionsService {
     private userService: UserService,
     private notificationService: MessagingService,
     private chatService: ChatService,
+    private mapService: MapService
   ) { }
 
   async leaveMeeting(user: IUser, meeting: IMeeting) {
 
-    await this.userService.removeMeetingFromUser(user.phone, meeting.id);
+    user = await this.userService.getById(user.phone).get().toPromise().then(response => response.data());
+
+    delete user.groups[meeting.id];
+
+    await this.userService.removeMeetingFromUser(user.phone, user);
 
     if (meeting.numberOfMembers > 1) {
 
@@ -70,7 +77,9 @@ export class FunctionsService {
       
       await this.meetingService.addUserToMeeting(meeting.id, {...meeting, ...data});
   
-      await this.userService.addMeetingToUser(contact.phone, meeting.id);
+      contact.groups[meeting.id] = { myLocation: false }
+
+      await this.userService.addMeetingToUser(contact.phone, contact);
   
       await this.chatService.saveMessage(meeting.id, {
         message: `${contact.name} foi adicionado ao encontro`,

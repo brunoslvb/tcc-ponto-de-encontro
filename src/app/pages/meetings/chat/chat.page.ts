@@ -15,6 +15,8 @@ import { Observable, Subscription } from 'rxjs';
 import { MessagingService } from 'src/app/services/messaging.service';
 import { INotification } from 'src/app/interfaces/Notification';
 import { FunctionsService } from 'src/app/services/functions.service';
+import watchers from 'src/environments/globals';
+import { MapService } from 'src/app/services/map.service';
 
 @Component({
   selector: 'app-chat',
@@ -67,7 +69,8 @@ export class ChatPage implements OnInit {
     private modalController: ModalController,
     private builder: FormBuilder,
     private notificationService: MessagingService,
-    private functionsService: FunctionsService
+    private functionsService: FunctionsService,
+    private mapService: MapService
   ) { }
 
   ngOnInit() {
@@ -76,9 +79,15 @@ export class ChatPage implements OnInit {
       message: ['', Validators.required],
     });
     
+    this.teste();
   }
   
+  teste(){
+    console.log('lala', watchers);
+  }
+
   ionViewWillEnter(){
+    this.loadUser();
     this.getMessages();
     this.loadDataFromMeeting();
   }
@@ -134,6 +143,23 @@ export class ChatPage implements OnInit {
 
   }
 
+  async loadUser() {
+
+    try {
+
+      await this.userService.getById(this.user.phone).get().toPromise().then(async response => {
+
+        const data: any = response.data();
+
+        this.user = data;
+
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async loadDataFromMeeting(){
     const id = this.route.snapshot.paramMap.get("id");
 
@@ -148,7 +174,10 @@ export class ChatPage implements OnInit {
         this.meeting.id = response.payload.id;
         
         await this.subpointOptionFunction();
+        
+        this.mapService.checkActiveLocations(this.user);
       });
+
 
         
     } catch(error) {

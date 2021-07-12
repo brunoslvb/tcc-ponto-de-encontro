@@ -49,6 +49,27 @@ export class CreatePage implements OnInit {
     });
   }
 
+  ionViewWillEnter(){
+    this.loadUser();
+  }
+
+  async loadUser() {
+
+    try {
+
+      await this.userService.getById(this.user.phone).get().toPromise().then(async response => {
+
+        const data: any = response.data();
+
+        this.user = data;
+
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async searchAddress(){    
     if(!this.registerForm.value.address.trim().length) {      
       this.addresses = [];
@@ -138,9 +159,9 @@ export class CreatePage implements OnInit {
     try {
       const { id } = await this.meetingService.createMeeting(data);
 
-      await Object.keys(data.members).forEach(async member => {
-        await this.userService.addMeetingToUser(member, id);
-      });
+      this.user.groups[id] = { myLocation: false };
+
+      await this.userService.addMeetingToUser(this.user.phone, this.user);
 
       await this.chatService.saveMessage(id, {
         message: `Encontro ${data.name} criado`,

@@ -14,6 +14,7 @@ import { UserService } from 'src/app/services/user.service';
 import { ModalContactsComponent } from '../components/modal-contacts/modal-contacts.component';
 import firebase from 'firebase/app';
 import { FunctionsService } from 'src/app/services/functions.service';
+import { MapService } from 'src/app/services/map.service';
 
 @Component({
   selector: 'app-details',
@@ -70,7 +71,8 @@ export class DetailsPage implements OnInit {
     private modalController: ModalController,
     private alertController: AlertController,
     private notificationService: MessagingService,
-    private functionsService: FunctionsService
+    private functionsService: FunctionsService,
+    private mapService: MapService
   ) { }
 
   ngOnInit() {
@@ -85,10 +87,28 @@ export class DetailsPage implements OnInit {
   }
 
   async load(){
+    await this.loadUser();
     await this.loadMeeting();
     await this.subpointOptionFunction();
     await this.loadMembers();
     await this.loadContacts();
+  }
+
+  async loadUser() {
+
+    try {
+
+      await this.userService.getById(this.user.phone).get().toPromise().then(async response => {
+
+        const data: any = response.data();
+
+        this.user = data;
+
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async leaveMeeting(){
@@ -150,6 +170,8 @@ export class DetailsPage implements OnInit {
         
         this.meeting.id = response.id;
         
+        this.mapService.checkActiveLocations(this.user);
+
       });
 
         
@@ -160,6 +182,9 @@ export class DetailsPage implements OnInit {
   }
 
   async loadContacts(){
+
+    console.log('lala');
+    
 
     await this.userService.getContacts().get().toPromise().then(response => {
 
@@ -194,7 +219,7 @@ export class DetailsPage implements OnInit {
 
   }
   
-  async subpointOptionFunction(){
+  async subpointOptionFunction(){    
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
     if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
       this.subpointOption.active = true;
@@ -255,7 +280,11 @@ export class DetailsPage implements OnInit {
       
       delete data.members[user.phone];
 
-      await this.userService.removeMeetingFromUser(user.phone, this.meeting.id);
+      user = await this.userService.getById(user.phone).get().toPromise().then(response => response.data());
+
+      delete user.groups[this.meeting.id];
+
+      await this.userService.removeMeetingFromUser(user.phone, user);
 
       await this.meetingService.update(this.meeting.id, data);
       

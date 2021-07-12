@@ -10,6 +10,8 @@ import { IUser } from 'src/app/interfaces/User';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subscription } from 'rxjs';
 import loadsh from 'lodash';
+import watchers from 'src/environments/globals';
+import { MapService } from 'src/app/services/map.service';
 
 declare var google;
 
@@ -46,6 +48,8 @@ export class MapPage implements OnInit {
 
   users = [];
 
+  myLocationFlag: boolean = false;
+
   private groupedUsers = [];
 
   private markers: any[] = [];
@@ -69,6 +73,7 @@ export class MapPage implements OnInit {
     private userService: UserService,
     private route: ActivatedRoute,
     private geolocation: Geolocation,
+    private mapService: MapService
   ) { }
 
   ngOnInit() {
@@ -133,24 +138,43 @@ export class MapPage implements OnInit {
 
   async getCurrentLocation() {
     
-    if(this.watchPosition) {      
-      return;
-    }
+    const flag = !this.user.groups[this.meeting.id].myLocation;
 
-    this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 });
+    this.user.groups[this.meeting.id].myLocation = flag;
 
-    this.watchPosition.subscribe(async response => {
+    await this.userService.update(this.user);
 
-      this.meeting.members[this.user.phone] = {
-        latitude: response.coords.latitude,
-        longitude: response.coords.longitude,
-      }
+    this.refresh();
 
-      this.myOrigin.setMap(null);
-      await this.loadMyOrigin();
-      await this.getRoutes();
+    // console.log(watchers);
 
-    });
+    // watchers['opa'] = {
+    //   'teste': 'lala'
+    // };
+
+    console.log(watchers);
+    
+
+    // if(this.watchPosition) {      
+    //   return;
+    // }
+
+    // this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }).subscribe(async (response: any) => {
+
+    //   this.watchPosition.unsubscribe();
+
+    //   this.watchPosition = null;
+
+    //   this.meeting.members[this.user.phone] = {
+    //     latitude: response.coords.latitude,
+    //     longitude: response.coords.longitude,
+    //   }
+
+    //   this.myOrigin.setMap(null);
+    //   await this.loadMyOrigin();
+    //   await this.getRoutes();
+
+    // });
 
   }
 
@@ -165,7 +189,11 @@ export class MapPage implements OnInit {
 
       this.meeting.id = response.id;
 
+      this.myLocationFlag = this.user.groups[this.meeting.id].myLocation;
+
       this.travelMode = this.meeting.members[this.user.phone].travelMode ? this.meeting.members[this.user.phone].travelMode : 'DRIVING';
+
+      this.mapService.checkActiveLocations(this.user);
 
     });
   }
@@ -356,23 +384,25 @@ export class MapPage implements OnInit {
       const data = {
         phone: members[i].phone,
       }
+      
+      const { latitude, longitude } = this.getLatLng(members[i], this.meeting);
 
-      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group1Polygon)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), this.group1Polygon)) {
         group1.members.push(data);
         continue;
       }
 
-      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group2Polygon)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), this.group2Polygon)) {
         group2.members.push(data);
         continue;
       }
 
-      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group3Polygon)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), this.group3Polygon)) {
         group3.members.push(data);
         continue;
       }
 
-      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(members[i].location.latitude, members[i].location.longitude), this.group4Polygon)) {
+      if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), this.group4Polygon)) {
         group4.members.push(data);
         continue;
       }
@@ -391,13 +421,14 @@ export class MapPage implements OnInit {
     // console.log(this.meeting);
     // console.log({...this.meeting, ...data});
 
-    // console.log(loadsh.isEqual(this.meeting, {...this.meeting, ...data}));
+    console.log(loadsh.isEqual(this.meeting, {...this.meeting, ...data}));
 
     if (!loadsh.isEqual(this.meeting, { ...this.meeting, ...data })) {
-      await this.meetingService.update(this.meeting.id, data);
+      await this.meetingService.update(this.meeting.id, { ...this.meeting, ...data });
     }
 
     await this.getSubpointGroup();
+    await this.loadMeeting();
 
   }
 

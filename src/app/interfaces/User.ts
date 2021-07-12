@@ -8,7 +8,7 @@ export interface IUser {
     latitude?: number;
     longitude?: number;
   };
-  groups?: Array<string>;
+  groups?: object;
   photo?: string;
   receiveNotifications?: boolean;
   tokenNotification?: string;

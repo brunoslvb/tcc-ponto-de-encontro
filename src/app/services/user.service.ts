@@ -15,16 +15,16 @@ export class UserService {
     private firestore: AngularFirestore
   ) { }
 
-  addMeetingToUser(userId: string, meetingId: string){
-    return this.firestore.collection(this.collection).doc(userId).update({ groups: firebase.firestore.FieldValue.arrayUnion(meetingId) });
+  addMeetingToUser(userId: string, data: object){
+    return this.firestore.collection(this.collection).doc(userId).update(data);
   }
 
   getById(userId: string){
     return this.firestore.collection(this.collection).doc(userId);
   }
 
-  removeMeetingFromUser(userId: string, meetingId: string){
-    return this.firestore.collection(this.collection).doc(userId).update({ groups: firebase.firestore.FieldValue.arrayRemove(meetingId) });
+  removeMeetingFromUser(userId: string, data: object){
+    return this.firestore.collection(this.collection).doc(userId).update(data);
   }
 
   getContacts() {

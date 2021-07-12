@@ -125,7 +125,7 @@ export class RegisterPage implements OnInit {
         latitude: this.coords[0],
         longitude: this.coords[1]
       },
-      groups: [],
+      groups: {},
       receiveNotifications: true
     }
 
