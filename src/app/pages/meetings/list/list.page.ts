@@ -274,6 +274,8 @@ export class ListPage implements OnInit {
     try {
       await this.authService.logout();
 
+      sessionStorage.clear();
+
       await this.nav.navigateRoot('/auth', { replaceUrl: true });
 
     } catch(err) {

@@ -115,12 +115,18 @@ span {
   text-align: center;
   flex-flow: column;
   height: 100%;
-  color: #385A64;
+  color: #9E9E9E;
   padding: 20px;
 
+  h4 {
+    line-height: 30px;
+    font-weight: 200;
+  }
+
   ion-fab-button, ion-icon {
-    color: #385A64;
-    --background: #FFF;
+    color: #FFF;
+    --background: #4ECDC4;
+    --background-activated: #4ECDC4;
   }
   
 }

@@ -94,7 +94,7 @@ export class ChatPage implements OnInit {
 
   ionViewWillLeave(){
     this.dismissPopover();
-    this.listenerMeeting.unsubscribe();
+    // this.listenerMeeting.unsubscribe();
   }
 
   async leaveMeeting(){
@@ -165,13 +165,13 @@ export class ChatPage implements OnInit {
 
     try{
       
-      this.listenerMeeting = await this.meetingService.getById(id).snapshotChanges().subscribe(async response => {
+      await this.meetingService.getById(id).get().toPromise().then(async response => {
         
-        const data: any = response.payload.data(); 
+        const data: any = response.data(); 
         
         this.meeting = data;
         
-        this.meeting.id = response.payload.id;
+        this.meeting.id = response.id;
         
         await this.subpointOptionFunction();
         

@@ -128,6 +128,8 @@ export class DetailsPage implements OnInit {
 
     } catch(err) {
       await this.presentToast('Problemas ao sair do grupo. Tente novamente mais tarde.');
+      console.error(err);
+      
     } finally {
       await this.loading.dismiss();
     }

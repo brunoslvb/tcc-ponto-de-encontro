@@ -43,7 +43,7 @@ export class MapService {
 
             watchers[group].unsubscribe();
 
-            await this.resetAddressInMeeting(user, group);
+            // await this.resetAddressInMeeting(user, group);
 
           }
 
@@ -72,13 +72,13 @@ export class MapService {
 
   async getCurrentPosition(meetingId, user){
 
-    const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }).subscribe((response: any) => {
+    const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 30000, timeout: 30000 }).subscribe((response: any) => {
+
+      console.log('Getting position...');
 
       const { latitude, longitude } = response.coords;
 
       this.getRoute(meetingId, user, {latitude, longitude});
-
-      console.log('Passou aqui');
 
     });
 

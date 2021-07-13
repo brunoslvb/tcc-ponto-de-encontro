@@ -252,6 +252,7 @@ export class MapPage implements OnInit {
         lat: this.meeting.location.latitude,
         lng: this.meeting.location.longitude,
       },
+      icon: '../../../../assets/flag3.png',
       map: this.map
     });
 
@@ -262,8 +263,11 @@ export class MapPage implements OnInit {
     const lat = this.meeting.location.latitude;
     const lng = this.meeting.location.longitude;
 
-    const yOffset = 85;
-    const xOffset = 50;
+    const yOffset = -23.2;
+    const xOffset = 0.4;
+
+    const fillColor = "transparent";
+    const strokeColor = "transparent";
 
     this.group1Vertices = [
       { lat: lat, lng },
@@ -275,10 +279,10 @@ export class MapPage implements OnInit {
     //group1 lat > t.lat ; lng > t.lng
     this.group1Polygon = new google.maps.Polygon({
       paths: this.group1Vertices,
-      strokeColor: "transparent",
+      strokeColor,
       strokeOpacity: 1.0,
       strokeWeight: 2,
-      fillColor: "transparent",
+      fillColor,
       fillOpacity: 0.35,
       clickable: true
     });
@@ -292,10 +296,10 @@ export class MapPage implements OnInit {
 
     this.group2Polygon = new google.maps.Polygon({
       paths: this.group2Vertices,
-      strokeColor: "transparent",
+      strokeColor,
       strokeOpacity: 1.0,
       strokeWeight: 2,
-      fillColor: "transparent",
+      fillColor,
       fillOpacity: 0.35,
       clickable: true
     });
@@ -311,10 +315,10 @@ export class MapPage implements OnInit {
 
     this.group3Polygon = new google.maps.Polygon({
       paths: this.group3Vertices,
-      strokeColor: "transparent",
+      strokeColor,
       strokeOpacity: 1.0,
       strokeWeight: 2,
-      fillColor: "transparent",
+      fillColor,
       fillOpacity: 0.35,
       clickable: true,
     });
@@ -330,10 +334,10 @@ export class MapPage implements OnInit {
 
     this.group4Polygon = new google.maps.Polygon({
       paths: this.group4Vertices,
-      strokeColor: "transparent",
+      strokeColor,
       strokeOpacity: 1.0,
       strokeWeight: 2,
-      fillColor: "transparent",
+      fillColor,
       fillOpacity: 0.35,
       clickable: true
     });
@@ -471,6 +475,7 @@ export class MapPage implements OnInit {
     this.myOrigin = new google.maps.Marker({
       title: this.user.name,
       position: new google.maps.LatLng(latitude, longitude),
+      icon: '../../../../assets/person.png',
       map: this.map
     });
 
@@ -489,7 +494,8 @@ export class MapPage implements OnInit {
         this.markers.push(new google.maps.Marker({
           title: user.name,
           position: new google.maps.LatLng(latitude, longitude),
-          map: this.map
+          map: this.map,
+          icon: '../../../../assets/person.png'
         }));
       }
     });
@@ -522,6 +528,7 @@ export class MapPage implements OnInit {
           lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
           lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
         },
+        icon: '../../../../assets/pin.png',
         map: this.map,
       }));
     }
