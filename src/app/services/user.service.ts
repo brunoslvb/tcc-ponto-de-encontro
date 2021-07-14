@@ -39,7 +39,7 @@ export class UserService {
     return this.firestore.collection(this.collection).doc(this.currentUser.phone).collection("contacts").doc(user.phone).set({});
   }
 
-  update(user: IUser){
+  update(user: any){
     return this.firestore.collection(this.collection).doc(this.currentUser.phone).update(user);
   }
 

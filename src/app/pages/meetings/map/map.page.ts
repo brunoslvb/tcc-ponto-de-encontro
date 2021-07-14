@@ -7,7 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 import { IUser } from 'src/app/interfaces/User';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subscription } from 'rxjs';
 import loadsh from 'lodash';
 import watchers from 'src/environments/globals';
@@ -74,7 +73,6 @@ export class MapPage implements OnInit {
     private meetingService: MeetingService,
     private userService: UserService,
     private route: ActivatedRoute,
-    private geolocation: Geolocation,
     private mapService: MapService,
     private toastController: ToastController
   ) { }
@@ -147,36 +145,6 @@ export class MapPage implements OnInit {
     await this.userService.update(this.user);
 
     this.refresh();
-
-    // console.log(watchers);
-
-    // watchers['opa'] = {
-    //   'teste': 'lala'
-    // };
-
-    console.log(watchers);
-
-
-    // if(this.watchPosition) {      
-    //   return;
-    // }
-
-    // this.watchPosition = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }).subscribe(async (response: any) => {
-
-    //   this.watchPosition.unsubscribe();
-
-    //   this.watchPosition = null;
-
-    //   this.meeting.members[this.user.phone] = {
-    //     latitude: response.coords.latitude,
-    //     longitude: response.coords.longitude,
-    //   }
-
-    //   this.myOrigin.setMap(null);
-    //   await this.loadMyOrigin();
-    //   await this.getRoutes();
-
-    // });
 
   }
 
@@ -597,8 +565,6 @@ export class MapPage implements OnInit {
 
   async getRoutes() {
 
-    const points = new Array<ILatLng>();
-
     const { latitude, longitude } = this.getLatLng(this.user, this.meeting);
 
     let waypts = [];
@@ -684,12 +650,15 @@ export class MapPage implements OnInit {
     this.markers = [];
   }
 
-  changeTravelMode(event) {
+  async changeTravelMode(event) {
     if (this.travelModeAux === null) {
       this.travelMode = event.detail.value;
       this.travelModeAux = event.detail.value;
       return;
     }
+
+    await this.loadMeeting();
+
     this.travelMode = event.detail.value;
     this.getRoutes();
   }

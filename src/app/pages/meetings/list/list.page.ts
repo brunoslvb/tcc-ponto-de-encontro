@@ -10,6 +10,9 @@ import { MeetingService } from 'src/app/services/meeting.service';
 import { MessagingService } from 'src/app/services/messaging.service';
 import { UserService } from 'src/app/services/user.service';
 import { ModalListContactsComponent } from '../components/modal-list-contacts/modal-list-contacts.component';
+import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation/ngx';
+
+declare var window;
 
 @Component({
   selector: 'app-list',
@@ -37,8 +40,39 @@ export class ListPage implements OnInit {
     private authService: AuthService,
     private mapService: MapService,
     private firebaseX: FirebaseX,
-    private statusBar: StatusBar
-  ) { }
+    private statusBar: StatusBar,
+    private backgroundGeolocation: BackgroundGeolocation
+  ) {
+    const config: BackgroundGeolocationConfig = {
+      desiredAccuracy: 10,
+      stationaryRadius: 20,
+      distanceFilter: 30,
+      debug: false, //  enable this hear sounds for background-geolocation life-cycle.
+      stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+      interval: 15000,
+      fastestInterval: 30000,
+      notificationsEnabled: false,
+      startForeground: true,
+      notificationTitle: 'Localização',
+      notificationText: 'Estamos recebendo atualizações de sua posição em tempo real',
+      notificationIconSmall: '../../../../assets/logo.png',
+    };
+
+    this.backgroundGeolocation.configure(config).then(() => {
+      this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe((location: BackgroundGeolocationResponse) => {
+        
+        console.log(location);
+
+        const { latitude, longitude } = location;
+
+        this.mapService.updateLocationInMeetings(this.user.phone, { latitude, longitude });
+
+      });
+    });
+
+    window.app = this;
+
+  }
 
   ngOnInit() {
     this.firebaseX.getToken().then(token => this.userService.update({tokenNotification: token}));

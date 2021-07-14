@@ -9,7 +9,8 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+// import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
@@ -44,7 +45,8 @@ firebase.initializeApp(environment.firebaseConfig);
     SplashScreen,
     MessagingService,
     AsyncPipe,
-    Geolocation,
+    BackgroundGeolocation,
+    // Geolocation,
     FirebaseX,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

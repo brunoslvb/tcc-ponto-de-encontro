@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { IMeeting } from '../interfaces/Meeting';
 import { MeetingService } from './meeting.service';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
 import watchers from 'src/environments/globals';
 import { IUser } from '../interfaces/User';
+import { UserService } from './user.service';
 
+declare var window;
 declare var google;
 
 @Injectable({
@@ -16,42 +17,59 @@ export class MapService {
 
   constructor(
     private meetingService: MeetingService,
-    private geolocation: Geolocation
+    private userService: UserService
   ) { }
 
   async checkActiveLocations(user: IUser) {
 
     const groups = user.groups;
 
+    let count = 0;
+
     if (Object.keys(groups).length !== 0) {
 
-      Object.keys(groups).forEach(async group => {
-
+      for(const group in groups) {
         if (groups[group].myLocation === true) {
-
-          if (watchers[group] === undefined) {
-
-            const watcher = await this.getCurrentPosition(group, user);
-
-            watchers[group] = watcher;
-
-          }
-
+          this.startBackgroundGeolocation();
+          break;
         } else {
-
-          if (watchers[group] !== undefined) {
-
-            watchers[group].unsubscribe();
-
-            // await this.resetAddressInMeeting(user, group);
-
-          }
-
+          count++;
         }
+      }
 
-      });
+      if(Object.keys(groups).length === count) this.stopBackgroundGeolocation();
+
+    } else {
+      this.stopBackgroundGeolocation();
     }
 
+  }
+
+  async updateLocationInMeetings(userId: string, coords: {latitude: number, longitude: number}){
+
+    let user: IUser;
+
+    await this.userService.getById(userId).get().toPromise().then(response => {
+      user = response.data();
+    });
+
+
+    Object.keys(user.groups).forEach(group => {
+      
+      if(user.groups[group].myLocation === true) {
+        this.getRoute(group, user, coords);
+      }
+
+    });
+
+  }
+
+  startBackgroundGeolocation(){
+    window.app.backgroundGeolocation.start();
+  }
+
+  stopBackgroundGeolocation(){
+    window.app.backgroundGeolocation.stop();
   }
 
   async resetAddressInMeeting(user: IUser, meetingId: string) {
@@ -70,21 +88,21 @@ export class MapService {
 
   }
 
-  async getCurrentPosition(meetingId, user) {
+  // async getCurrentPosition(meetingId, user) {
 
-    const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 60000, timeout: 60000 }).subscribe((response: any) => {
+  //   const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 60000, timeout: 60000 }).subscribe((response: any) => {
 
-      console.log('Getting position...');
+  //     console.log('Getting position...');
 
-      const { latitude, longitude } = response.coords;
+  //     const { latitude, longitude } = response.coords;
 
-      this.getRoute(meetingId, user, { latitude, longitude });
+  //     this.getRoute(meetingId, user, { latitude, longitude });
 
-    });
+  //   });
 
-    return watcher;
+  //   return watcher;
 
-  }
+  // }
 
   circlePath(center, radius, points){
     let a = [];
@@ -100,10 +118,10 @@ export class MapService {
   drawSubpointRadius(lat, lng){
     return new google.maps.Polygon({
       paths: this.circlePath(new google.maps.LatLng(lat, lng), 100, 360),
-      strokeColor: "#F00",
+      strokeColor: "transparent",
       strokeOpacity: 1.0,
       strokeWeight: 2,
-      fillColor: "#F00",
+      fillColor: "transparent",
       fillOpacity: 0.35,
       clickable: true,
     });

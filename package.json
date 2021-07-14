@@ -20,6 +20,7 @@
     "@angular/platform-browser": "~10.0.0",
     "@angular/platform-browser-dynamic": "~10.0.0",
     "@angular/router": "~10.0.0",
+    "@ionic-native/background-geolocation": "^5.34.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/fcm": "^5.34.0",
     "@ionic-native/firebase": "^5.34.0",
@@ -47,6 +48,7 @@
     "@angular/compiler-cli": "~10.0.0",
     "@angular/language-service": "~10.0.0",
     "@ionic/angular-toolkit": "^2.3.0",
+    "@mauron85/cordova-plugin-background-geolocation": "^3.1.0",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
@@ -106,7 +108,17 @@
         "ANDROID_GOOGLE_SERVICES_VERSION": "4.3.4",
         "ANDROID_GRADLE_TOOLS_VERSION": "4.1.0"
       },
-      "cordova-plugin-firebasex": {}
+      "cordova-plugin-firebasex": {},
+      "cordova-plugin-background-geolocation": {
+        "GOOGLE_PLAY_SERVICES_VERSION": "11+",
+        "ANDROID_SUPPORT_LIBRARY_VERSION": "26+",
+        "ICON": "@mipmap/icon",
+        "SMALL_ICON": "@mipmap/icon",
+        "ACCOUNT_NAME": "@string/app_name",
+        "ACCOUNT_LABEL": "@string/app_name",
+        "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
+        "CONTENT_AUTHORITY": "$PACKAGE_NAME"
+      }
     },
     "platforms": [
       "android"
