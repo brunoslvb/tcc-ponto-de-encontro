@@ -22,6 +22,8 @@ import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { MessagingService } from './services/messaging.service';
 import { AsyncPipe } from '@angular/common';
 
+import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+
 firebase.initializeApp(environment.firebaseConfig);
 
 @NgModule({
@@ -43,6 +45,7 @@ firebase.initializeApp(environment.firebaseConfig);
     MessagingService,
     AsyncPipe,
     Geolocation,
+    FirebaseX,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

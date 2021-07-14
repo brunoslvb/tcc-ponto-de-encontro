@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FirebaseX } from '@ionic-native/firebase-x/ngx';
 import { AlertController, LoadingController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
@@ -7,7 +8,6 @@ import { MapService } from 'src/app/services/map.service';
 import { MeetingService } from 'src/app/services/meeting.service';
 import { MessagingService } from 'src/app/services/messaging.service';
 import { UserService } from 'src/app/services/user.service';
-import watchers from 'src/environments/globals';
 import { ModalListContactsComponent } from '../components/modal-list-contacts/modal-list-contacts.component';
 
 @Component({
@@ -34,15 +34,13 @@ export class ListPage implements OnInit {
     private toastController: ToastController,
     private messagingService: MessagingService,
     private authService: AuthService,
-    private mapService: MapService
+    private mapService: MapService,
+    private firebaseX: FirebaseX
   ) { }
 
   ngOnInit() {
-
-    this.messagingService.requestPermission();
-    this.messagingService.receiveMessage();
-    this.message = this.messagingService.currentMessage;
-
+    this.firebaseX.getToken().then(token => this.userService.update({tokenNotification: token}));
+    this.firebaseX.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
   }
   
   ionViewWillEnter(){
