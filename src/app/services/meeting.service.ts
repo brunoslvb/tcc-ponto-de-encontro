@@ -66,6 +66,7 @@ export class MeetingService {
             }
           });
         });
+        resolve(null);
       });
     });
   }

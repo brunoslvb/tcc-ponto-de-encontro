@@ -186,9 +186,10 @@ export class ChatPage implements OnInit {
 
   
   async subpointOptionFunction(){
-    console.log('Ta aqui');
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
-    console.log(this.subpointGroup);
+
+    if(this.subpointGroup === null) return;
+    
     if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
       this.subpointOption.active = true;
       if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){

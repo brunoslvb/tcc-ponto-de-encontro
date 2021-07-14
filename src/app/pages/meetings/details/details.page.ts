@@ -225,8 +225,11 @@ export class DetailsPage implements OnInit {
 
   }
   
-  async subpointOptionFunction(){    
+  async subpointOptionFunction(){
     this.subpointGroup = await this.meetingService.getSubpointGroup(this.route.snapshot.paramMap.get("id"));    
+
+    if(this.subpointGroup === null) return;
+
     if(this.meeting.subpoints[this.subpointGroup].members.length > 1) {
       this.subpointOption.active = true;
       if(this.meeting.subpoints[this.subpointGroup].suggestion.pending === true && this.meeting.subpoints[this.subpointGroup].suggestion.votes[this.user.phone] === undefined){

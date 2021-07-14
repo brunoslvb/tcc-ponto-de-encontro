@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { LoadingController, ModalController, NavController, NavParams, Platform } from '@ionic/angular';
+import { LoadingController, ModalController, NavController, NavParams, Platform, ToastController } from '@ionic/angular';
 import { GoogleMaps, GoogleMap, GoogleMapsEvent, GoogleMapOptions, Marker, Environment, GoogleMapsAnimation, ILatLng, Polygon, Poly } from '@ionic-native/google-maps';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -64,6 +64,8 @@ export class MapPage implements OnInit {
   private group3Polygon = null;
   private group4Polygon = null;
 
+  private subpointRadius: any = null;
+
   constructor(
     private nav: NavController,
     private loadingController: LoadingController,
@@ -73,11 +75,12 @@ export class MapPage implements OnInit {
     private userService: UserService,
     private route: ActivatedRoute,
     private geolocation: Geolocation,
-    private mapService: MapService
+    private mapService: MapService,
+    private toastController: ToastController
   ) { }
 
-  ngOnInit(){}
-  
+  ngOnInit() { }
+
   ionViewWillEnter() {
     this.statusBar.backgroundColorByHexString('#F8F8F8');
     this.statusBar.styleDefault();
@@ -136,7 +139,7 @@ export class MapPage implements OnInit {
   }
 
   async getCurrentLocation() {
-    
+
     const flag = !this.user.groups[this.meeting.id].myLocation;
 
     this.user.groups[this.meeting.id].myLocation = flag;
@@ -152,7 +155,7 @@ export class MapPage implements OnInit {
     // };
 
     console.log(watchers);
-    
+
 
     // if(this.watchPosition) {      
     //   return;
@@ -219,17 +222,17 @@ export class MapPage implements OnInit {
     const promises = Object.keys(this.meeting.members).map(member => this.userService.getById(member).get().toPromise().then(response => response.data()));
 
     await Promise.all(promises).then(async (response) => {
-      
+
       this.users = response.map((user: any) => {
-        
-        if(Object.keys(this.meeting.members[user.phone]).length !== 0) {
+
+        if (Object.keys(this.meeting.members[user.phone]).length !== 0) {
           user.temp = this.meeting.members[user.phone];
         } else {
           user.temp = {};
         }
 
         return user;
-        
+
       });
 
     });
@@ -387,7 +390,7 @@ export class MapPage implements OnInit {
       const data = {
         phone: members[i].phone,
       }
-      
+
       const { latitude, longitude } = this.getLatLng(members[i], this.meeting);
 
       if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), this.group1Polygon)) {
@@ -424,7 +427,7 @@ export class MapPage implements OnInit {
     // console.log(this.meeting);
     // console.log({...this.meeting, ...data});
 
-    console.log(loadsh.isEqual(this.meeting, {...this.meeting, ...data}));
+    console.log(loadsh.isEqual(this.meeting, { ...this.meeting, ...data }));
 
     if (!loadsh.isEqual(this.meeting, { ...this.meeting, ...data })) {
       await this.meetingService.update(this.meeting.id, { ...this.meeting, ...data });
@@ -467,7 +470,7 @@ export class MapPage implements OnInit {
 
   }
 
-  async loadMyOrigin(){
+  async loadMyOrigin() {
 
     const { latitude, longitude } = this.getLatLng(this.user, this.meeting);
 
@@ -482,12 +485,12 @@ export class MapPage implements OnInit {
 
   }
 
-  async loadOrigins() {    
+  async loadOrigins() {
 
     this.users.forEach((user: any) => {
 
-      if(user.phone !== this.user.phone){
-        
+      if (user.phone !== this.user.phone) {
+
         const { latitude, longitude } = this.getLatLng(user, this.meeting);
 
         this.markers.push(new google.maps.Marker({
@@ -501,7 +504,7 @@ export class MapPage implements OnInit {
 
   }
 
-  getLatLng(user, meeting){
+  getLatLng(user, meeting) {
     let latitude = null;
     let longitude = null;
 
@@ -513,23 +516,33 @@ export class MapPage implements OnInit {
       longitude = user.location.longitude;
     }
 
-    return { latitude, longitude};
+    return { latitude, longitude };
   }
 
   async loadSubpoint() {
 
     console.log(this.meeting.subpoints[this.subpointGroup]);
 
-    if (this.meeting.subpoints[this.subpointGroup].location.latitude !== undefined) {
-      this.markers.push(new google.maps.Marker({
-        title: 'Subpoint',
-        position: {
-          lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
-          lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
-        },
-        icon: '../../../../assets/pin.png',
-        map: this.map,
-      }));
+    if (this.subpointGroup !== null) {
+      if (this.meeting.subpoints[this.subpointGroup].location.latitude !== undefined) {
+
+        const lat = this.meeting.subpoints[this.subpointGroup].location.latitude;
+        const lng = this.meeting.subpoints[this.subpointGroup].location.longitude;
+
+        this.subpointRadius = this.mapService.drawSubpointRadius(lat, lng);
+
+        this.subpointRadius.setMap(this.map);
+
+        this.markers.push(new google.maps.Marker({
+          title: 'Subpoint',
+          position: {
+            lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
+            lng: this.meeting.subpoints[this.subpointGroup].location.longitude,
+          },
+          icon: '../../../../assets/pin.png',
+          map: this.map,
+        }));
+      }
     }
 
 
@@ -540,7 +553,7 @@ export class MapPage implements OnInit {
 
   }
 
-  setInfoWindow(marker){
+  setInfoWindow(marker) {
     const infoWindow = new google.maps.InfoWindow({
       content: marker.title
     });
@@ -574,6 +587,14 @@ export class MapPage implements OnInit {
 
   }
 
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000
+    });
+    toast.present();
+  }
+
   async getRoutes() {
 
     const points = new Array<ILatLng>();
@@ -582,15 +603,19 @@ export class MapPage implements OnInit {
 
     let waypts = [];
 
-    if (this.meeting.subpoints[this.subpointGroup].location.members) {
-      if (this.meeting.subpoints[this.subpointGroup].location.members[this.user.phone]) {
-        waypts.push({
-          location: {
-            lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
-            lng: this.meeting.subpoints[this.subpointGroup].location.longitude
-          },
-          stopover: true
-        });
+    if (this.subpointGroup !== null) {
+      if (this.meeting.subpoints[this.subpointGroup].location.members && this.meeting.subpoints[this.subpointGroup].location.members[this.user.phone]) {
+        if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), this.subpointRadius)) {
+          this.meeting.subpoints[this.subpointGroup].location.members[this.user.phone] = false;
+        } else {
+          waypts.push({
+            location: {
+              lat: this.meeting.subpoints[this.subpointGroup].location.latitude,
+              lng: this.meeting.subpoints[this.subpointGroup].location.longitude
+            },
+            stopover: true
+          });
+        }
       }
     }
 
@@ -604,8 +629,6 @@ export class MapPage implements OnInit {
       waypoints: waypts,
       // optimizeWaypoints: true,
     }).then(async result => {
-
-      console.log(result);
 
       let duration = 0;
 
@@ -629,6 +652,9 @@ export class MapPage implements OnInit {
       await this.meetingService.update(this.meeting.id, this.meeting);
 
       this.googleMapsDisplay.setDirections(result);
+    
+    }).catch(async err => {
+      return await this.presentToast('Problemas ao encontrar uma rota para esta localização');
     });
 
   }
@@ -659,7 +685,7 @@ export class MapPage implements OnInit {
   }
 
   changeTravelMode(event) {
-    if(this.travelModeAux === null) {
+    if (this.travelModeAux === null) {
       this.travelMode = event.detail.value;
       this.travelModeAux = event.detail.value;
       return;

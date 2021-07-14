@@ -19,17 +19,17 @@ export class MapService {
     private geolocation: Geolocation
   ) { }
 
-  async checkActiveLocations(user: IUser){
-    
+  async checkActiveLocations(user: IUser) {
+
     const groups = user.groups;
 
-    if(Object.keys(groups).length !== 0) {
-      
+    if (Object.keys(groups).length !== 0) {
+
       Object.keys(groups).forEach(async group => {
 
-        if(groups[group].myLocation === true) {
-          
-          if(watchers[group] === undefined){
+        if (groups[group].myLocation === true) {
+
+          if (watchers[group] === undefined) {
 
             const watcher = await this.getCurrentPosition(group, user);
 
@@ -39,7 +39,7 @@ export class MapService {
 
         } else {
 
-          if(watchers[group] !== undefined){
+          if (watchers[group] !== undefined) {
 
             watchers[group].unsubscribe();
 
@@ -54,7 +54,7 @@ export class MapService {
 
   }
 
-  async resetAddressInMeeting(user: IUser, meetingId: string){
+  async resetAddressInMeeting(user: IUser, meetingId: string) {
     let meeting: IMeeting;
 
     await this.meetingService.getById(meetingId).get().toPromise().then(response => {
@@ -70,7 +70,7 @@ export class MapService {
 
   }
 
-  async getCurrentPosition(meetingId, user){
+  async getCurrentPosition(meetingId, user) {
 
     const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 60000, timeout: 60000 }).subscribe((response: any) => {
 
@@ -78,7 +78,7 @@ export class MapService {
 
       const { latitude, longitude } = response.coords;
 
-      this.getRoute(meetingId, user, {latitude, longitude});
+      this.getRoute(meetingId, user, { latitude, longitude });
 
     });
 
@@ -86,7 +86,30 @@ export class MapService {
 
   }
 
-  async getRoute(meetingId, user, coords){
+  circlePath(center, radius, points){
+    let a = [];
+    let p = 360/points;
+    let d = 0;
+
+    for(let i=0; i<points; ++i, d+=p){
+        a.push(google.maps.geometry.spherical.computeOffset(center, radius, d));
+    }
+    return a;
+  }
+
+  drawSubpointRadius(lat, lng){
+    return new google.maps.Polygon({
+      paths: this.circlePath(new google.maps.LatLng(lat, lng), 100, 360),
+      strokeColor: "#F00",
+      strokeOpacity: 1.0,
+      strokeWeight: 2,
+      fillColor: "#F00",
+      fillOpacity: 0.35,
+      clickable: true,
+    });
+  }
+
+  async getRoute(meetingId, user, coords) {
 
     let meeting: IMeeting = null;
 
@@ -111,15 +134,27 @@ export class MapService {
 
     let waypts = [];
 
-    if (meeting.subpoints[subpointGroup].location.members) {
-      if (meeting.subpoints[subpointGroup].location.members[user.phone]) {
-        waypts.push({
-          location: {
-            lat: meeting.subpoints[subpointGroup].location.latitude,
-            lng: meeting.subpoints[subpointGroup].location.longitude
-          },
-          stopover: true
-        });
+    
+    if (subpointGroup !== null) {
+      const location = meeting.subpoints[subpointGroup].location;
+      if (location.members && location.members[user.phone] && location.latitude !== undefined) {
+
+        const lat = location.latitude;
+        const lng = location.longitude;
+
+        const subpointRadius = this.drawSubpointRadius(lat, lng);
+
+        if(google.maps.geometry.poly.containsLocation(new google.maps.LatLng(latitude, longitude), subpointRadius)) {
+          meeting.subpoints[subpointGroup].location.members[user.phone] = false;
+        } else {
+          waypts.push({
+            location: {
+              lat: location.latitude,
+              lng: location.longitude
+            },
+            stopover: true
+          });
+        }
       }
     }
 
