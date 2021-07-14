@@ -7,6 +7,7 @@ import firebase from 'firebase';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { IUser } from 'src/app/interfaces/User';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 const window = {
   recaptchaVerifier: undefined
@@ -42,6 +43,7 @@ export class RegisterPage implements OnInit {
     private toastController: ToastController,
     private authService: AuthService,
     private loadingController: LoadingController,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -52,12 +54,14 @@ export class RegisterPage implements OnInit {
       phone: ['', [Validators.required, Validators.pattern("^[0-9]{9}$")]],
       address: ['', [Validators.required]],
     });
-
+    
     this.recaptchaVerifier();
-
+    
   }
   
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#F8F8F8');
+    this.statusBar.styleDefault();
     this.authService.isUserLoggedIn();
   }
 

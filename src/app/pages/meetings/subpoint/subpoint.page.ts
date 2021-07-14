@@ -54,7 +54,8 @@ export class SubpointPage implements OnInit {
     private toastController: ToastController,
     private alertController: AlertController,
     private route: ActivatedRoute,
-    private notificationService: MessagingService
+    private notificationService: MessagingService,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -64,6 +65,8 @@ export class SubpointPage implements OnInit {
   }
   
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
     this.loadMeeting();
   }
 

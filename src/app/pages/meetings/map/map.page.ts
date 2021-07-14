@@ -76,18 +76,17 @@ export class MapPage implements OnInit {
     private mapService: MapService
   ) { }
 
-  ngOnInit() {
-    this.statusBar.overlaysWebView(true);
-  }
-
+  ngOnInit(){}
+  
   ionViewWillEnter() {
+    this.statusBar.backgroundColorByHexString('#F8F8F8');
+    this.statusBar.styleDefault();
     this.load();
   }
 
   ionViewDidLeave() {
-    this.statusBar.styleDefault();
-    this.statusBar.overlaysWebView(false);
-    this.statusBar.backgroundColorByHexString('#d3d6e7');
+    // this.statusBar.styleDefault();
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
     // this.listener.unsubscribe();
   }
 
@@ -252,7 +251,7 @@ export class MapPage implements OnInit {
         lat: this.meeting.location.latitude,
         lng: this.meeting.location.longitude,
       },
-      icon: '../../../../assets/flag3.png',
+      icon: '../../../../assets/flag.png',
       map: this.map
     });
 

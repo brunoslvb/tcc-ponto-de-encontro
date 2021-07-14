@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AlertController, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { IUser } from 'src/app/interfaces/User';
 import { UserService } from 'src/app/services/user.service';
@@ -21,10 +22,15 @@ export class ModalListContactsComponent implements OnInit {
     private loadingController: LoadingController,
     private modalController: ModalController,
     private toastController: ToastController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
+
+    // this.statusBar.backgroundColorByHexString('#F8F8F8');
+    // this.statusBar.styleDefault();
+
     this.loadContacts();
   }
 

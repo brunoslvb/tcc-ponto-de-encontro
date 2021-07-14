@@ -7,6 +7,7 @@ import firebase from 'firebase/app';
 
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 const window = {
   recaptchaVerifier: undefined
@@ -32,7 +33,8 @@ export class LoginPage implements OnInit {
     private alertController: AlertController,
     private toastController: ToastController,
     private authService: AuthService,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -45,6 +47,8 @@ export class LoginPage implements OnInit {
   }
   
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#F8F8F8');
+    this.statusBar.styleDefault();
     this.authService.isUserLoggedIn();
   }
 

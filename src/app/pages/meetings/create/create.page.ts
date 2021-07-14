@@ -7,6 +7,7 @@ import { MeetingService } from 'src/app/services/meeting.service';
 import { UserService } from 'src/app/services/user.service';
 
 import firebase from 'firebase/app';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 declare var google;
 
@@ -37,7 +38,8 @@ export class CreatePage implements OnInit {
     private userService: UserService,
     private chatService: ChatService,
     private loadingController: LoadingController,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -48,8 +50,10 @@ export class CreatePage implements OnInit {
       time: ['', Validators.required],
     });
   }
-
+  
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
     this.loadUser();
   }
 

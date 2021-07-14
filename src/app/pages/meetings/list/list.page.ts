@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FirebaseX } from '@ionic-native/firebase-x/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AlertController, LoadingController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { IUser } from 'src/app/interfaces/User';
@@ -35,7 +36,8 @@ export class ListPage implements OnInit {
     private messagingService: MessagingService,
     private authService: AuthService,
     private mapService: MapService,
-    private firebaseX: FirebaseX
+    private firebaseX: FirebaseX,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -44,6 +46,8 @@ export class ListPage implements OnInit {
   }
   
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
     this.getMeetingsFromUser();
   }
 

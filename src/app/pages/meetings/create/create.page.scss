@@ -2,7 +2,7 @@ ion-header ion-toolbar {
 
   --background: var(--ion-color-turquoise);
   color: #FFF;
-  margin-bottom: 20px;
+  // margin-bottom: 20px;
 
   ion-buttons {
     display: flex;
@@ -25,6 +25,8 @@ ion-button {
 
 form {
   
+  padding-top: 20px;
+
   .list {
     position: absolute;
     font-weight: 200;

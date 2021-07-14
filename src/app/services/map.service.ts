@@ -72,7 +72,7 @@ export class MapService {
 
   async getCurrentPosition(meetingId, user){
 
-    const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 30000, timeout: 30000 }).subscribe((response: any) => {
+    const watcher = this.geolocation.watchPosition({ enableHighAccuracy: true, maximumAge: 60000, timeout: 60000 }).subscribe((response: any) => {
 
       console.log('Getting position...');
 

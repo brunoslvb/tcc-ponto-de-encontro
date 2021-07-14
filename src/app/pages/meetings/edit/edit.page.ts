@@ -8,6 +8,7 @@ import { UserService } from 'src/app/services/user.service';
 import firebase from 'firebase';
 import { IMeeting } from 'src/app/interfaces/Meeting';
 import { ActivatedRoute } from '@angular/router';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 declare var google;
 
@@ -48,6 +49,7 @@ export class EditPage implements OnInit {
     private loadingController: LoadingController,
     private toastController: ToastController,
     private route: ActivatedRoute,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -58,6 +60,11 @@ export class EditPage implements OnInit {
       date: ['', Validators.required],
       time: ['', Validators.required],
     });
+  }
+
+  ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
   }
 
   async loadMeeting(){

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { LoadingController, ModalController, NavController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { IUser } from 'src/app/interfaces/User';
@@ -47,11 +48,11 @@ export class ProfilePage implements OnInit {
     private userService: UserService,
     private loadingController: LoadingController,
     private toastController: ToastController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
-
     this.getUserData();
 
     this.editForm = this.builder.group({
@@ -65,6 +66,11 @@ export class ProfilePage implements OnInit {
 
   ionViewWillLeave(){
     this.listener.unsubscribe();
+  }
+
+  ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
   }
 
   async searchAddress(){    

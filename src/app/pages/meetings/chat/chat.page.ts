@@ -17,6 +17,7 @@ import { INotification } from 'src/app/interfaces/Notification';
 import { FunctionsService } from 'src/app/services/functions.service';
 import watchers from 'src/environments/globals';
 import { MapService } from 'src/app/services/map.service';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 @Component({
   selector: 'app-chat',
@@ -70,7 +71,8 @@ export class ChatPage implements OnInit {
     private builder: FormBuilder,
     private notificationService: MessagingService,
     private functionsService: FunctionsService,
-    private mapService: MapService
+    private mapService: MapService,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -78,15 +80,11 @@ export class ChatPage implements OnInit {
     this.chatForm = this.builder.group({
       message: ['', Validators.required],
     });
-    
-    this.teste();
   }
   
-  teste(){
-    console.log('lala', watchers);
-  }
-
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
     this.loadUser();
     this.getMessages();
     this.loadDataFromMeeting();

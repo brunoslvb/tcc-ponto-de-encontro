@@ -15,6 +15,7 @@ import { ModalContactsComponent } from '../components/modal-contacts/modal-conta
 import firebase from 'firebase/app';
 import { FunctionsService } from 'src/app/services/functions.service';
 import { MapService } from 'src/app/services/map.service';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 @Component({
   selector: 'app-details',
@@ -72,13 +73,16 @@ export class DetailsPage implements OnInit {
     private alertController: AlertController,
     private notificationService: MessagingService,
     private functionsService: FunctionsService,
-    private mapService: MapService
+    private mapService: MapService,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
   }
   
   ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#4ECDC4');
+    this.statusBar.styleLightContent();
     this.load();
   }
 
